@@ -1,0 +1,9 @@
+(function() {var implementors = {};
+implementors["aho_corasick"] = [{"text":"impl StructuralEq for MatchKind","synthetic":false,"types":[]},{"text":"impl StructuralEq for MatchKind","synthetic":false,"types":[]},{"text":"impl StructuralEq for Match","synthetic":false,"types":[]}];
+implementors["camino"] = [{"text":"impl&lt;'a&gt; StructuralEq for Utf8Components&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; StructuralEq for Utf8Component&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; StructuralEq for Utf8Prefix&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; StructuralEq for Utf8PrefixComponent&lt;'a&gt;","synthetic":false,"types":[]}];
+implementors["proc_macro2"] = [{"text":"impl StructuralEq for Delimiter","synthetic":false,"types":[]},{"text":"impl StructuralEq for Spacing","synthetic":false,"types":[]}];
+implementors["serde_json"] = [{"text":"impl StructuralEq for Category","synthetic":false,"types":[]},{"text":"impl StructuralEq for Value","synthetic":false,"types":[]},{"text":"impl StructuralEq for Number","synthetic":false,"types":[]}];
+implementors["testrunner"] = [{"text":"impl StructuralEq for OutputFormat","synthetic":false,"types":[]},{"text":"impl StructuralEq for SerializableFormat","synthetic":false,"types":[]}];
+implementors["toml"] = [{"text":"impl StructuralEq for Error","synthetic":false,"types":[]},{"text":"impl StructuralEq for Error","synthetic":false,"types":[]}];
+implementors["unicode_segmentation"] = [{"text":"impl StructuralEq for GraphemeIncomplete","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

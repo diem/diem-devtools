@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TestFilter","A filter for tests."]]});
