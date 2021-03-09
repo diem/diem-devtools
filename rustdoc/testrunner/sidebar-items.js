@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["dispatch",""],["output",""],["test_filter",""],["test_list",""]]});
+initSidebarItems({"mod":[["dispatch",""],["output",""],["runner",""],["test_filter",""],["test_list",""]]});

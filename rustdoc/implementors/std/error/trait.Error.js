@@ -1,7 +1,9 @@
 (function() {var implementors = {};
 implementors["aho_corasick"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
 implementors["clap"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
+implementors["crossbeam_channel"] = [{"text":"impl&lt;T:&nbsp;Send&gt; Error for SendError&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Send&gt; Error for TrySendError&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Send&gt; Error for SendTimeoutError&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl Error for RecvError","synthetic":false,"types":[]},{"text":"impl Error for TryRecvError","synthetic":false,"types":[]},{"text":"impl Error for RecvTimeoutError","synthetic":false,"types":[]},{"text":"impl Error for TrySelectError","synthetic":false,"types":[]},{"text":"impl Error for SelectTimeoutError","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl Error for LexError","synthetic":false,"types":[]}];
+implementors["rayon_core"] = [{"text":"impl Error for ThreadPoolBuildError","synthetic":false,"types":[]}];
 implementors["serde"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
 implementors["serde_json"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];

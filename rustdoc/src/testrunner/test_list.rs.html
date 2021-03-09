@@ -158,6 +158,17 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -169,6 +180,8 @@
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Serialize</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>, <span class="ident">path</span>::<span class="ident">Path</span>};
 
+<span class="comment">// TODO: capture ignored and not-ignored tests</span>
+
 <span class="doccomment">/// List of tests, gotten by executing a test binary with the `--list` command.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestList</span> {
@@ -178,11 +191,15 @@
 <span class="kw">impl</span> <span class="ident">TestList</span> {
     <span class="doccomment">/// Creates a new test list by running the given command and applying the specified filter.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">test_bin</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8Path</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">test_bin_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span> <span class="op">=</span> <span class="ident">test_bin</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">cmd</span><span class="macro">!</span>(<span class="ident">test_bin_path</span>, <span class="string">&quot;--list&quot;</span>, <span class="string">&quot;--format&quot;</span>, <span class="string">&quot;terse&quot;</span>)
-            .<span class="ident">stdout_capture</span>()
-            .<span class="ident">read</span>()
-            .<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;running &#39;{} --list --format --terse&#39; failed&quot;</span>, <span class="ident">test_bin</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">cmd</span><span class="macro">!</span>(
+            <span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>::<span class="ident">as_ref</span>(<span class="ident">test_bin</span>),
+            <span class="string">&quot;--list&quot;</span>,
+            <span class="string">&quot;--format&quot;</span>,
+            <span class="string">&quot;terse&quot;</span>
+        )
+        .<span class="ident">stdout_capture</span>()
+        .<span class="ident">read</span>()
+        .<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;running &#39;{} --list --format --terse&#39; failed&quot;</span>, <span class="ident">test_bin</span>))<span class="question-mark">?</span>;
 
         <span class="comment">// Parse the output.</span>
         <span class="self">Self</span>::<span class="ident">parse</span>(<span class="ident">output</span>, <span class="ident">filter</span>)
@@ -205,6 +222,11 @@
             }
             <span class="ident">OutputFormat</span>::<span class="ident">Serializable</span>(<span class="ident">format</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">format</span>.<span class="ident">to_writer</span>(<span class="self">self</span>, <span class="ident">writer</span>),
         }
+    }
+
+    <span class="doccomment">/// Iterates over the list of tests.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="self">self</span>.<span class="ident">tests</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>)
     }
 
     <span class="doccomment">/// Outputs this list as a string with the given format.</span>
