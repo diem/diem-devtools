@@ -73,6 +73,21 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -91,6 +106,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
 <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Opts</span> {
+    <span class="doccomment">/// List tests in binary</span>
     <span class="ident">ListTests</span> {
         <span class="doccomment">/// Output format</span>
         <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;T&quot;</span>, <span class="ident">long</span>, <span class="ident">default_value</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">OutputFormat</span>::<span class="ident">variants</span>(), <span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
@@ -99,6 +115,7 @@
         <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">flatten</span>)]</span>
         <span class="ident">bin_filter</span>: <span class="ident">TestBinFilter</span>,
     },
+    <span class="doccomment">/// Run tests</span>
     <span class="ident">Run</span> {
         <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">flatten</span>)]</span>
         <span class="ident">bin_filter</span>: <span class="ident">TestBinFilter</span>,
@@ -108,9 +125,17 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
+<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestBinFilter</span> {
-    <span class="doccomment">/// Path to the test binary to run.</span>
-    <span class="ident">test_bin</span>: <span class="ident">Utf8PathBuf</span>,
+    <span class="doccomment">/// Path to test binary</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(
+        <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;b&quot;</span>,
+        <span class="ident">long</span>,
+        <span class="ident">required</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="ident">min_values</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">number_of_values</span> <span class="op">=</span> <span class="number">1</span>
+    )]</span>
+    <span class="ident">test_bin</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span><span class="op">&gt;</span>,
 
     <span class="comment">// TODO: add regex-based filtering in the future?</span>
     <span class="doccomment">/// Test filter</span>
@@ -135,12 +160,17 @@
                 <span class="ident">test_list</span>.<span class="ident">write</span>(<span class="ident">format</span>, <span class="ident">stdout_lock</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">Opts</span>::<span class="ident">Run</span> { <span class="ident">bin_filter</span>, <span class="ident">opts</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Running {}&quot;</span>, <span class="ident">bin_filter</span>.<span class="ident">test_bin</span>);
+                <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Running {:?}&quot;</span>, <span class="ident">bin_filter</span>.<span class="ident">test_bin</span>);
 
                 <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">bin_filter</span>.<span class="ident">compute</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">bin_filter</span>.<span class="ident">test_bin</span>, <span class="kw-2">&amp;</span><span class="ident">test_list</span>);
-                <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">execute</span>();
-                <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">results</span>);
+                <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>);
+                <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">execute</span>();
+                <span class="kw">for</span> (<span class="ident">test</span>, <span class="ident">run_status</span>) <span class="kw">in</span> <span class="ident">receiver</span>.<span class="ident">iter</span>() {
+                    <span class="macro">println</span><span class="macro">!</span>(
+                        <span class="string">&quot;{} {}: {} ({:?})&quot;</span>,
+                        <span class="ident">test</span>.<span class="ident">test_bin</span>, <span class="ident">test</span>.<span class="ident">test_name</span>, <span class="ident">run_status</span>.<span class="ident">status</span>, <span class="ident">run_status</span>.<span class="ident">time_taken</span>
+                    );
+                }
             }
         }
         <span class="prelude-val">Ok</span>(())

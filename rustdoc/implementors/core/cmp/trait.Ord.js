@@ -4,6 +4,7 @@ implementors["crossbeam_epoch"] = [{"text":"impl&lt;T:&nbsp;?Sized + Pointable&g
 implementors["either"] = [{"text":"impl&lt;L:&nbsp;Ord, R:&nbsp;Ord&gt; Ord for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl Ord for Ident","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Ord for Lifetime","synthetic":false,"types":[]}];
+implementors["testrunner"] = [{"text":"impl&lt;'a&gt; Ord for TestInstance&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl&lt;T:&nbsp;Ord&gt; Ord for Spanned&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["variance"] = [{"text":"impl&lt;T&gt; Ord for Invariant&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'id&gt; Ord for InvariantLifetime&lt;'id&gt;","synthetic":false,"types":[]}];
 implementors["vec_map"] = [{"text":"impl&lt;V:&nbsp;Ord&gt; Ord for VecMap&lt;V&gt;","synthetic":false,"types":[]}];

@@ -4,6 +4,7 @@ implementors["crossbeam_epoch"] = [{"text":"impl&lt;'g, T:&nbsp;?Sized + Pointab
 implementors["either"] = [{"text":"impl&lt;L:&nbsp;PartialOrd, R:&nbsp;PartialOrd&gt; PartialOrd&lt;Either&lt;L, R&gt;&gt; for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl PartialOrd&lt;Ident&gt; for Ident","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl PartialOrd&lt;Lifetime&gt; for Lifetime","synthetic":false,"types":[]}];
+implementors["testrunner"] = [{"text":"impl&lt;'a&gt; PartialOrd&lt;TestInstance&lt;'a&gt;&gt; for TestInstance&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl&lt;T:&nbsp;PartialOrd&gt; PartialOrd&lt;Spanned&lt;T&gt;&gt; for Spanned&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["variance"] = [{"text":"impl&lt;T&gt; PartialOrd&lt;Invariant&lt;T&gt;&gt; for Invariant&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'id&gt; PartialOrd&lt;InvariantLifetime&lt;'id&gt;&gt; for InvariantLifetime&lt;'id&gt;","synthetic":false,"types":[]}];
 implementors["vec_map"] = [{"text":"impl&lt;V:&nbsp;PartialOrd&gt; PartialOrd&lt;VecMap&lt;V&gt;&gt; for VecMap&lt;V&gt;","synthetic":false,"types":[]}];
