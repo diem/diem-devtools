@@ -241,6 +241,11 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -249,15 +254,15 @@
 <span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">anyhow</span>, <span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
 <span class="kw">use</span> <span class="ident">duct</span>::<span class="ident">cmd</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Serialize</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">BTreeMap</span>, <span class="ident">io</span>, <span class="ident">path</span>::<span class="ident">Path</span>};
 
 <span class="comment">// TODO: capture ignored and not-ignored tests</span>
 
 <span class="doccomment">/// List of tests, gotten by executing a test binary with the `--list` command.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestList</span> {
-    <span class="ident">tests</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">tests</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TestList</span> {
@@ -325,6 +330,11 @@
         }
     }
 
+    <span class="doccomment">/// Returns the tests for a given binary, or `None` if the binary wasn&#39;t in the list.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test_bin</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Utf8Path</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">String</span>]<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">tests</span>.<span class="ident">get</span>(<span class="ident">test_bin</span>.<span class="ident">as_ref</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">tests</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">tests</span>)
+    }
+
     <span class="doccomment">/// Iterates over the list of tests, returning the path and test name.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">tests</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">test_bin</span>, <span class="ident">tests</span>)<span class="op">|</span> {
@@ -347,11 +357,11 @@
     <span class="comment">// ---</span>
 
     <span class="doccomment">/// Parses the output of --list --format terse.</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">list_output</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">list_output</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">Self</span>::<span class="ident">parse_impl</span>(<span class="ident">list_output</span>.<span class="ident">as_ref</span>(), <span class="ident">filter</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_impl</span>(<span class="ident">list_output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_impl</span>(<span class="ident">list_output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// The output is in the form:</span>
         <span class="comment">// &lt;test name&gt;: test</span>
         <span class="comment">// &lt;test name&gt;: test</span>
@@ -417,8 +427,8 @@
             <span class="ident">tests</span>.<span class="ident">tests</span>,
             <span class="macro">btreemap</span><span class="macro">!</span> {
                 <span class="string">&quot;/fake/binary&quot;</span>.<span class="ident">into</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec</span><span class="macro">!</span>[
-                    <span class="string">&quot;tests::foo::test_bar&quot;</span>.<span class="ident">to_owned</span>().<span class="ident">into_boxed_str</span>(),
-                    <span class="string">&quot;tests::baz::test_quux&quot;</span>.<span class="ident">to_owned</span>().<span class="ident">into_boxed_str</span>(),
+                    <span class="string">&quot;tests::foo::test_bar&quot;</span>.<span class="ident">to_owned</span>(),
+                    <span class="string">&quot;tests::baz::test_quux&quot;</span>.<span class="ident">to_owned</span>(),
                 ],
             }
         );
