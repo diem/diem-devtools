@@ -301,6 +301,10 @@
 <span id="298">298</span>
 <span id="299">299</span>
 <span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -459,9 +463,13 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tests</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
         <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">list_output</span>.<span class="ident">lines</span>() {
-            <span class="kw">let</span> <span class="ident">test_name</span> <span class="op">=</span> <span class="ident">line</span>
-                .<span class="ident">strip_suffix</span>(<span class="string">&quot;: test&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;line &#39;{}&#39; did not end with the string &#39;: test&#39;&quot;</span>, <span class="ident">line</span>))<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">test_name</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">strip_suffix</span>(<span class="string">&quot;: test&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                <span class="macro">anyhow</span><span class="macro">!</span>(
+                    <span class="string">&quot;line &#39;{}&#39; did not end with the string &#39;: test&#39;, full output:\n{}&quot;</span>,
+                    <span class="ident">line</span>,
+                    <span class="ident">list_output</span>
+                )
+            })<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="ident">filter</span>.<span class="ident">is_match</span>(<span class="ident">test_name</span>) {
                 <span class="ident">tests</span>.<span class="ident">push</span>(<span class="ident">test_name</span>.<span class="ident">into</span>());
             }
