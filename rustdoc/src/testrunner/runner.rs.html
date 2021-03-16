@@ -160,6 +160,10 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -230,6 +234,8 @@
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">run_sender</span>.<span class="ident">send</span>((<span class="ident">test</span>, <span class="ident">res</span>));
                 })
             });
+
+            <span class="ident">drop</span>(<span class="ident">sender</span>);
         });
 
         <span class="ident">receiver</span>
@@ -262,14 +268,18 @@
         <span class="ident">start_time</span>: <span class="kw-2">&amp;</span><span class="ident">Instant</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TestRunStatus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Capture stdout and stderr.</span>
-        <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="macro">cmd</span><span class="macro">!</span>(
-            <span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>::<span class="ident">as_ref</span>(<span class="ident">test</span>.<span class="ident">test_bin</span>),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="macro">cmd</span><span class="macro">!</span>(
+            <span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>::<span class="ident">as_ref</span>(<span class="ident">test</span>.<span class="ident">binary</span>),
             <span class="ident">test</span>.<span class="ident">test_name</span>,
             <span class="string">&quot;--nocapture&quot;</span>
         )
         .<span class="ident">stdout_capture</span>()
         .<span class="ident">stderr_capture</span>()
         .<span class="ident">unchecked</span>();
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cwd</span>) <span class="op">=</span> <span class="ident">test</span>.<span class="ident">cwd</span> {
+            <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">dir</span>(<span class="ident">cwd</span>);
+        }
 
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">start</span>()<span class="question-mark">?</span>;
 
@@ -307,7 +317,6 @@
     <span class="ident">Success</span>,
     <span class="ident">Failure</span>,
     <span class="ident">ExecutionFailure</span>,
-    <span class="ident">InfraFailure</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TestStatus</span> {
@@ -315,8 +324,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">TestStatus</span>::<span class="ident">Success</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;success&quot;</span>),
             <span class="ident">TestStatus</span>::<span class="ident">Failure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;failure&quot;</span>),
-            <span class="ident">TestStatus</span>::<span class="ident">ExecutionFailure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;execution failure&quot;</span>),
-            <span class="ident">TestStatus</span>::<span class="ident">InfraFailure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;infra failure&quot;</span>),
+            <span class="ident">TestStatus</span>::<span class="ident">ExecutionFailure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;exec-fail&quot;</span>),
         }
     }
 }

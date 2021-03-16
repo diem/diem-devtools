@@ -7,6 +7,5 @@ implementors["proc_macro2"] = [{"text":"impl Hash for Ident","synthetic":false,"
 implementors["syn"] = [{"text":"impl Hash for Member","synthetic":false,"types":[]},{"text":"impl Hash for Index","synthetic":false,"types":[]},{"text":"impl Hash for Lifetime","synthetic":false,"types":[]}];
 implementors["testrunner"] = [{"text":"impl&lt;'a&gt; Hash for TestInstance&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl&lt;T:&nbsp;Hash&gt; Hash for Spanned&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["variance"] = [{"text":"impl&lt;T&gt; Hash for Invariant&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'id&gt; Hash for InvariantLifetime&lt;'id&gt;","synthetic":false,"types":[]}];
 implementors["vec_map"] = [{"text":"impl&lt;V:&nbsp;Hash&gt; Hash for VecMap&lt;V&gt;","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
