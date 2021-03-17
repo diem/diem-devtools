@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Color",""],["TestEvent",""]],"struct":[["TestReporter","Functionality to report test results to stdout, and in the future to other formats (e.g. JUnit)."]]});

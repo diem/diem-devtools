@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Opts","This test runner accepts a Rust test binary and does fancy things with it."]],"struct":[["TestBinFilter",""]]});
+initSidebarItems({"enum":[["Command",""]],"struct":[["Opts","This test runner accepts a Rust test binary and does fancy things with it."],["TestBinFilter",""]]});
