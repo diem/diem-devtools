@@ -4,6 +4,7 @@ implementors["camino"] = [{"text":"impl&lt;'a&gt; Hash for Utf8Component&lt;'a&g
 implementors["crossbeam_utils"] = [{"text":"impl&lt;T:&nbsp;Hash&gt; Hash for CachePadded&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["either"] = [{"text":"impl&lt;L:&nbsp;Hash, R:&nbsp;Hash&gt; Hash for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl Hash for Ident","synthetic":false,"types":[]}];
+implementors["signal_hook_registry"] = [{"text":"impl Hash for SigId","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Hash for Member","synthetic":false,"types":[]},{"text":"impl Hash for Index","synthetic":false,"types":[]},{"text":"impl Hash for Lifetime","synthetic":false,"types":[]}];
 implementors["testrunner"] = [{"text":"impl&lt;'a&gt; Hash for TestInstance&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl&lt;T:&nbsp;Hash&gt; Hash for Spanned&lt;T&gt;","synthetic":false,"types":[]}];

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["TestStatus",""]],"struct":[["TestRunStatus","Information about a test that finished running."],["TestRunner","Context for running tests."],["TestRunnerOpts","Test runner options."]]});
+initSidebarItems({"enum":[["TestStatus",""]],"struct":[["RunStats","Statistics for a test run."],["TestRunStatus","Information about a test that finished running."],["TestRunner","Context for running tests."],["TestRunnerOpts","Test runner options."]]});

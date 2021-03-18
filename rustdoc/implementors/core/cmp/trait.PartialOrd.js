@@ -3,6 +3,7 @@ implementors["camino"] = [{"text":"impl&lt;'a&gt; PartialOrd&lt;Utf8Components&l
 implementors["crossbeam_epoch"] = [{"text":"impl&lt;'g, T:&nbsp;?Sized + Pointable&gt; PartialOrd&lt;Shared&lt;'g, T&gt;&gt; for Shared&lt;'g, T&gt;","synthetic":false,"types":[]}];
 implementors["either"] = [{"text":"impl&lt;L:&nbsp;PartialOrd, R:&nbsp;PartialOrd&gt; PartialOrd&lt;Either&lt;L, R&gt;&gt; for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl PartialOrd&lt;Ident&gt; for Ident","synthetic":false,"types":[]}];
+implementors["signal_hook_registry"] = [{"text":"impl PartialOrd&lt;SigId&gt; for SigId","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl PartialOrd&lt;Lifetime&gt; for Lifetime","synthetic":false,"types":[]}];
 implementors["testrunner"] = [{"text":"impl&lt;'a&gt; PartialOrd&lt;TestInstance&lt;'a&gt;&gt; for TestInstance&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl&lt;T:&nbsp;PartialOrd&gt; PartialOrd&lt;Spanned&lt;T&gt;&gt; for Spanned&lt;T&gt;","synthetic":false,"types":[]}];

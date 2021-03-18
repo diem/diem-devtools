@@ -3,6 +3,7 @@ implementors["camino"] = [{"text":"impl&lt;'a&gt; Ord for Utf8Components&lt;'a&g
 implementors["crossbeam_epoch"] = [{"text":"impl&lt;T:&nbsp;?Sized + Pointable&gt; Ord for Shared&lt;'_, T&gt;","synthetic":false,"types":[]}];
 implementors["either"] = [{"text":"impl&lt;L:&nbsp;Ord, R:&nbsp;Ord&gt; Ord for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl Ord for Ident","synthetic":false,"types":[]}];
+implementors["signal_hook_registry"] = [{"text":"impl Ord for SigId","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Ord for Lifetime","synthetic":false,"types":[]}];
 implementors["testrunner"] = [{"text":"impl&lt;'a&gt; Ord for TestInstance&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl&lt;T:&nbsp;Ord&gt; Ord for Spanned&lt;T&gt;","synthetic":false,"types":[]}];
