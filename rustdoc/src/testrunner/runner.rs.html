@@ -513,6 +513,16 @@
 <span id="510">510</span>
 <span id="511">511</span>
 <span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -1015,6 +1025,16 @@
     <span class="ident">Pass</span>,
     <span class="ident">Fail</span>,
     <span class="ident">ExecFail</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TestStatus</span> {
+    <span class="doccomment">/// Returns true if the test was successful.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">TestStatus</span>::<span class="ident">Pass</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">TestStatus</span>::<span class="ident">Fail</span> <span class="op">|</span> <span class="ident">TestStatus</span>::<span class="ident">ExecFail</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TestStatus</span> {
