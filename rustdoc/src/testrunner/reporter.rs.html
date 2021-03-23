@@ -447,6 +447,15 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -565,10 +574,7 @@
     <span class="doccomment">/// Report this test event to the given writer.</span>
     <span class="kw">fn</span> <span class="ident">write_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">event</span> {
-            <span class="ident">TestEvent</span>::<span class="ident">RunStarted</span> {
-                <span class="ident">test_count</span>,
-                <span class="ident">binary_count</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TestEvent</span>::<span class="ident">RunStarted</span> { <span class="ident">test_list</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">pass_spec</span>())<span class="question-mark">?</span>;
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Starting&quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
@@ -576,13 +582,24 @@
                 <span class="kw">let</span> <span class="ident">count_spec</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">count_spec</span>();
 
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_count</span>)<span class="question-mark">?</span>;
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_list</span>.<span class="ident">run_count</span>())<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; tests across &quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">binary_count</span>)<span class="question-mark">?</span>;
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_list</span>.<span class="ident">binary_count</span>())<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; binaries&quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; binaries&quot;</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">skip_count</span> <span class="op">=</span> <span class="ident">test_list</span>.<span class="ident">skip_count</span>();
+                <span class="kw">if</span> <span class="ident">skip_count</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; (&quot;</span>)<span class="question-mark">?</span>;
+                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">skip_count</span>)<span class="question-mark">?</span>;
+                    <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; skipped)&quot;</span>)<span class="question-mark">?</span>;
+                }
+
+                <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">TestEvent</span>::<span class="ident">TestStarted</span> { .. } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// TODO</span>
@@ -643,6 +660,8 @@
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">skip_spec</span>())<span class="question-mark">?</span>;
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;SKIP&quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                <span class="comment">// same spacing [   0.034s]</span>
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;[         ] &quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">write_instance</span>(<span class="ident">test_instance</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
                 <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
@@ -670,10 +689,10 @@
 
             <span class="ident">TestEvent</span>::<span class="ident">RunFinished</span> {
                 <span class="ident">start_time</span>,
-                <span class="ident">test_count</span>,
+                <span class="ident">initial_run_count</span>,
                 <span class="ident">run_stats</span>:
                     <span class="ident">RunStats</span> {
-                        <span class="ident">tests_run</span>,
+                        <span class="ident">run_count</span>,
                         <span class="ident">passed</span>,
                         <span class="ident">failed</span>,
                         <span class="ident">exec_failed</span>,
@@ -699,9 +718,9 @@
                 <span class="kw">let</span> <span class="ident">count_spec</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">count_spec</span>();
 
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">tests_run</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">tests_run</span> <span class="op">!</span><span class="op">=</span> <span class="ident">test_count</span> {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;/{}&quot;</span>, <span class="ident">test_count</span>)<span class="question-mark">?</span>;
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">run_count</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">run_count</span> <span class="op">!</span><span class="op">=</span> <span class="ident">initial_run_count</span> {
+                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;/{}&quot;</span>, <span class="ident">initial_run_count</span>)<span class="question-mark">?</span>;
                 }
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; tests run: &quot;</span>)<span class="question-mark">?</span>;
@@ -762,7 +781,7 @@
         <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;  &quot;</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Now look for the part of the test after the last ::, if any.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">splits</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">test_name</span>.<span class="ident">rsplitn</span>(<span class="number">2</span>, <span class="string">&quot;::&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">splits</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">name</span>.<span class="ident">rsplitn</span>(<span class="number">2</span>, <span class="string">&quot;::&quot;</span>);
         <span class="kw">let</span> <span class="ident">trailing</span> <span class="op">=</span> <span class="ident">splits</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;test should have at least 1 element&quot;</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rest</span>) <span class="op">=</span> <span class="ident">splits</span>.<span class="ident">next</span>() {
             <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}::&quot;</span>, <span class="ident">rest</span>)<span class="question-mark">?</span>;
@@ -832,11 +851,10 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The test run started.</span>
     <span class="ident">RunStarted</span> {
-        <span class="doccomment">/// The number of binaries that will be run.</span>
-        <span class="ident">binary_count</span>: <span class="ident">usize</span>,
-
-        <span class="doccomment">/// The total number of tests that will be run.</span>
-        <span class="ident">test_count</span>: <span class="ident">usize</span>,
+        <span class="doccomment">/// The list of tests that will be run.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// The methods on the test list indicate the number of</span>
+        <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestList</span>,
     },
 
     <span class="doccomment">/// A test started running.</span>
@@ -878,7 +896,7 @@
         <span class="doccomment">/// The total number of tests that were expected to be run.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// If the test run is canceled, this will be more than `run_stats.tests_run`.</span>
-        <span class="ident">test_count</span>: <span class="ident">usize</span>,
+        <span class="ident">initial_run_count</span>: <span class="ident">usize</span>,
 
         <span class="doccomment">/// Statistics for the run.</span>
         <span class="ident">run_stats</span>: <span class="ident">RunStats</span>,
