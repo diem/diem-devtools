@@ -114,6 +114,9 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -125,7 +128,7 @@
     <span class="ident">test_filter</span>::{<span class="ident">RunIgnored</span>, <span class="ident">TestFilter</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestBinary</span>, <span class="ident">TestList</span>},
 };
-<span class="kw">use</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span>;
+<span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="prelude-ty">Result</span>};
 <span class="kw">use</span> <span class="ident">camino</span>::<span class="ident">Utf8PathBuf</span>;
 <span class="kw">use</span> <span class="ident">structopt</span>::<span class="ident">StructOpt</span>;
 
@@ -219,10 +222,13 @@
                 <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">bin_filter</span>.<span class="ident">compute</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">reporter</span> <span class="op">=</span> <span class="ident">TestReporter</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>, <span class="self">self</span>.<span class="ident">color</span>, <span class="ident">reporter_opts</span>);
                 <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">runner_opts</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>);
-                <span class="ident">runner</span>.<span class="ident">try_execute</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">run_stats</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">try_execute</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> {
                     <span class="ident">reporter</span>.<span class="ident">report_event</span>(<span class="ident">event</span>)
                     <span class="comment">// TODO: no-fail-fast logic</span>
                 })<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">run_stats</span>.<span class="ident">is_success</span>() {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;test run failed&quot;</span>);
+                }
             }
         }
         <span class="prelude-val">Ok</span>(())
