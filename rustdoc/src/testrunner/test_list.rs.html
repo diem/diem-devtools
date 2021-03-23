@@ -513,6 +513,21 @@
 <span id="510">510</span>
 <span id="511">511</span>
 <span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -579,6 +594,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RustTestInfo</span> {
+    <span class="doccomment">/// Returns true if this test is marked ignored.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Ignored tests, if run, are executed with the `--ignored` argument.</span>
+    <span class="kw">pub</span> <span class="ident">ignored</span>: <span class="ident">bool</span>,
+
     <span class="doccomment">/// Whether the test matches the provided test filter.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only tests that match the filter are run.</span>
@@ -734,6 +754,7 @@
             <span class="ident">tests</span>.<span class="ident">insert</span>(
                 <span class="ident">test_name</span>.<span class="ident">into</span>(),
                 <span class="ident">RustTestInfo</span> {
+                    <span class="ident">ignored</span>: <span class="bool-val">false</span>,
                     <span class="ident">filter_match</span>: <span class="ident">filter</span>.<span class="ident">filter_match</span>(<span class="kw-2">&amp;</span><span class="ident">test_name</span>, <span class="bool-val">false</span>),
                 },
             );
@@ -745,6 +766,7 @@
             <span class="ident">tests</span>.<span class="ident">insert</span>(
                 <span class="ident">test_name</span>.<span class="ident">into</span>(),
                 <span class="ident">RustTestInfo</span> {
+                    <span class="ident">ignored</span>: <span class="bool-val">true</span>,
                     <span class="ident">filter_match</span>: <span class="ident">filter</span>.<span class="ident">filter_match</span>(<span class="kw-2">&amp;</span><span class="ident">test_name</span>, <span class="bool-val">true</span>),
                 },
             );
@@ -950,15 +972,19 @@
                 <span class="string">&quot;/fake/binary&quot;</span>.<span class="ident">into</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TestBinInfo</span> {
                     <span class="ident">tests</span>: <span class="macro">btreemap</span><span class="macro">!</span> {
                         <span class="string">&quot;tests::foo::test_bar&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
+                            <span class="ident">ignored</span>: <span class="bool-val">false</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Matches</span>,
                         },
                         <span class="string">&quot;tests::baz::test_quux&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
+                            <span class="ident">ignored</span>: <span class="bool-val">false</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Matches</span>,
                         },
                         <span class="string">&quot;tests::ignored::test_bar&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
+                            <span class="ident">ignored</span>: <span class="bool-val">true</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason</span>::<span class="ident">Ignored</span> },
                         },
                         <span class="string">&quot;tests::baz::test_ignored&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
+                            <span class="ident">ignored</span>: <span class="bool-val">true</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason</span>::<span class="ident">Ignored</span> },
                         },
                     },
@@ -985,22 +1011,26 @@
                   &quot;friendly-name&quot;: &quot;fake-package&quot;,
                   &quot;tests&quot;: {
                     &quot;tests::baz::test_ignored&quot;: {
+                      &quot;ignored&quot;: true,
                       &quot;filter-match&quot;: {
                         &quot;status&quot;: &quot;mismatch&quot;,
                         &quot;reason&quot;: &quot;ignored&quot;
                       }
                     },
                     &quot;tests::baz::test_quux&quot;: {
+                      &quot;ignored&quot;: false,
                       &quot;filter-match&quot;: {
                         &quot;status&quot;: &quot;matches&quot;
                       }
                     },
                     &quot;tests::foo::test_bar&quot;: {
+                      &quot;ignored&quot;: false,
                       &quot;filter-match&quot;: {
                         &quot;status&quot;: &quot;matches&quot;
                       }
                     },
                     &quot;tests::ignored::test_bar&quot;: {
+                      &quot;ignored&quot;: true,
                       &quot;filter-match&quot;: {
                         &quot;status&quot;: &quot;mismatch&quot;,
                         &quot;reason&quot;: &quot;ignored&quot;
