@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CancelReason","The reason why a test run is being cancelled."],["Color",""],["FailureOutput",""],["TestEvent",""]],"struct":[["ReporterOpts",""],["TestReporter","Functionality to report test results to stdout, and in the future to other formats (e.g. JUnit)."]]});
+initSidebarItems({"enum":[["CancelReason","The reason why a test run is being cancelled."],["Color",""],["FailureOutput",""],["TestEvent",""]],"struct":[["ReporterOpts",""],["TestReporter","Functionality to report test results to stdout and JUnit"]]});

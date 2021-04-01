@@ -608,12 +608,25 @@
 <span id="605">605</span>
 <span id="606">606</span>
 <span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">TestEvent</span>},
+    <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
 };
 <span class="kw">use</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span>;
@@ -660,20 +673,20 @@
 }
 
 <span class="doccomment">/// Context for running tests.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="ident">opts</span>: <span class="ident">TestRunnerOpts</span>,
-    <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestList</span>,
+    <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
     <span class="ident">run_pool</span>: <span class="ident">ThreadPool</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Executes the listed tests, each one in its own process.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The callback is called with the results of each test.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">callback</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RunStats</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="self">self</span>.<span class="ident">try_execute</span>::<span class="op">&lt;</span><span class="ident">Infallible</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">test_event</span><span class="op">|</span> {
             <span class="ident">callback</span>(<span class="ident">test_event</span>);
@@ -688,7 +701,7 @@
     <span class="doccomment">/// error, the callback is no longer called.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_execute</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RunStats</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
         <span class="ident">E</span>: <span class="ident">Send</span>,
     {
         <span class="comment">// TODO: add support for other test-running approaches, measure performance.</span>
@@ -743,9 +756,12 @@
                         <span class="kw">return</span>;
                     }
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">test_instance</span>.<span class="ident">info</span>.<span class="ident">filter_match</span>.<span class="ident">is_match</span>() {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FilterMatch</span>::<span class="ident">Mismatch</span> { <span class="ident">reason</span> } <span class="op">=</span> <span class="ident">test_instance</span>.<span class="ident">info</span>.<span class="ident">filter_match</span> {
                         <span class="comment">// Failure to send means the receiver was dropped.</span>
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">this_run_sender</span>.<span class="ident">send</span>(<span class="ident">InternalTestEvent</span>::<span class="ident">Skipped</span> { <span class="ident">test_instance</span> });
+                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">this_run_sender</span>.<span class="ident">send</span>(<span class="ident">InternalTestEvent</span>::<span class="ident">Skipped</span> {
+                            <span class="ident">test_instance</span>,
+                            <span class="ident">reason</span>,
+                        });
                         <span class="kw">return</span>;
                     }
 
@@ -841,7 +857,7 @@
     <span class="comment">// ---</span>
 
     <span class="doccomment">/// Run an individual test in its own process.</span>
-    <span class="kw">fn</span> <span class="ident">run_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestRunStatus</span> {
+    <span class="kw">fn</span> <span class="ident">run_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestRunStatus</span> {
         <span class="kw">let</span> <span class="ident">start_time</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">run_test_inner</span>(<span class="ident">test</span>, <span class="kw-2">&amp;</span><span class="ident">start_time</span>) {
@@ -858,7 +874,7 @@
 
     <span class="kw">fn</span> <span class="ident">run_test_inner</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
         <span class="ident">start_time</span>: <span class="kw-2">&amp;</span><span class="ident">Instant</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TestRunStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;--exact&quot;</span>, <span class="ident">test</span>.<span class="ident">name</span>, <span class="string">&quot;--nocapture&quot;</span>];
@@ -987,9 +1003,9 @@
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">CallbackContext</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">CallbackContext</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
 {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">callback</span>: <span class="ident">F</span>, <span class="ident">initial_run_count</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
@@ -1006,11 +1022,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">run_started</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">run_started</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
         (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent</span>::<span class="ident">RunStarted</span> { <span class="ident">test_list</span> })
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">event</span> {
             <span class="ident">InternalEvent</span>::<span class="ident">Signal</span>(<span class="ident">InternalSignalEvent</span>::<span class="ident">Handle</span> { <span class="ident">handle</span> }) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">signal_handle</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handle</span>);
@@ -1039,10 +1055,16 @@
                 })
                 .<span class="ident">map_err</span>(<span class="ident">InternalError</span>::<span class="ident">Error</span>)
             }
-            <span class="ident">InternalEvent</span>::<span class="ident">Test</span>(<span class="ident">InternalTestEvent</span>::<span class="ident">Skipped</span> { <span class="ident">test_instance</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">InternalEvent</span>::<span class="ident">Test</span>(<span class="ident">InternalTestEvent</span>::<span class="ident">Skipped</span> {
+                <span class="ident">test_instance</span>,
+                <span class="ident">reason</span>,
+            }) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">run_stats</span>.<span class="ident">skipped</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent</span>::<span class="ident">TestSkipped</span> { <span class="ident">test_instance</span> })
-                    .<span class="ident">map_err</span>(<span class="ident">InternalError</span>::<span class="ident">Error</span>)
+                (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent</span>::<span class="ident">TestSkipped</span> {
+                    <span class="ident">test_instance</span>,
+                    <span class="ident">reason</span>,
+                })
+                .<span class="ident">map_err</span>(<span class="ident">InternalError</span>::<span class="ident">Error</span>)
             }
             <span class="ident">InternalEvent</span>::<span class="ident">Signal</span>(<span class="ident">InternalSignalEvent</span>::<span class="ident">Canceled</span> { <span class="ident">signal</span>: <span class="ident">_signal</span> }) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">debug_assert_ne</span><span class="macro">!</span>(
@@ -1079,6 +1101,7 @@
     <span class="kw">fn</span> <span class="ident">run_finished</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
         (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent</span>::<span class="ident">RunFinished</span> {
             <span class="ident">start_time</span>: <span class="self">self</span>.<span class="ident">start_time</span>,
+            <span class="ident">elapsed</span>: <span class="self">self</span>.<span class="ident">start_time</span>.<span class="ident">elapsed</span>(),
             <span class="ident">run_stats</span>: <span class="self">self</span>.<span class="ident">run_stats</span>,
         })
     }
@@ -1094,22 +1117,23 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Test</span>(<span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="kw">enum</span> <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
+    <span class="ident">Test</span>(<span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>),
     <span class="ident">Signal</span>(<span class="ident">InternalSignalEvent</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">enum</span> <span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
     <span class="ident">Started</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
     },
     <span class="ident">Finished</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
         <span class="ident">run_status</span>: <span class="ident">TestRunStatus</span>,
     },
     <span class="ident">Skipped</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">reason</span>: <span class="ident">MismatchReason</span>,
     },
 }
 

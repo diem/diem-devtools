@@ -220,7 +220,7 @@
                 <span class="ident">reporter_opts</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">bin_filter</span>.<span class="ident">compute</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">reporter</span> <span class="op">=</span> <span class="ident">TestReporter</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>, <span class="self">self</span>.<span class="ident">color</span>, <span class="ident">reporter_opts</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reporter</span> <span class="op">=</span> <span class="ident">TestReporter</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>, <span class="self">self</span>.<span class="ident">color</span>, <span class="ident">reporter_opts</span>);
                 <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">runner_opts</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>);
                 <span class="kw">let</span> <span class="ident">run_stats</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">try_execute</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> {
                     <span class="ident">reporter</span>.<span class="ident">report_event</span>(<span class="ident">event</span>)
