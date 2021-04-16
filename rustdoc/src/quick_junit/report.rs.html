@@ -492,6 +492,19 @@
 <span id="489">489</span>
 <span id="490">490</span>
 <span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -735,6 +748,12 @@
     <span class="doccomment">/// The name of the testcase.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
 
+    <span class="doccomment">/// The &quot;classname&quot; of the testcase.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Typically, this represents the fully qualified path to the test. In other words,</span>
+    <span class="doccomment">/// `classname` + `name` together should uniquely identify and locate a test.</span>
+    <span class="kw">pub</span> <span class="ident">classname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// The number of assertions in the testcase.</span>
     <span class="kw">pub</span> <span class="ident">assertions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 
@@ -759,6 +778,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">TestcaseStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
+            <span class="ident">classname</span>: <span class="prelude-val">None</span>,
             <span class="ident">assertions</span>: <span class="prelude-val">None</span>,
             <span class="ident">time</span>: <span class="prelude-val">None</span>,
             <span class="ident">status</span>,
@@ -766,6 +786,12 @@
             <span class="ident">system_err</span>: <span class="prelude-val">None</span>,
             <span class="ident">extra</span>: <span class="ident">IndexMap</span>::<span class="ident">new</span>(),
         }
+    }
+
+    <span class="doccomment">/// Sets the classname of the test.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_classname</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">classname</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">classname</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">classname</span>.<span class="ident">into</span>());
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the number of assertions in the testcase.</span>
