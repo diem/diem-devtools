@@ -619,6 +619,54 @@
 <span id="616">616</span>
 <span id="617">617</span>
 <span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -633,6 +681,11 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Report</span> {
     <span class="doccomment">/// The name of this test suite.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+
+    <span class="doccomment">/// The time at which the first test in this report began execution.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is not part of the JUnit spec, but may be useful for some tools.</span>
+    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The overall time taken by the test suite.</span>
     <span class="doccomment">///</span>
@@ -657,12 +710,19 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
+            <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
             <span class="ident">time</span>: <span class="prelude-val">None</span>,
             <span class="ident">tests</span>: <span class="number">0</span>,
             <span class="ident">failures</span>: <span class="number">0</span>,
             <span class="ident">errors</span>: <span class="number">0</span>,
             <span class="ident">testsuites</span>: <span class="macro">vec</span><span class="macro">!</span>[],
         }
+    }
+
+    <span class="doccomment">/// Sets the start timestamp for the report.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the time taken for overall execution.</span>
@@ -732,11 +792,11 @@
     <span class="doccomment">/// A &quot;failure&quot; is usually some sort of *expected* issue in a test.</span>
     <span class="kw">pub</span> <span class="ident">failures</span>: <span class="ident">usize</span>,
 
+    <span class="doccomment">/// The time at which the testsuite began execution.</span>
+    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// The overall time taken by the testsuite.</span>
     <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// The time at which the testsuite was executed.</span>
-    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The testcases that form this testsuite.</span>
     <span class="kw">pub</span> <span class="ident">testcases</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Testcase</span><span class="op">&gt;</span>,
@@ -773,15 +833,15 @@
         }
     }
 
-    <span class="doccomment">/// Sets the time taken for the testsuite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
-        <span class="self">self</span>
-    }
-
     <span class="doccomment">/// Sets the start timestamp for the testsuite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the time taken for the testsuite.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
     }
 
@@ -873,6 +933,11 @@
     <span class="doccomment">/// The number of assertions in the testcase.</span>
     <span class="kw">pub</span> <span class="ident">assertions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 
+    <span class="doccomment">/// The time at which this testcase began execution.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is not part of the JUnit spec, but may be useful for some tools.</span>
+    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// The time it took to execute this testcase.</span>
     <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
 
@@ -896,6 +961,7 @@
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">classname</span>: <span class="prelude-val">None</span>,
             <span class="ident">assertions</span>: <span class="prelude-val">None</span>,
+            <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
             <span class="ident">time</span>: <span class="prelude-val">None</span>,
             <span class="ident">status</span>,
             <span class="ident">system_out</span>: <span class="prelude-val">None</span>,
@@ -913,6 +979,12 @@
     <span class="doccomment">/// Sets the number of assertions in the testcase.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_assertions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">assertions</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">assertions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">assertions</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the start timestamp for the testcase.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -1083,6 +1155,16 @@
     <span class="doccomment">/// The failure kind: error or failure.</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>,
 
+    <span class="doccomment">/// The time at which this rerun began execution.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is not part of the JUnit spec, but may be useful for some tools.</span>
+    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The time it took to execute this rerun.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is not part of the JUnit spec, but may be useful for some tools.</span>
+    <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// The failure message.</span>
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 
@@ -1109,6 +1191,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">TestRerun</span> {
             <span class="ident">kind</span>,
+            <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
+            <span class="ident">time</span>: <span class="prelude-val">None</span>,
             <span class="ident">message</span>: <span class="prelude-val">None</span>,
             <span class="ident">ty</span>: <span class="prelude-val">None</span>,
             <span class="ident">stack_trace</span>: <span class="prelude-val">None</span>,
@@ -1116,6 +1200,18 @@
             <span class="ident">system_err</span>: <span class="prelude-val">None</span>,
             <span class="ident">description</span>: <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="doccomment">/// Sets the start timestamp for this rerun.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the time taken for this rerun.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the message.</span>
