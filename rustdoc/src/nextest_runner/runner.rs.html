@@ -799,11 +799,20 @@
 <span id="796">796</span>
 <span id="797">797</span>
 <span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">config</span>::<span class="ident">NextestProfile</span>,
     <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">TestEvent</span>},
     <span class="ident">stopwatch</span>::{<span class="ident">StopwatchEnd</span>, <span class="ident">StopwatchStart</span>},
     <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>},
@@ -831,20 +840,27 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">StructOpt</span>)]</span>
 <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunnerOpts</span> {
+    <span class="doccomment">/// Number of retries for failing tests [default: from profile]</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">retries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// Number of tests to run simultaneously [default: logical CPU count]</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;test-threads&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">test_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of times tests are run on failure (tests that pass on retry will be considered flaky)</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;1&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">tries</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TestRunnerOpts</span> {
     <span class="doccomment">/// Creates a new test runner.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="ident">TestList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestRunner</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
+        <span class="ident">profile</span>: <span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">test_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus</span>::<span class="ident">get</span>);
+        <span class="kw">let</span> <span class="ident">retries</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">retries</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">retries</span>());
         <span class="ident">TestRunner</span> {
-            <span class="ident">opts</span>: <span class="self">self</span>,
+            <span class="comment">// The number of tries = retries + 1.</span>
+            <span class="ident">tries</span>: <span class="ident">retries</span> <span class="op">+</span> <span class="number">1</span>,
             <span class="ident">test_list</span>,
             <span class="ident">run_pool</span>: <span class="ident">ThreadPoolBuilder</span>::<span class="ident">new</span>()
                 <span class="comment">// The main run_pool closure will need its own thread.</span>
@@ -858,7 +874,7 @@
 
 <span class="doccomment">/// Context for running tests.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
-    <span class="ident">opts</span>: <span class="ident">TestRunnerOpts</span>,
+    <span class="ident">tries</span>: <span class="ident">usize</span>,
     <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
     <span class="ident">run_pool</span>: <span class="ident">ThreadPool</span>,
 }
@@ -958,13 +974,13 @@
 
                         <span class="kw">let</span> <span class="ident">run_status</span> <span class="op">=</span> <span class="self">self</span>
                             .<span class="ident">run_test</span>(<span class="ident">test_instance</span>, <span class="ident">attempt</span>)
-                            .<span class="ident">into_external</span>(<span class="ident">attempt</span>, <span class="self">self</span>.<span class="ident">opts</span>.<span class="ident">tries</span>);
+                            .<span class="ident">into_external</span>(<span class="ident">attempt</span>, <span class="self">self</span>.<span class="ident">tries</span>);
 
                         <span class="kw">if</span> <span class="ident">run_status</span>.<span class="ident">status</span>.<span class="ident">is_success</span>() {
                             <span class="comment">// The test succeeded.</span>
                             <span class="ident">run_statuses</span>.<span class="ident">push</span>(<span class="ident">run_status</span>);
                             <span class="kw">break</span>;
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">attempt</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">opts</span>.<span class="ident">tries</span> {
+                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">attempt</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tries</span> {
                             <span class="comment">// Retry this test: send a retry event, then retry the loop.</span>
                             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">this_run_sender</span>.<span class="ident">send</span>(<span class="ident">InternalTestEvent</span>::<span class="ident">Retry</span> {
                                 <span class="ident">test_instance</span>,

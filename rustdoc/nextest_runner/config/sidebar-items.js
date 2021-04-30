@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ConfigReadError","An error that occurred while reading the config."]],"struct":[["ConfigOpts",""],["NextestConfig","Configuration for nextest."],["NextestProfile","A representation of a nextest profile."],["ProfileNotFound",""]]});
