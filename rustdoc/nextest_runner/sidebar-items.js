@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["config","Manages configuration for nextest."],["dispatch",""],["output",""],["reporter",""],["runner",""],["test_filter",""],["test_list",""]]});
+initSidebarItems({"mod":[["dispatch",""],["output",""],["reporter",""],["runner",""],["test_filter",""],["test_list",""]]});
