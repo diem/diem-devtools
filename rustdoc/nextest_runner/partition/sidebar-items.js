@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["BuildPartitioner","A builder for creating `Partitioner` instances."]],"struct":[["ParseError","An error that occurs while parsing a `BuildPartitioner` input."]],"trait":[["Partitioner","Represents an individual partitioner, typically scoped to a test binary."]]});

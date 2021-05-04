@@ -170,6 +170,11 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
@@ -315,6 +320,11 @@
                     ]
                     .<span class="ident">iter</span>()
                     .<span class="ident">collect</span>();
+                    <span class="kw">let</span> <span class="ident">junit_dir</span> <span class="op">=</span> <span class="ident">junit_path</span>.<span class="ident">parent</span>().<span class="ident">expect</span>(<span class="string">&quot;junit path must have a parent&quot;</span>);
+                    <span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">create_dir_all</span>(<span class="ident">junit_dir</span>).<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> {
+                        <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;failed to create junit output directory &#39;{}&#39;&quot;</span>, <span class="ident">junit_dir</span>)
+                    })<span class="question-mark">?</span>;
+
                     <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File</span>::<span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="ident">junit_path</span>).<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> {
                         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;failed to open junit file &#39;{}&#39; for writing&quot;</span>, <span class="ident">junit_path</span>)
                     })<span class="question-mark">?</span>;
