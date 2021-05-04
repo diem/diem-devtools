@@ -166,16 +166,17 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
+<span id="166">166</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">output</span>::<span class="ident">OutputFormat</span>,
-    <span class="ident">partition</span>::<span class="ident">BuildPartitioner</span>,
+    <span class="ident">partition</span>::<span class="ident">PartitionerBuilder</span>,
     <span class="ident">reporter</span>::{<span class="ident">Color</span>, <span class="ident">TestReporter</span>},
     <span class="ident">runner</span>::<span class="ident">TestRunnerOpts</span>,
-    <span class="ident">test_filter</span>::{<span class="ident">RunIgnored</span>, <span class="ident">TestFilter</span>},
+    <span class="ident">test_filter</span>::{<span class="ident">RunIgnored</span>, <span class="ident">TestFilterBuilder</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestBinary</span>, <span class="ident">TestList</span>},
 };
 <span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
@@ -257,7 +258,7 @@
 
     <span class="doccomment">/// Test partition, e.g. hash:1/2 or count:2/3</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BuildPartitioner</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">partition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartitionerBuilder</span><span class="op">&gt;</span>,
 
     <span class="comment">// TODO: add regex-based filtering in the future?</span>
     <span class="doccomment">/// Test filter</span>
@@ -266,7 +267,8 @@
 
 <span class="kw">impl</span> <span class="ident">TestBinFilter</span> {
     <span class="kw">fn</span> <span class="ident">compute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TestList</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span> <span class="ident">TestFilter</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">run_ignored</span>, <span class="self">self</span>.<span class="ident">partition</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>);
+        <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span>
+            <span class="ident">TestFilterBuilder</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">run_ignored</span>, <span class="self">self</span>.<span class="ident">partition</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>);
         <span class="ident">TestList</span>::<span class="ident">new</span>(
             <span class="self">self</span>.<span class="ident">test_bin</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">binary</span><span class="op">|</span> <span class="ident">TestBinary</span> {
                 <span class="ident">binary</span>: <span class="ident">binary</span>.<span class="ident">clone</span>(),
