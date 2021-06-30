@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/duct-0.13.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/duct-0.13.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../duct/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../duct/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2155,24 +2155,24 @@
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! ```</span>
 
-<span class="kw">use</span> <span class="ident">once_cell</span>::<span class="ident">sync</span>::<span class="ident">OnceCell</span>;
-<span class="kw">use</span> <span class="ident">shared_child</span>::<span class="ident">SharedChild</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">File</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::{<span class="ident">Command</span>, <span class="ident">ExitStatus</span>, <span class="ident">Output</span>, <span class="ident">Stdio</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">JoinHandle</span>;
+<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
+<span class="kw">use</span> <span class="ident">shared_child::SharedChild</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>};
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::fs::File</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use</span> <span class="ident">std::io::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
+<span class="kw">use</span> <span class="ident">std::process</span>::{<span class="ident">Command</span>, <span class="ident">ExitStatus</span>, <span class="ident">Output</span>, <span class="ident">Stdio</span>};
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="kw">use</span> <span class="ident">std::thread::JoinHandle</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">unix</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std::os::unix::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">windows</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std::os::windows::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Unix-specific extensions to duct, for sending signals.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
@@ -2204,12 +2204,12 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">IntoExecutablePath</span>,
     <span class="ident">U</span>: <span class="ident">IntoIterator</span>,
-    <span class="ident">U</span>::<span class="ident">Item</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>,
+    <span class="ident">U::Item</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">argv_vec</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">argv_vec</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="ident">argv_vec</span>.<span class="ident">push</span>(<span class="ident">program</span>.<span class="ident">to_executable</span>());
-    <span class="ident">argv_vec</span>.<span class="ident">extend</span>(<span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into</span>::<span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>::<span class="ident">into</span>));
-    <span class="ident">Expression</span>::<span class="ident">new</span>(<span class="ident">Cmd</span>(<span class="ident">argv_vec</span>))
+    <span class="ident">argv_vec</span>.<span class="ident">extend</span>(<span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into</span>::<span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span><span class="ident">::into</span>));
+    <span class="ident">Expression::new</span>(<span class="ident">Cmd</span>(<span class="ident">argv_vec</span>))
 }
 
 <span class="doccomment">/// Create a command with any number of of positional arguments, which may be</span>
@@ -2236,12 +2236,12 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">cmd</span> {
+<span class="macro">macro_rules!</span> <span class="ident">cmd</span> {
     ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">program</span>:<span class="ident">expr</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span> )<span class="op">*</span> $(,)<span class="question-mark">?</span> ) <span class="op">=</span><span class="op">&gt;</span> {
         {
-            <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsString</span>;
-            <span class="kw">let</span> <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">OsString</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[$( <span class="ident">Into</span>::<span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>::<span class="ident">into</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>) ),<span class="kw-2">*</span>];
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">cmd</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">program</span>, <span class="ident">args</span>)
+            <span class="kw">use</span> <span class="ident">std::ffi::OsString</span>;
+            <span class="kw">let</span> <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">OsString</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[$( <span class="ident">Into</span>::<span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span><span class="ident">::into</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>) ),<span class="kw-2">*</span>];
+            <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::cmd</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">program</span>, <span class="ident">args</span>)
         }
     };
 }
@@ -2317,7 +2317,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="comment">// This could be optimized to avoid creating a background threads, by</span>
         <span class="comment">// using the current thread to read stdout or stderr if only one of</span>
         <span class="comment">// them is captured, or by using async IO to read both.</span>
@@ -2346,9 +2346,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">reader</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::new</span>();
         <span class="ident">reader</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>)<span class="question-mark">?</span>;
         <span class="kw">while</span> <span class="ident">output</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">output</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\r&#39;</span>) {
             <span class="ident">output</span>.<span class="ident">truncate</span>(<span class="ident">output</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
@@ -2375,15 +2375,15 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Handle</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">stdout_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">stderr_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">IoContext</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">stdout_capture</span>, <span class="kw-2">&amp;</span><span class="ident">stderr_capture</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Handle</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stdout_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext::new</span>();
+        <span class="kw">let</span> <span class="ident">stderr_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext::new</span>();
+        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">IoContext::new</span>(<span class="kw-2">&amp;</span><span class="ident">stdout_capture</span>, <span class="kw-2">&amp;</span><span class="ident">stderr_capture</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">Handle</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start</span>(<span class="ident">context</span>)<span class="question-mark">?</span>,
-            <span class="ident">result</span>: <span class="ident">OnceCell</span>::<span class="ident">new</span>(),
-            <span class="ident">readers</span>: <span class="ident">Mutex</span>::<span class="ident">new</span>((
+            <span class="ident">result</span>: <span class="ident">OnceCell::new</span>(),
+            <span class="ident">readers</span>: <span class="ident">Mutex::new</span>((
                 <span class="ident">stdout_capture</span>.<span class="ident">maybe_read_thread</span>(),
                 <span class="ident">stderr_capture</span>.<span class="ident">maybe_read_thread</span>(),
             )),
@@ -2418,14 +2418,14 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReaderHandle</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">stdout_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">stderr_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">IoContext</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">stdout_capture</span>, <span class="kw-2">&amp;</span><span class="ident">stderr_capture</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ReaderHandle</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stdout_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext::new</span>();
+        <span class="kw">let</span> <span class="ident">stderr_capture</span> <span class="op">=</span> <span class="ident">OutputCaptureContext::new</span>();
+        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">IoContext::new</span>(<span class="kw-2">&amp;</span><span class="ident">stdout_capture</span>, <span class="kw-2">&amp;</span><span class="ident">stderr_capture</span>);
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">stdout_capture</span>().<span class="number">0</span>.<span class="ident">start</span>(<span class="ident">context</span>)<span class="question-mark">?</span>,
-            <span class="ident">result</span>: <span class="ident">OnceCell</span>::<span class="ident">new</span>(),
-            <span class="ident">readers</span>: <span class="ident">Mutex</span>::<span class="ident">new</span>((<span class="prelude-val">None</span>, <span class="ident">stderr_capture</span>.<span class="ident">maybe_read_thread</span>())),
+            <span class="ident">result</span>: <span class="ident">OnceCell::new</span>(),
+            <span class="ident">readers</span>: <span class="ident">Mutex::new</span>((<span class="prelude-val">None</span>, <span class="ident">stderr_capture</span>.<span class="ident">maybe_read_thread</span>())),
         };
         <span class="prelude-val">Ok</span>(<span class="ident">ReaderHandle</span> {
             <span class="ident">handle</span>,
@@ -2462,7 +2462,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pipe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">right</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Pipe</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">right</span>.<span class="ident">into</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Pipe</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">right</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Use bytes or a string as input for an expression, like `&lt;&lt;&lt;` in the</span>
@@ -2485,7 +2485,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdin_bytes</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdinBytes</span>(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">bytes</span>.<span class="ident">into</span>())), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdinBytes</span>(<span class="ident">Arc::new</span>(<span class="ident">bytes</span>.<span class="ident">into</span>())), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Open a file at the given path and use it as input for an expression,</span>
@@ -2504,7 +2504,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdin_path</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdinPath</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdinPath</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Use an already opened file or pipe as input for an expression.</span>
@@ -2523,11 +2523,11 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdin_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawFd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdinFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdinFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdin_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawHandle</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdinFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdinFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Use `/dev/null` (or `NUL` on Windows) as input for an expression.</span>
@@ -2544,7 +2544,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdin_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdinNull</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdinNull</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Open a file at the given path and use it as output for an expression,</span>
@@ -2567,7 +2567,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_path</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutPath</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutPath</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Use an already opened file or pipe as output for an expression.</span>
@@ -2590,11 +2590,11 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawFd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawHandle</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Use `/dev/null` (or `NUL` on Windows) as output for an expression.</span>
@@ -2615,7 +2615,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutNull</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutNull</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Capture the standard output of an expression. The captured bytes will</span>
@@ -2646,7 +2646,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_capture</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutCapture</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutCapture</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Join the standard output of an expression to its standard error pipe,</span>
@@ -2664,7 +2664,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_to_stderr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutToStderr</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutToStderr</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Open a file at the given path and use it as error output for an</span>
@@ -2687,7 +2687,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stderr_path</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StderrPath</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StderrPath</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Use an already opened file or pipe as error output for an expression.</span>
@@ -2710,11 +2710,11 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stderr_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawFd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StderrFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StderrFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stderr_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawHandle</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StderrFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StderrFile</span>(<span class="ident">into_file</span>(<span class="ident">file</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Use `/dev/null` (or `NUL` on Windows) as error output for an expression.</span>
@@ -2731,7 +2731,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stderr_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StderrNull</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StderrNull</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Capture the error output of an expression. The captured bytes will be</span>
@@ -2752,7 +2752,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stderr_capture</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StderrCapture</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StderrCapture</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Join the standard error of an expression to its standard output pipe,</span>
@@ -2770,7 +2770,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stderr_to_stdout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StderrToStdout</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StderrToStdout</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Swap the stdout and stderr of an expression.</span>
@@ -2793,7 +2793,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout_stderr_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">StdoutStderrSwap</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">StdoutStderrSwap</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Set the working directory where the expression will execute.</span>
@@ -2831,7 +2831,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dir</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">Dir</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">Dir</span>(<span class="ident">path</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Set a variable in the expression&#39;s environment.</span>
@@ -2852,7 +2852,7 @@
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>,
         <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(
             <span class="ident">Env</span>(<span class="ident">canonicalize_env_var_name</span>(<span class="ident">name</span>.<span class="ident">into</span>()), <span class="ident">val</span>.<span class="ident">into</span>()),
             <span class="self">self</span>.<span class="ident">clone</span>(),
         ))
@@ -2884,7 +2884,7 @@
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(
             <span class="ident">EnvRemove</span>(<span class="ident">canonicalize_env_var_name</span>(<span class="ident">name</span>.<span class="ident">into</span>())),
             <span class="self">self</span>.<span class="ident">clone</span>(),
         ))
@@ -2924,7 +2924,7 @@
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">canonicalize_env_var_name</span>(<span class="ident">k</span>.<span class="ident">into</span>()), <span class="ident">v</span>.<span class="ident">into</span>()))
             .<span class="ident">collect</span>();
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">FullEnv</span>(<span class="ident">env_map</span>), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">FullEnv</span>(<span class="ident">env_map</span>), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Prevent a non-zero exit status from causing</span>
@@ -2959,7 +2959,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">Unchecked</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">Unchecked</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Add a hook for modifying</span>
@@ -2996,20 +2996,20 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before_spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hook</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">Io</span>(<span class="ident">BeforeSpawn</span>(<span class="ident">BeforeSpawnHook</span>::<span class="ident">new</span>(<span class="ident">hook</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">Io</span>(<span class="ident">BeforeSpawn</span>(<span class="ident">BeforeSpawnHook::new</span>(<span class="ident">hook</span>)), <span class="self">self</span>.<span class="ident">clone</span>()))
     }
 
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">ExpressionInner</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span> {
-        <span class="ident">Expression</span>(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">inner</span>))
+        <span class="ident">Expression</span>(<span class="ident">Arc::new</span>(<span class="ident">inner</span>))
     }
 }
 
 <span class="comment">// Delegate to the ExpressionInner for debug formatting. This avoids printing</span>
 <span class="comment">// redundant Expression() constructors around everything.</span>
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Expression</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Expression</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -3064,15 +3064,15 @@
     <span class="doccomment">/// IO error if child returns a non-zero exit status. To suppress this</span>
     <span class="doccomment">/// error and return an `Output` even when the exit status is non-zero, use</span>
     <span class="doccomment">/// the [`unchecked`](struct.Expression.html#method.unchecked) method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="comment">// Await the children and any threads that are reading their output.</span>
         <span class="comment">// Another caller may already have done this.</span>
         <span class="kw">let</span> (<span class="ident">expression_status</span>, <span class="ident">output</span>) <span class="op">=</span> <span class="ident">wait_on_handle_and_ouput</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
         <span class="comment">// If the child returned a non-zero exit status, and that&#39;s a checked</span>
         <span class="comment">// error, return the error.</span>
         <span class="kw">if</span> <span class="ident">expression_status</span>.<span class="ident">is_checked_error</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
-                <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+                <span class="ident">io::ErrorKind::Other</span>,
                 <span class="ident">expression_status</span>.<span class="ident">message</span>(),
             ));
         }
@@ -3093,8 +3093,8 @@
     <span class="doccomment">/// IO error if child returns a non-zero exit status. To suppress this</span>
     <span class="doccomment">/// error and return an `Output` even when the exit status is non-zero, use</span>
     <span class="doccomment">/// the [`unchecked`](struct.Expression.html#method.unchecked) method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">wait</span>(<span class="ident">WaitMode</span>::<span class="ident">Nonblocking</span>)<span class="question-mark">?</span>.<span class="ident">is_none</span>() {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">wait</span>(<span class="ident">WaitMode::Nonblocking</span>)<span class="question-mark">?</span>.<span class="ident">is_none</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">wait</span>().<span class="ident">map</span>(<span class="prelude-val">Some</span>)
@@ -3118,7 +3118,7 @@
     <span class="doccomment">/// IO error if child returns a non-zero exit status. To suppress this</span>
     <span class="doccomment">/// error and return an `Output` even when the exit status is non-zero, use</span>
     <span class="doccomment">/// the [`unchecked`](struct.Expression.html#method.unchecked) method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_output</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_output</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wait</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">output</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">into_inner</span>().<span class="ident">expect</span>(<span class="string">&quot;result missing&quot;</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
@@ -3136,7 +3136,7 @@
     <span class="doccomment">/// spawned itself. See</span>
     <span class="doccomment">/// [`gotchas.md`](https://github.com/oconnor663/duct.py/blob/master/gotchas.md)</span>
     <span class="doccomment">/// for an extensive discussion of this behavior.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">kill</span>()<span class="question-mark">?</span>;
         <span class="comment">// This wait cleans up the child but does not return an error for a</span>
         <span class="comment">// non-zero exit status.</span>
@@ -3146,7 +3146,7 @@
         <span class="comment">// and we can&#39;t expect them to exit promptly. We only want to reap our</span>
         <span class="comment">// immediate zombie children here. See gotchas.md for more on why we</span>
         <span class="comment">// can&#39;t do better.</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">wait</span>(<span class="ident">WaitMode</span>::<span class="ident">Blocking</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">wait</span>(<span class="ident">WaitMode::Blocking</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -3161,7 +3161,7 @@
 <span class="comment">// includes collection the output results from reader threads. After calling</span>
 <span class="comment">// this function, the result cell is guaranteed to be populated. This does not</span>
 <span class="comment">// do any status checking.</span>
-<span class="kw">fn</span> <span class="ident">wait_on_handle_and_ouput</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">ExpressionStatus</span>, <span class="ident">Output</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">wait_on_handle_and_ouput</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">ExpressionStatus</span>, <span class="ident">Output</span>)<span class="op">&gt;</span> {
     <span class="comment">// Take the reader threads lock and then see if a result has already been</span>
     <span class="comment">// collected. Doing this check inside the lock avoids racing to fill the</span>
     <span class="comment">// result if it&#39;s empty.</span>
@@ -3176,7 +3176,7 @@
         <span class="comment">// shouldn&#39;t really happen.</span>
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">handle</span>
             .<span class="ident">inner</span>
-            .<span class="ident">wait</span>(<span class="ident">WaitMode</span>::<span class="ident">Blocking</span>)<span class="question-mark">?</span>
+            .<span class="ident">wait</span>(<span class="ident">WaitMode::Blocking</span>)<span class="question-mark">?</span>
             .<span class="ident">expect</span>(<span class="string">&quot;blocking wait can&#39;t return None&quot;</span>);
         <span class="comment">// Now that we have an exit status, we need to join the output reader</span>
         <span class="comment">// threads, if any. We&#39;re already holding the lock that we need.</span>
@@ -3187,11 +3187,11 @@
         <span class="kw">let</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">stdout_reader</span>
             .<span class="ident">take</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">join</span>().<span class="ident">expect</span>(<span class="string">&quot;stdout reader error&quot;</span>))
-            .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()))<span class="question-mark">?</span>;
+            .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>()))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">stderr_reader</span>
             .<span class="ident">take</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">join</span>().<span class="ident">expect</span>(<span class="string">&quot;stderr reader error&quot;</span>))
-            .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()))<span class="question-mark">?</span>;
+            .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>()))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Output</span> {
             <span class="ident">status</span>: <span class="ident">status</span>.<span class="ident">status</span>,
             <span class="ident">stdout</span>,
@@ -3209,11 +3209,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ExpressionInner</span> {
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HandleInner</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandleInner</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Cmd</span>(<span class="ident">argv</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HandleInner</span>::<span class="ident">Child</span>(<span class="ident">start_argv</span>(<span class="ident">argv</span>, <span class="ident">context</span>)<span class="question-mark">?</span>),
+            <span class="ident">Cmd</span>(<span class="ident">argv</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HandleInner::Child</span>(<span class="ident">start_argv</span>(<span class="ident">argv</span>, <span class="ident">context</span>)<span class="question-mark">?</span>),
             <span class="ident">Pipe</span>(<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">HandleInner</span>::<span class="ident">Pipe</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">PipeHandle</span>::<span class="ident">start</span>(<span class="ident">left</span>, <span class="ident">right</span>, <span class="ident">context</span>)<span class="question-mark">?</span>))
+                <span class="ident">HandleInner::Pipe</span>(<span class="ident">Box::new</span>(<span class="ident">PipeHandle::start</span>(<span class="ident">left</span>, <span class="ident">right</span>, <span class="ident">context</span>)<span class="question-mark">?</span>))
             }
             <span class="ident">Io</span>(<span class="ident">io_inner</span>, <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">start_io</span>(<span class="ident">io_inner</span>, <span class="ident">expr</span>, <span class="ident">context</span>)<span class="question-mark">?</span>,
         })
@@ -3233,12 +3233,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">HandleInner</span> {
-    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HandleInner</span>::<span class="ident">Child</span>(<span class="ident">child_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">child_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>),
-            <span class="ident">HandleInner</span>::<span class="ident">Pipe</span>(<span class="ident">pipe_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pipe_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>),
-            <span class="ident">HandleInner</span>::<span class="ident">StdinBytes</span>(<span class="ident">stdin_bytes_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stdin_bytes_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>),
-            <span class="ident">HandleInner</span>::<span class="ident">Unchecked</span>(<span class="ident">inner_handle</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HandleInner::Child</span>(<span class="ident">child_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">child_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>),
+            <span class="ident">HandleInner::Pipe</span>(<span class="ident">pipe_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pipe_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>),
+            <span class="ident">HandleInner::StdinBytes</span>(<span class="ident">stdin_bytes_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stdin_bytes_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>),
+            <span class="ident">HandleInner::Unchecked</span>(<span class="ident">inner_handle</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">inner_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">status</span><span class="op">|</span> {
                     <span class="ident">status</span>.<span class="ident">checked</span> <span class="op">=</span> <span class="bool-val">false</span>;
                     <span class="ident">status</span>
@@ -3247,28 +3247,28 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HandleInner</span>::<span class="ident">Child</span>(<span class="ident">child_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">child_handle</span>.<span class="ident">kill</span>(),
-            <span class="ident">HandleInner</span>::<span class="ident">Pipe</span>(<span class="ident">pipe_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pipe_handle</span>.<span class="ident">kill</span>(),
-            <span class="ident">HandleInner</span>::<span class="ident">StdinBytes</span>(<span class="ident">stdin_bytes_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stdin_bytes_handle</span>.<span class="ident">kill</span>(),
-            <span class="ident">HandleInner</span>::<span class="ident">Unchecked</span>(<span class="ident">inner_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner_handle</span>.<span class="ident">kill</span>(),
+            <span class="ident">HandleInner::Child</span>(<span class="ident">child_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">child_handle</span>.<span class="ident">kill</span>(),
+            <span class="ident">HandleInner::Pipe</span>(<span class="ident">pipe_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pipe_handle</span>.<span class="ident">kill</span>(),
+            <span class="ident">HandleInner::StdinBytes</span>(<span class="ident">stdin_bytes_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stdin_bytes_handle</span>.<span class="ident">kill</span>(),
+            <span class="ident">HandleInner::Unchecked</span>(<span class="ident">inner_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner_handle</span>.<span class="ident">kill</span>(),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">pids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HandleInner</span>::<span class="ident">Child</span>(<span class="ident">child_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">child_handle</span>.<span class="ident">child</span>.<span class="ident">id</span>()],
-            <span class="ident">HandleInner</span>::<span class="ident">Pipe</span>(<span class="ident">pipe_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pipe_handle</span>.<span class="ident">pids</span>(),
-            <span class="ident">HandleInner</span>::<span class="ident">StdinBytes</span>(<span class="ident">stdin_bytes_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stdin_bytes_handle</span>.<span class="ident">inner_handle</span>.<span class="ident">pids</span>(),
-            <span class="ident">HandleInner</span>::<span class="ident">Unchecked</span>(<span class="ident">inner_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner_handle</span>.<span class="ident">pids</span>(),
+            <span class="ident">HandleInner::Child</span>(<span class="ident">child_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">child_handle</span>.<span class="ident">child</span>.<span class="ident">id</span>()],
+            <span class="ident">HandleInner::Pipe</span>(<span class="ident">pipe_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pipe_handle</span>.<span class="ident">pids</span>(),
+            <span class="ident">HandleInner::StdinBytes</span>(<span class="ident">stdin_bytes_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stdin_bytes_handle</span>.<span class="ident">inner_handle</span>.<span class="ident">pids</span>(),
+            <span class="ident">HandleInner::Unchecked</span>(<span class="ident">inner_handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner_handle</span>.<span class="ident">pids</span>(),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">start_argv</span>(<span class="ident">argv</span>: <span class="kw-2">&amp;</span>[<span class="ident">OsString</span>], <span class="ident">context</span>: <span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChildHandle</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">start_argv</span>(<span class="ident">argv</span>: <span class="kw-2">&amp;</span>[<span class="ident">OsString</span>], <span class="ident">context</span>: <span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ChildHandle</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">exe</span> <span class="op">=</span> <span class="ident">canonicalize_exe_path_for_dir</span>(<span class="kw-2">&amp;</span><span class="ident">argv</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">context</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">exe</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">Command::new</span>(<span class="ident">exe</span>);
     <span class="ident">command</span>.<span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="ident">argv</span>[<span class="number">1</span>..]);
     <span class="comment">// TODO: Avoid unnecessary dup&#39;ing here.</span>
     <span class="ident">command</span>.<span class="ident">stdin</span>(<span class="ident">context</span>.<span class="ident">stdin</span>.<span class="ident">into_stdio</span>()<span class="question-mark">?</span>);
@@ -3285,8 +3285,8 @@
     <span class="kw">for</span> <span class="ident">hook</span> <span class="kw">in</span> <span class="ident">context</span>.<span class="ident">before_spawn_hooks</span>.<span class="ident">iter</span>() {
         <span class="ident">hook</span>.<span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">command</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">let</span> <span class="ident">shared_child</span> <span class="op">=</span> <span class="ident">SharedChild</span>::<span class="ident">spawn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">command</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">command_string</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">argv</span>);
+    <span class="kw">let</span> <span class="ident">shared_child</span> <span class="op">=</span> <span class="ident">SharedChild::spawn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">command</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">command_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">argv</span>);
     <span class="prelude-val">Ok</span>(<span class="ident">ChildHandle</span> {
         <span class="ident">child</span>: <span class="ident">shared_child</span>,
         <span class="ident">command_string</span>: <span class="ident">command_string</span>,
@@ -3295,15 +3295,15 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">ChildHandle</span> {
-    <span class="ident">child</span>: <span class="ident">shared_child</span>::<span class="ident">SharedChild</span>,
+    <span class="ident">child</span>: <span class="ident">shared_child::SharedChild</span>,
     <span class="ident">command_string</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ChildHandle</span> {
-    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">maybe_status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
-            <span class="ident">WaitMode</span>::<span class="ident">Blocking</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">child</span>.<span class="ident">wait</span>()<span class="question-mark">?</span>),
-            <span class="ident">WaitMode</span>::<span class="ident">Nonblocking</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">child</span>.<span class="ident">try_wait</span>()<span class="question-mark">?</span>,
+            <span class="ident">WaitMode::Blocking</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">child</span>.<span class="ident">wait</span>()<span class="question-mark">?</span>),
+            <span class="ident">WaitMode::Nonblocking</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">child</span>.<span class="ident">try_wait</span>()<span class="question-mark">?</span>,
         };
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="ident">maybe_status</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ExpressionStatus</span> {
@@ -3316,7 +3316,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">child</span>.<span class="ident">kill</span>()
     }
 }
@@ -3328,13 +3328,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PipeHandle</span> {
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">left</span>: <span class="kw-2">&amp;</span><span class="ident">Expression</span>, <span class="ident">right</span>: <span class="kw-2">&amp;</span><span class="ident">Expression</span>, <span class="ident">context</span>: <span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PipeHandle</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">reader</span>, <span class="ident">writer</span>) <span class="op">=</span> <span class="ident">os_pipe</span>::<span class="ident">pipe</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">left</span>: <span class="kw-2">&amp;</span><span class="ident">Expression</span>, <span class="ident">right</span>: <span class="kw-2">&amp;</span><span class="ident">Expression</span>, <span class="ident">context</span>: <span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">PipeHandle</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">reader</span>, <span class="ident">writer</span>) <span class="op">=</span> <span class="ident">os_pipe::pipe</span>()<span class="question-mark">?</span>;
         <span class="comment">// dup&#39;ing stdin/stdout isn&#39;t strictly necessary, but no big deal</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left_context</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>;
-        <span class="ident">left_context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">into_file</span>(<span class="ident">writer</span>));
+        <span class="ident">left_context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">into_file</span>(<span class="ident">writer</span>));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right_context</span> <span class="op">=</span> <span class="ident">context</span>;
-        <span class="ident">right_context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">into_file</span>(<span class="ident">reader</span>));
+        <span class="ident">right_context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">into_file</span>(<span class="ident">reader</span>));
 
         <span class="comment">// Errors starting the left side just short-circuit us.</span>
         <span class="kw">let</span> <span class="ident">left_handle</span> <span class="op">=</span> <span class="ident">left</span>.<span class="number">0</span>.<span class="ident">start</span>(<span class="ident">left_context</span>)<span class="question-mark">?</span>;
@@ -3357,13 +3357,13 @@
                 <span class="comment">// Similarly, this private API wait should never return an</span>
                 <span class="comment">// error. It might return a non-zero status, but here that&#39;s</span>
                 <span class="comment">// still an Ok result.</span>
-                <span class="ident">left_handle</span>.<span class="ident">wait</span>(<span class="ident">WaitMode</span>::<span class="ident">Blocking</span>)<span class="question-mark">?</span>;
+                <span class="ident">left_handle</span>.<span class="ident">wait</span>(<span class="ident">WaitMode::Blocking</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Wait on both sides first, without propagating any errors.</span>
         <span class="kw">let</span> <span class="ident">left_wait_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">left_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>);
         <span class="kw">let</span> <span class="ident">right_wait_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">right_handle</span>.<span class="ident">wait</span>(<span class="ident">mode</span>);
@@ -3380,7 +3380,7 @@
 
     <span class="comment">// As with wait, we need to call kill on both sides even if the left side</span>
     <span class="comment">// returns an error.</span>
-    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">left_kill_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">left_handle</span>.<span class="ident">kill</span>();
         <span class="kw">let</span> <span class="ident">right_kill_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">right_handle</span>.<span class="ident">kill</span>();
         <span class="comment">// As with wait, the left side happened first, so its errors take</span>
@@ -3423,56 +3423,56 @@
     <span class="ident">io_inner</span>: <span class="kw-2">&amp;</span><span class="ident">IoExpressionInner</span>,
     <span class="ident">expr_inner</span>: <span class="kw-2">&amp;</span><span class="ident">Expression</span>,
     <span class="kw-2">mut</span> <span class="ident">context</span>: <span class="ident">IoContext</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HandleInner</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandleInner</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">io_inner</span> {
         <span class="ident">StdinBytes</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HandleInner</span>::<span class="ident">StdinBytes</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">StdinBytesHandle</span>::<span class="ident">start</span>(
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HandleInner::StdinBytes</span>(<span class="ident">Box::new</span>(<span class="ident">StdinBytesHandle::start</span>(
                 <span class="ident">expr_inner</span>,
                 <span class="ident">context</span>,
-                <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">v</span>),
+                <span class="ident">Arc::clone</span>(<span class="ident">v</span>),
             )<span class="question-mark">?</span>)));
         }
         <span class="ident">StdinPath</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">File</span>::<span class="ident">open</span>(<span class="ident">p</span>)<span class="question-mark">?</span>);
+            <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">File::open</span>(<span class="ident">p</span>)<span class="question-mark">?</span>);
         }
         <span class="ident">StdinFile</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
+            <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
         }
         <span class="ident">StdinNull</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Null</span>;
+            <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue::Null</span>;
         }
         <span class="ident">StdoutPath</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">File</span>::<span class="ident">create</span>(<span class="ident">p</span>)<span class="question-mark">?</span>);
+            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">File::create</span>(<span class="ident">p</span>)<span class="question-mark">?</span>);
         }
         <span class="ident">StdoutFile</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
+            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
         }
         <span class="ident">StdoutNull</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Null</span>;
+            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue::Null</span>;
         }
         <span class="ident">StdoutCapture</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">into_file</span>(<span class="ident">context</span>.<span class="ident">stdout_capture</span>.<span class="ident">write_pipe</span>()<span class="question-mark">?</span>));
+            <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">into_file</span>(<span class="ident">context</span>.<span class="ident">stdout_capture</span>.<span class="ident">write_pipe</span>()<span class="question-mark">?</span>));
         }
         <span class="ident">StdoutToStderr</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">context</span>.<span class="ident">stdout</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">stderr</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>;
         }
         <span class="ident">StderrPath</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">File</span>::<span class="ident">create</span>(<span class="ident">p</span>)<span class="question-mark">?</span>);
+            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">File::create</span>(<span class="ident">p</span>)<span class="question-mark">?</span>);
         }
         <span class="ident">StderrFile</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
+            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
         }
         <span class="ident">StderrNull</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Null</span>;
+            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue::Null</span>;
         }
         <span class="ident">StderrCapture</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">into_file</span>(<span class="ident">context</span>.<span class="ident">stderr_capture</span>.<span class="ident">write_pipe</span>()<span class="question-mark">?</span>));
+            <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">into_file</span>(<span class="ident">context</span>.<span class="ident">stderr_capture</span>.<span class="ident">write_pipe</span>()<span class="question-mark">?</span>));
         }
         <span class="ident">StderrToStdout</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">context</span>.<span class="ident">stderr</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">stdout</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>;
         }
         <span class="ident">StdoutStderrSwap</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">context</span>.<span class="ident">stdout</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">context</span>.<span class="ident">stderr</span>);
+            <span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">context</span>.<span class="ident">stdout</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">context</span>.<span class="ident">stderr</span>);
         }
         <span class="ident">Dir</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">context</span>.<span class="ident">dir</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
@@ -3488,7 +3488,7 @@
         }
         <span class="ident">Unchecked</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">inner_handle</span> <span class="op">=</span> <span class="ident">expr_inner</span>.<span class="number">0</span>.<span class="ident">start</span>(<span class="ident">context</span>)<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HandleInner</span>::<span class="ident">Unchecked</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">inner_handle</span>)));
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HandleInner::Unchecked</span>(<span class="ident">Box::new</span>(<span class="ident">inner_handle</span>)));
         }
         <span class="ident">BeforeSpawn</span>(<span class="ident">hook</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">context</span>.<span class="ident">before_spawn_hooks</span>.<span class="ident">push</span>(<span class="ident">hook</span>.<span class="ident">clone</span>());
@@ -3500,7 +3500,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">StdinBytesHandle</span> {
     <span class="ident">inner_handle</span>: <span class="ident">HandleInner</span>,
-    <span class="ident">writer_thread</span>: <span class="ident">SharedThread</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">writer_thread</span>: <span class="ident">SharedThread</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">StdinBytesHandle</span> {
@@ -3508,20 +3508,20 @@
         <span class="ident">expression</span>: <span class="kw-2">&amp;</span><span class="ident">Expression</span>,
         <span class="kw-2">mut</span> <span class="ident">context</span>: <span class="ident">IoContext</span>,
         <span class="ident">input</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StdinBytesHandle</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">reader</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>) <span class="op">=</span> <span class="ident">os_pipe</span>::<span class="ident">pipe</span>()<span class="question-mark">?</span>;
-        <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">into_file</span>(<span class="ident">reader</span>));
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">StdinBytesHandle</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">reader</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>) <span class="op">=</span> <span class="ident">os_pipe::pipe</span>()<span class="question-mark">?</span>;
+        <span class="ident">context</span>.<span class="ident">stdin</span> <span class="op">=</span> <span class="ident">IoValue::Handle</span>(<span class="ident">into_file</span>(<span class="ident">reader</span>));
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">expression</span>.<span class="number">0</span>.<span class="ident">start</span>(<span class="ident">context</span>)<span class="question-mark">?</span>;
         <span class="comment">// We only spawn the writer thread if the expression started</span>
         <span class="comment">// successfully, so that start errors won&#39;t leak a zombie thread.</span>
-        <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>));
+        <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">std::thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>));
         <span class="prelude-val">Ok</span>(<span class="ident">StdinBytesHandle</span> {
             <span class="ident">inner_handle</span>: <span class="ident">inner</span>,
-            <span class="ident">writer_thread</span>: <span class="ident">SharedThread</span>::<span class="ident">new</span>(<span class="ident">thread</span>),
+            <span class="ident">writer_thread</span>: <span class="ident">SharedThread::new</span>(<span class="ident">thread</span>),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">WaitMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// We&#39;re responsible for joining the writer thread and not leaving a zombie.</span>
         <span class="comment">// But waiting on the inner child can return an error, and in that case we</span>
         <span class="comment">// don&#39;t know whether the child is still running or not. The rule in</span>
@@ -3535,7 +3535,7 @@
             <span class="comment">// the child exited without reading all of its input, so we suppress</span>
             <span class="comment">// them. Return other errors though.</span>
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">writer_thread</span>.<span class="ident">join</span>() {
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">BrokenPipe</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">io::ErrorKind::BrokenPipe</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">clone_io_error</span>(<span class="ident">err</span>));
                 }
                 <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
@@ -3544,7 +3544,7 @@
         <span class="ident">wait_res</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner_handle</span>.<span class="ident">kill</span>()
     }
 }
@@ -3576,27 +3576,27 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">BeforeSpawnHook</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
+    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">BeforeSpawnHook</span> {
     <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">hook</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">hook</span>),
+            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">hook</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         (<span class="self">self</span>.<span class="ident">inner</span>)(<span class="ident">command</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BeforeSpawnHook</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;&lt;closure&gt;&quot;</span>)
+<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BeforeSpawnHook</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;&lt;closure&gt;&quot;</span>)
     }
 }
 
@@ -3622,18 +3622,18 @@
         <span class="ident">stderr_capture</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutputCaptureContext</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">stdin</span>: <span class="ident">IoValue</span>::<span class="ident">ParentStdin</span>,
-            <span class="ident">stdout</span>: <span class="ident">IoValue</span>::<span class="ident">ParentStdout</span>,
-            <span class="ident">stderr</span>: <span class="ident">IoValue</span>::<span class="ident">ParentStderr</span>,
+            <span class="ident">stdin</span>: <span class="ident">IoValue::ParentStdin</span>,
+            <span class="ident">stdout</span>: <span class="ident">IoValue::ParentStdout</span>,
+            <span class="ident">stderr</span>: <span class="ident">IoValue::ParentStderr</span>,
             <span class="ident">stdout_capture</span>,
             <span class="ident">stderr_capture</span>,
             <span class="ident">dir</span>: <span class="prelude-val">None</span>,
-            <span class="ident">env</span>: <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">vars_os</span>().<span class="ident">collect</span>(),
-            <span class="ident">before_spawn_hooks</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">env</span>: <span class="ident">std::env::vars_os</span>().<span class="ident">collect</span>(),
+            <span class="ident">before_spawn_hooks</span>: <span class="ident">Vec::new</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">try_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IoContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">IoContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">IoContext</span> {
             <span class="ident">stdin</span>: <span class="self">self</span>.<span class="ident">stdin</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>,
             <span class="ident">stdout</span>: <span class="self">self</span>.<span class="ident">stdout</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>,
@@ -3660,23 +3660,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">IoValue</span> {
-    <span class="kw">fn</span> <span class="ident">try_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IoValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">IoValue</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">IoValue</span>::<span class="ident">ParentStdin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue</span>::<span class="ident">ParentStdin</span>,
-            <span class="ident">IoValue</span>::<span class="ident">ParentStdout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue</span>::<span class="ident">ParentStdout</span>,
-            <span class="ident">IoValue</span>::<span class="ident">ParentStderr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue</span>::<span class="ident">ParentStderr</span>,
-            <span class="ident">IoValue</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue</span>::<span class="ident">Null</span>,
-            <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>),
+            <span class="ident">IoValue::ParentStdin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue::ParentStdin</span>,
+            <span class="ident">IoValue::ParentStdout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue::ParentStdout</span>,
+            <span class="ident">IoValue::ParentStderr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue::ParentStderr</span>,
+            <span class="ident">IoValue::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue::Null</span>,
+            <span class="ident">IoValue::Handle</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IoValue::Handle</span>(<span class="ident">f</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">into_stdio</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Stdio</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_stdio</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Stdio</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">IoValue</span>::<span class="ident">ParentStdin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">os_pipe</span>::<span class="ident">dup_stdin</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
-            <span class="ident">IoValue</span>::<span class="ident">ParentStdout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">os_pipe</span>::<span class="ident">dup_stdout</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
-            <span class="ident">IoValue</span>::<span class="ident">ParentStderr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">os_pipe</span>::<span class="ident">dup_stderr</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
-            <span class="ident">IoValue</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Stdio</span>::<span class="ident">null</span>(),
-            <span class="ident">IoValue</span>::<span class="ident">Handle</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">into</span>(),
+            <span class="ident">IoValue::ParentStdin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">os_pipe::dup_stdin</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="ident">IoValue::ParentStdout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">os_pipe::dup_stdout</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="ident">IoValue::ParentStderr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">os_pipe::dup_stderr</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="ident">IoValue::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Stdio::null</span>(),
+            <span class="ident">IoValue::Handle</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">into</span>(),
         })
     }
 }
@@ -3692,11 +3692,11 @@
 <span class="comment">// this with a new trait.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
 <span class="kw">fn</span> <span class="ident">into_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawFd</span><span class="op">&gt;</span>(<span class="ident">handle</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">File</span> {
-    <span class="kw">unsafe</span> { <span class="ident">File</span>::<span class="ident">from_raw_fd</span>(<span class="ident">handle</span>.<span class="ident">into_raw_fd</span>()) }
+    <span class="kw">unsafe</span> { <span class="ident">File::from_raw_fd</span>(<span class="ident">handle</span>.<span class="ident">into_raw_fd</span>()) }
 }
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
 <span class="kw">fn</span> <span class="ident">into_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawHandle</span><span class="op">&gt;</span>(<span class="ident">handle</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">File</span> {
-    <span class="kw">unsafe</span> { <span class="ident">File</span>::<span class="ident">from_raw_handle</span>(<span class="ident">handle</span>.<span class="ident">into_raw_handle</span>()) }
+    <span class="kw">unsafe</span> { <span class="ident">File::from_raw_handle</span>(<span class="ident">handle</span>.<span class="ident">into_raw_handle</span>()) }
 }
 
 <span class="comment">// This struct keeps track of a child exit status, whether or not it&#39;s been</span>
@@ -3714,7 +3714,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(
+        <span class="macro">format!</span>(
             <span class="string">&quot;command {} exited with code {}&quot;</span>,
             <span class="self">self</span>.<span class="ident">command</span>,
             <span class="self">self</span>.<span class="ident">exit_code_string</span>()
@@ -3724,7 +3724,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
     <span class="kw">fn</span> <span class="ident">exit_code_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">code</span>().<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&lt;signal {}&gt;&quot;</span>, <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">signal</span>().<span class="ident">unwrap</span>());
+            <span class="kw">return</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;signal {}&gt;&quot;</span>, <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">signal</span>().<span class="ident">unwrap</span>());
         }
         <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">code</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>()
     }
@@ -3735,7 +3735,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">canonicalize_exe_path_for_dir</span>(<span class="ident">exe_name</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">canonicalize_exe_path_for_dir</span>(<span class="ident">exe_name</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">IoContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
     <span class="comment">// There&#39;s a tricky interaction between exe paths and `dir`. Exe paths can</span>
     <span class="comment">// be relative, and so we have to ask: Is an exe path interpreted relative</span>
     <span class="comment">// to the parent&#39;s cwd, or the child&#39;s? The answer is that it&#39;s platform</span>
@@ -3766,10 +3766,10 @@
     <span class="kw">let</span> <span class="ident">has_separator</span> <span class="op">=</span> <span class="ident">exe_name</span>
         .<span class="ident">to_string_lossy</span>()
         .<span class="ident">chars</span>()
-        .<span class="ident">any</span>(<span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">is_separator</span>);
-    <span class="kw">let</span> <span class="ident">is_relative</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">exe_name</span>).<span class="ident">is_relative</span>();
+        .<span class="ident">any</span>(<span class="ident">std::path::is_separator</span>);
+    <span class="kw">let</span> <span class="ident">is_relative</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">exe_name</span>).<span class="ident">is_relative</span>();
     <span class="kw">if</span> <span class="ident">context</span>.<span class="ident">dir</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_separator</span> <span class="op">&amp;&amp;</span> <span class="ident">is_relative</span> {
-        <span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">exe_name</span>).<span class="ident">canonicalize</span>().<span class="ident">map</span>(<span class="ident">Into</span>::<span class="ident">into</span>)
+        <span class="ident">Path::new</span>(<span class="ident">exe_name</span>).<span class="ident">canonicalize</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">exe_name</span>.<span class="ident">to_owned</span>())
     }
@@ -3781,7 +3781,7 @@
 <span class="comment">// relative paths to accomplish both of those.</span>
 <span class="kw">fn</span> <span class="ident">dotify_relative_exe_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
     <span class="comment">// This is a no-op if path is absolute or begins with a Windows prefix.</span>
-    <span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;.&quot;</span>).<span class="ident">join</span>(<span class="ident">path</span>)
+    <span class="ident">Path::new</span>(<span class="string">&quot;.&quot;</span>).<span class="ident">join</span>(<span class="ident">path</span>)
 }
 
 <span class="doccomment">/// An implementation detail of [`cmd`](fn.cmd.html), to distinguish paths from</span>
@@ -3859,11 +3859,11 @@
 }
 
 <span class="comment">// io::Error doesn&#39;t implement clone directly, so we kind of hack it together.</span>
-<span class="kw">fn</span> <span class="ident">clone_io_error</span>(<span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="ident">io</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="ident">Error</span> {
+<span class="kw">fn</span> <span class="ident">clone_io_error</span>(<span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Error</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">error</span>.<span class="ident">raw_os_error</span>() {
-        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(<span class="ident">code</span>)
+        <span class="ident">io::Error::from_raw_os_error</span>(<span class="ident">code</span>)
     } <span class="kw">else</span> {
-        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">error</span>.<span class="ident">kind</span>(), <span class="ident">error</span>.<span class="ident">to_string</span>())
+        <span class="ident">io::Error::new</span>(<span class="ident">error</span>.<span class="ident">kind</span>(), <span class="ident">error</span>.<span class="ident">to_string</span>())
     }
 }
 
@@ -3877,8 +3877,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SharedThread</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">SharedThread</span> {
-            <span class="ident">result</span>: <span class="ident">OnceCell</span>::<span class="ident">new</span>(),
-            <span class="ident">handle</span>: <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="prelude-val">Some</span>(<span class="ident">handle</span>)),
+            <span class="ident">result</span>: <span class="ident">OnceCell::new</span>(),
+            <span class="ident">handle</span>: <span class="ident">Mutex::new</span>(<span class="prelude-val">Some</span>(<span class="ident">handle</span>)),
         }
     }
 
@@ -3905,13 +3905,13 @@
 <span class="kw">impl</span> <span class="ident">WaitMode</span> {
     <span class="kw">fn</span> <span class="ident">should_join_background_thread</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">expression_result</span>: <span class="kw-2">&amp;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">expression_result</span>: <span class="kw-2">&amp;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExpressionStatus</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="comment">// Nonblocking waits can only join associated background threads if the</span>
         <span class="comment">// running expression is finished (that is, when the thread is</span>
         <span class="comment">// guaranteed to finish soon). Blocking waits should always join, even</span>
         <span class="comment">// in the presence of errors.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">WaitMode</span>::<span class="ident">Blocking</span> <span class="op">=</span> <span class="self">self</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">WaitMode::Blocking</span> <span class="op">=</span> <span class="self">self</span> {
             <span class="bool-val">true</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">expression_result</span> {
             <span class="bool-val">true</span>
@@ -3939,30 +3939,30 @@
     <span class="ident">name</span>
 }
 
-<span class="kw">type</span> <span class="ident">ReaderThread</span> <span class="op">=</span> <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">ReaderThread</span> <span class="op">=</span> <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">OutputCaptureContext</span> {
-    <span class="ident">pair</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span>(<span class="ident">os_pipe</span>::<span class="ident">PipeReader</span>, <span class="ident">os_pipe</span>::<span class="ident">PipeWriter</span>)<span class="op">&gt;</span>,
+    <span class="ident">pair</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span>(<span class="ident">os_pipe::PipeReader</span>, <span class="ident">os_pipe::PipeWriter</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">OutputCaptureContext</span> {
     <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">pair</span>: <span class="ident">OnceCell</span>::<span class="ident">new</span>(),
+            <span class="ident">pair</span>: <span class="ident">OnceCell::new</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">write_pipe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">os_pipe</span>::<span class="ident">PipeWriter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">writer</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pair</span>.<span class="ident">get_or_try_init</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">os_pipe</span>::<span class="ident">pipe</span>())<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">write_pipe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">os_pipe::PipeWriter</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">writer</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pair</span>.<span class="ident">get_or_try_init</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">os_pipe::pipe</span>())<span class="question-mark">?</span>;
         <span class="ident">writer</span>.<span class="ident">try_clone</span>()
     }
 
     <span class="comment">// Only spawn a read thread if the write pipe was used.</span>
     <span class="kw">fn</span> <span class="ident">maybe_read_thread</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReaderThread</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw-2">mut</span> <span class="ident">reader</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pair</span>.<span class="ident">into_inner</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="prelude-val">Some</span>(<span class="ident">std::thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                 <span class="ident">reader</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
             }))
@@ -4045,7 +4045,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReaderHandle</span> {
     <span class="ident">handle</span>: <span class="ident">Handle</span>,
-    <span class="ident">reader</span>: <span class="ident">os_pipe</span>::<span class="ident">PipeReader</span>,
+    <span class="ident">reader</span>: <span class="ident">os_pipe::PipeReader</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ReaderHandle</span> {
@@ -4060,7 +4060,7 @@
     <span class="doccomment">/// [`Output`](https://doc.rust-lang.org/std/process/struct.Output.html)</span>
     <span class="doccomment">/// will always be empty, because the `ReaderHandle` itself owns the</span>
     <span class="doccomment">/// child&#39;s stdout pipe.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">try_wait</span>()
     }
 
@@ -4082,7 +4082,7 @@
     <span class="doccomment">/// going to be short-lived. See</span>
     <span class="doccomment">/// [`gotchas.md`](https://github.com/oconnor663/duct.py/blob/master/gotchas.md)</span>
     <span class="doccomment">/// for an extensive discussion of these issues.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">kill</span>()
     }
 
@@ -4098,7 +4098,7 @@
     <span class="doccomment">/// [`unchecked`](struct.Expression.html#method.unchecked), and the child</span>
     <span class="doccomment">/// returns a non-zero exit status, the final call to `read` will return an</span>
     <span class="doccomment">/// error, just as [`run`](struct.Expression.html#method.run) would.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reader</span>).<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="comment">// EOF detected. Wait on the child to clean it up before returning.</span>
@@ -4113,7 +4113,7 @@
     <span class="doccomment">/// [`unchecked`](struct.Expression.html#method.unchecked), and the child</span>
     <span class="doccomment">/// returns a non-zero exit status, the final call to `read` will return an</span>
     <span class="doccomment">/// error, just as [`run`](struct.Expression.html#method.run) would.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">read</span>(<span class="ident">buf</span>)
     }
 }
@@ -4129,5 +4129,5 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span>;
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="duct"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="duct" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

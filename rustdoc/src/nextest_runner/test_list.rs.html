@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `nextest/runner/src/test_list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_list.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `nextest/runner/src/test_list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_list.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../nextest_runner/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../nextest_runner/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -548,16 +548,16 @@
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">output</span>::<span class="ident">OutputFormat</span>,
-    <span class="ident">reporter</span>::<span class="ident">Color</span>,
+    <span class="ident">output::OutputFormat</span>,
+    <span class="ident">reporter::Color</span>,
     <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">TestFilterBuilder</span>},
 };
 <span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">anyhow</span>, <span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
-<span class="kw">use</span> <span class="ident">duct</span>::<span class="ident">cmd</span>;
-<span class="kw">use</span> <span class="ident">once_cell</span>::<span class="ident">sync</span>::<span class="ident">OnceCell</span>;
+<span class="kw">use</span> <span class="ident">duct::cmd</span>;
+<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">BTreeMap</span>, <span class="ident">io</span>, <span class="ident">path</span>::<span class="ident">Path</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">io</span>, <span class="ident">path::Path</span>};
 <span class="kw">use</span> <span class="ident">termcolor</span>::{<span class="ident">BufferWriter</span>, <span class="ident">ColorSpec</span>, <span class="ident">NoColor</span>, <span class="ident">WriteColor</span>};
 
 <span class="comment">// TODO: capture ignored and not-ignored tests</span>
@@ -635,7 +635,7 @@
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">test_binary</span><span class="op">|</span> {
                 <span class="kw">let</span> (<span class="ident">non_ignored</span>, <span class="ident">ignored</span>) <span class="op">=</span> <span class="ident">test_binary</span>.<span class="ident">exec</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> (<span class="ident">bin</span>, <span class="ident">info</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">process_output</span>(
+                <span class="kw">let</span> (<span class="ident">bin</span>, <span class="ident">info</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::process_output</span>(
                     <span class="ident">test_binary</span>,
                     <span class="ident">filter</span>,
                     <span class="ident">non_ignored</span>.<span class="ident">as_str</span>(),
@@ -649,7 +649,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">test_binaries</span>,
             <span class="ident">test_count</span>,
-            <span class="ident">skip_count</span>: <span class="ident">OnceCell</span>::<span class="ident">new</span>(),
+            <span class="ident">skip_count</span>: <span class="ident">OnceCell::new</span>(),
         })
     }
 
@@ -663,7 +663,7 @@
         <span class="kw">let</span> <span class="ident">test_binaries</span> <span class="op">=</span> <span class="ident">test_bin_outputs</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">test_binary</span>, <span class="ident">non_ignored</span>, <span class="ident">ignored</span>)<span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">bin</span>, <span class="ident">info</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">process_output</span>(
+                <span class="kw">let</span> (<span class="ident">bin</span>, <span class="ident">info</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::process_output</span>(
                     <span class="ident">test_binary</span>,
                     <span class="ident">filter</span>,
                     <span class="ident">non_ignored</span>.<span class="ident">as_ref</span>(),
@@ -677,7 +677,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">test_binaries</span>,
             <span class="ident">test_count</span>,
-            <span class="ident">skip_count</span>: <span class="ident">OnceCell</span>::<span class="ident">new</span>(),
+            <span class="ident">skip_count</span>: <span class="ident">OnceCell::new</span>(),
         })
     }
 
@@ -714,7 +714,7 @@
 
     <span class="doccomment">/// Writes the list to stdout.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_to_stdout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">color</span>: <span class="ident">Color</span>, <span class="ident">output_format</span>: <span class="ident">OutputFormat</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">BufferWriter</span>::<span class="ident">stdout</span>(<span class="ident">color</span>.<span class="ident">color_choice</span>(<span class="ident">atty</span>::<span class="ident">Stream</span>::<span class="ident">Stdout</span>));
+        <span class="kw">let</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">BufferWriter::stdout</span>(<span class="ident">color</span>.<span class="ident">color_choice</span>(<span class="ident">atty::Stream::Stdout</span>));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">stdout</span>.<span class="ident">buffer</span>();
         <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">output_format</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>)<span class="question-mark">?</span>;
         <span class="ident">stdout</span>.<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>).<span class="ident">context</span>(<span class="string">&quot;error writing output&quot;</span>)
@@ -723,8 +723,8 @@
     <span class="doccomment">/// Outputs this list to the given writer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">output_format</span>: <span class="ident">OutputFormat</span>, <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">output_format</span> {
-            <span class="ident">OutputFormat</span>::<span class="ident">Plain</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_plain</span>(<span class="ident">writer</span>).<span class="ident">context</span>(<span class="string">&quot;error writing test list&quot;</span>),
-            <span class="ident">OutputFormat</span>::<span class="ident">Serializable</span>(<span class="ident">format</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">format</span>.<span class="ident">to_writer</span>(<span class="self">self</span>, <span class="ident">writer</span>),
+            <span class="ident">OutputFormat::Plain</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_plain</span>(<span class="ident">writer</span>).<span class="ident">context</span>(<span class="string">&quot;error writing test list&quot;</span>),
+            <span class="ident">OutputFormat::Serializable</span>(<span class="ident">format</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">format</span>.<span class="ident">to_writer</span>(<span class="self">self</span>, <span class="ident">writer</span>),
         }
     }
 
@@ -739,7 +739,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_tests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">test_binaries</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">test_bin</span>, <span class="ident">bin_info</span>)<span class="op">|</span> {
             <span class="ident">bin_info</span>.<span class="ident">tests</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">name</span>, <span class="ident">info</span>)<span class="op">|</span> {
-                <span class="ident">TestInstance</span>::<span class="ident">new</span>(
+                <span class="ident">TestInstance::new</span>(
                     <span class="ident">name</span>,
                     <span class="ident">test_bin</span>,
                     <span class="kw-2">&amp;</span><span class="ident">bin_info</span>.<span class="ident">binary_id</span>,
@@ -753,9 +753,9 @@
     <span class="doccomment">/// Outputs this list as a string with the given format.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">output_format</span>: <span class="ident">OutputFormat</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Ugh this sucks. String really should have an io::Write impl that errors on non-UTF8 text.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">NoColor</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>[]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">NoColor::new</span>(<span class="macro">vec!</span>[]);
         <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">output_format</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>.<span class="ident">into_inner</span>()).<span class="ident">expect</span>(<span class="string">&quot;buffer is valid UTF-8&quot;</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">String::from_utf8</span>(<span class="ident">buf</span>.<span class="ident">into_inner</span>()).<span class="ident">expect</span>(<span class="string">&quot;buffer is valid UTF-8&quot;</span>))
     }
 
     <span class="comment">// ---</span>
@@ -768,12 +768,12 @@
         <span class="ident">non_ignored</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">ignored</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Utf8PathBuf</span>, <span class="ident">TestBinInfo</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tests</span> <span class="op">=</span> <span class="ident">BTreeMap</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tests</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="comment">// Treat ignored and non-ignored as separate sets of single filters, so that partitioning</span>
         <span class="comment">// based on one doesn&#39;t affect the other.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">non_ignored_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_binary</span>);
-        <span class="kw">for</span> <span class="ident">test_name</span> <span class="kw">in</span> <span class="self">Self</span>::<span class="ident">parse</span>(<span class="ident">non_ignored</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
+        <span class="kw">for</span> <span class="ident">test_name</span> <span class="kw">in</span> <span class="self">Self</span><span class="ident">::parse</span>(<span class="ident">non_ignored</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
             <span class="ident">tests</span>.<span class="ident">insert</span>(
                 <span class="ident">test_name</span>.<span class="ident">into</span>(),
                 <span class="ident">RustTestInfo</span> {
@@ -784,7 +784,7 @@
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ignored_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_binary</span>);
-        <span class="kw">for</span> <span class="ident">test_name</span> <span class="kw">in</span> <span class="self">Self</span>::<span class="ident">parse</span>(<span class="ident">ignored</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
+        <span class="kw">for</span> <span class="ident">test_name</span> <span class="kw">in</span> <span class="self">Self</span><span class="ident">::parse</span>(<span class="ident">ignored</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
             <span class="comment">// TODO: catch dups</span>
             <span class="ident">tests</span>.<span class="ident">insert</span>(
                 <span class="ident">test_name</span>.<span class="ident">into</span>(),
@@ -813,7 +813,7 @@
 
     <span class="doccomment">/// Parses the output of --list --format terse and returns a sorted list.</span>
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">list_output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">parse_impl</span>(<span class="ident">list_output</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::parse_impl</span>(<span class="ident">list_output</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="ident">list</span>.<span class="ident">sort_unstable</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">list</span>)
     }
@@ -826,7 +826,7 @@
 
         <span class="ident">list_output</span>.<span class="ident">lines</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">line</span><span class="op">|</span> {
             <span class="ident">line</span>.<span class="ident">strip_suffix</span>(<span class="string">&quot;: test&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="macro">anyhow</span><span class="macro">!</span>(
+                <span class="macro">anyhow!</span>(
                     <span class="string">&quot;line &#39;{}&#39; did not end with the string &#39;: test&#39;, full output:\n{}&quot;</span>,
                     <span class="ident">line</span>,
                     <span class="ident">list_output</span>
@@ -835,33 +835,33 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">write_plain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_plain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">test_bin_spec</span> <span class="op">=</span> <span class="ident">test_bin_spec</span>();
-        <span class="kw">let</span> <span class="ident">field_spec</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">field_spec</span>();
+        <span class="kw">let</span> <span class="ident">field_spec</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::field_spec</span>();
         <span class="kw">let</span> <span class="ident">test_name_spec</span> <span class="op">=</span> <span class="ident">test_name_spec</span>();
 
         <span class="kw">for</span> (<span class="ident">test_bin</span>, <span class="ident">info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">test_binaries</span> {
             <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">test_bin_spec</span>)<span class="question-mark">?</span>;
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_bin</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_bin</span>)<span class="question-mark">?</span>;
             <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-            <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;:&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;:&quot;</span>)<span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cwd</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">cwd</span> {
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">field_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;  cwd: &quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;  cwd: &quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">cwd</span>)<span class="question-mark">?</span>;
+                <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">cwd</span>)<span class="question-mark">?</span>;
             }
 
             <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">tests</span> {
                 <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">test_name_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot;    {}&quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;    {}&quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>;
                 <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">info</span>.<span class="ident">filter_match</span>.<span class="ident">is_match</span>() {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">writer</span>, <span class="string">&quot; (skipped)&quot;</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; (skipped)&quot;</span>)<span class="question-mark">?</span>;
                 }
-                <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
+                <span class="macro">writeln!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
         }
@@ -869,9 +869,9 @@
     }
 
     <span class="kw">fn</span> <span class="ident">field_spec</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
         <span class="ident">color_spec</span>
-            .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor</span>::<span class="ident">Color</span>::<span class="ident">Yellow</span>))
+            .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Yellow</span>))
             .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
         <span class="ident">color_spec</span>
     }
@@ -886,17 +886,17 @@
     }
 
     <span class="kw">fn</span> <span class="ident">exec_single</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ignored</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">argv</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;--list&quot;</span>, <span class="string">&quot;--format&quot;</span>, <span class="string">&quot;terse&quot;</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">argv</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;--list&quot;</span>, <span class="string">&quot;--format&quot;</span>, <span class="string">&quot;terse&quot;</span>];
         <span class="kw">if</span> <span class="ident">ignored</span> {
             <span class="ident">argv</span>.<span class="ident">push</span>(<span class="string">&quot;--ignored&quot;</span>);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>::<span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binary</span>), <span class="ident">argv</span>).<span class="ident">stdout_capture</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binary</span>), <span class="ident">argv</span>).<span class="ident">stdout_capture</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cwd</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cwd</span> {
             <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">dir</span>(<span class="ident">cwd</span>);
         };
 
         <span class="ident">cmd</span>.<span class="ident">read</span>().<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="macro">format</span><span class="macro">!</span>(
+            <span class="macro">format!</span>(
                 <span class="string">&quot;running &#39;{} --list --format --terse{}&#39; failed&quot;</span>,
                 <span class="self">self</span>.<span class="ident">binary</span>,
                 <span class="kw">if</span> <span class="ident">ignored</span> { <span class="string">&quot; --ignored&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }
@@ -945,17 +945,17 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">test_bin_spec</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColorSpec</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
     <span class="ident">color_spec</span>
-        .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor</span>::<span class="ident">Color</span>::<span class="ident">Magenta</span>))
+        .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Magenta</span>))
         .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
     <span class="ident">color_spec</span>
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">test_name_spec</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColorSpec</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
     <span class="ident">color_spec</span>
-        .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor</span>::<span class="ident">Color</span>::<span class="ident">Blue</span>))
+        .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Blue</span>))
         .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
     <span class="ident">color_spec</span>
 }
@@ -964,26 +964,26 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">output</span>::<span class="ident">SerializableFormat</span>,
+        <span class="ident">output::SerializableFormat</span>,
         <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>, <span class="ident">RunIgnored</span>},
     };
-    <span class="kw">use</span> <span class="ident">indoc</span>::<span class="ident">indoc</span>;
-    <span class="kw">use</span> <span class="ident">maplit</span>::<span class="ident">btreemap</span>;
-    <span class="kw">use</span> <span class="ident">pretty_assertions</span>::<span class="ident">assert_eq</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>;
+    <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
+    <span class="kw">use</span> <span class="ident">maplit::btreemap</span>;
+    <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
+    <span class="kw">use</span> <span class="ident">std::iter</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse</span>() {
-        <span class="kw">let</span> <span class="ident">non_ignored_output</span> <span class="op">=</span> <span class="macro">indoc</span><span class="macro">!</span> {<span class="string">&quot;
+        <span class="kw">let</span> <span class="ident">non_ignored_output</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">&quot;
             tests::foo::test_bar: test
             tests::baz::test_quux: test
         &quot;</span>};
-        <span class="kw">let</span> <span class="ident">ignored_output</span> <span class="op">=</span> <span class="macro">indoc</span><span class="macro">!</span> {<span class="string">&quot;
+        <span class="kw">let</span> <span class="ident">ignored_output</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">&quot;
             tests::ignored::test_bar: test
             tests::baz::test_ignored: test
         &quot;</span>};
 
-        <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span> <span class="ident">TestFilterBuilder</span>::<span class="ident">any</span>(<span class="ident">RunIgnored</span>::<span class="ident">Default</span>);
+        <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span> <span class="ident">TestFilterBuilder::any</span>(<span class="ident">RunIgnored::Default</span>);
         <span class="kw">let</span> <span class="ident">fake_cwd</span>: <span class="ident">Utf8PathBuf</span> <span class="op">=</span> <span class="string">&quot;/fake/cwd&quot;</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">fake_binary_id</span> <span class="op">=</span> <span class="string">&quot;fake-package&quot;</span>.<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">test_binary</span> <span class="op">=</span> <span class="ident">TestBinary</span> {
@@ -991,31 +991,31 @@
             <span class="ident">cwd</span>: <span class="prelude-val">Some</span>(<span class="ident">fake_cwd</span>.<span class="ident">clone</span>()),
             <span class="ident">binary_id</span>: <span class="ident">fake_binary_id</span>.<span class="ident">clone</span>(),
         };
-        <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">TestList</span>::<span class="ident">new_with_outputs</span>(
-            <span class="ident">iter</span>::<span class="ident">once</span>((<span class="ident">test_binary</span>, <span class="kw-2">&amp;</span><span class="ident">non_ignored_output</span>, <span class="kw-2">&amp;</span><span class="ident">ignored_output</span>)),
+        <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">TestList::new_with_outputs</span>(
+            <span class="ident">iter::once</span>((<span class="ident">test_binary</span>, <span class="kw-2">&amp;</span><span class="ident">non_ignored_output</span>, <span class="kw-2">&amp;</span><span class="ident">ignored_output</span>)),
             <span class="kw-2">&amp;</span><span class="ident">test_filter</span>,
         )
         .<span class="ident">expect</span>(<span class="string">&quot;valid output&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">test_list</span>.<span class="ident">test_binaries</span>,
-            <span class="macro">btreemap</span><span class="macro">!</span> {
+            <span class="macro">btreemap!</span> {
                 <span class="string">&quot;/fake/binary&quot;</span>.<span class="ident">into</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TestBinInfo</span> {
-                    <span class="ident">tests</span>: <span class="macro">btreemap</span><span class="macro">!</span> {
+                    <span class="ident">tests</span>: <span class="macro">btreemap!</span> {
                         <span class="string">&quot;tests::foo::test_bar&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">false</span>,
-                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Matches</span>,
+                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Matches</span>,
                         },
                         <span class="string">&quot;tests::baz::test_quux&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">false</span>,
-                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Matches</span>,
+                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Matches</span>,
                         },
                         <span class="string">&quot;tests::ignored::test_bar&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">true</span>,
-                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason</span>::<span class="ident">Ignored</span> },
+                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason::Ignored</span> },
                         },
                         <span class="string">&quot;tests::baz::test_ignored&quot;</span>.<span class="ident">to_owned</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RustTestInfo</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">true</span>,
-                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>::<span class="ident">Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason</span>::<span class="ident">Ignored</span> },
+                            <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason::Ignored</span> },
                         },
                     },
                     <span class="ident">cwd</span>: <span class="prelude-val">Some</span>(<span class="ident">fake_cwd</span>),
@@ -1025,7 +1025,7 @@
         );
 
         <span class="comment">// Check that the expected outputs are valid.</span>
-        <span class="kw">static</span> <span class="ident">EXPECTED_PLAIN</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc</span><span class="macro">!</span> {<span class="string">&quot;
+        <span class="kw">static</span> <span class="ident">EXPECTED_PLAIN</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">&quot;
             /fake/binary:
               cwd: /fake/cwd
                 tests::baz::test_ignored (skipped)
@@ -1033,7 +1033,7 @@
                 tests::foo::test_bar
                 tests::ignored::test_bar (skipped)
         &quot;</span>};
-        <span class="kw">static</span> <span class="ident">EXPECTED_JSON_PRETTY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc</span><span class="macro">!</span> {<span class="string">r#&quot;
+        <span class="kw">static</span> <span class="ident">EXPECTED_JSON_PRETTY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             {
               &quot;test-count&quot;: 4,
               &quot;test-binaries&quot;: {
@@ -1072,20 +1072,20 @@
               }
             }&quot;#</span>};
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">test_list</span>
-                .<span class="ident">to_string</span>(<span class="ident">OutputFormat</span>::<span class="ident">Plain</span>)
+                .<span class="ident">to_string</span>(<span class="ident">OutputFormat::Plain</span>)
                 .<span class="ident">expect</span>(<span class="string">&quot;plain succeeded&quot;</span>),
             <span class="ident">EXPECTED_PLAIN</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">test_list</span>
-                .<span class="ident">to_string</span>(<span class="ident">OutputFormat</span>::<span class="ident">Serializable</span>(<span class="ident">SerializableFormat</span>::<span class="ident">JsonPretty</span>))
+                .<span class="ident">to_string</span>(<span class="ident">OutputFormat::Serializable</span>(<span class="ident">SerializableFormat::JsonPretty</span>))
                 .<span class="ident">expect</span>(<span class="string">&quot;json-pretty succeeded&quot;</span>),
             <span class="ident">EXPECTED_JSON_PRETTY</span>
         );
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="nextest_runner"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="nextest_runner" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
