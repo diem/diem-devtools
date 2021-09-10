@@ -8,7 +8,7 @@ use crate::{
     test_list::{TestInstance, TestList},
 };
 use anyhow::Result;
-use crossbeam_channel::Sender;
+use crossbeam_channel::{RecvTimeoutError, Sender};
 use duct::cmd;
 use rayon::{ThreadPool, ThreadPoolBuilder};
 use signal_hook::{iterator::Handle, low_level::emulate_default_handler};
@@ -21,7 +21,6 @@ use std::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    thread::sleep,
     time::{Duration, Instant, SystemTime},
 };
 use structopt::StructOpt;
@@ -51,6 +50,11 @@ impl TestRunnerOpts {
                 .thread_name(|idx| format!("testrunner-run-{}", idx))
                 .build()
                 .expect("run pool built"),
+            wait_pool: ThreadPoolBuilder::new()
+                .num_threads(test_threads + 1)
+                .thread_name(|idx| format!("testrunner-wait-{}", idx))
+                .build()
+                .expect("run pool built"),
         }
     }
 }
@@ -60,6 +64,7 @@ pub struct TestRunner<'list> {
     opts: TestRunnerOpts,
     test_list: &'list TestList,
     run_pool: ThreadPool,
+    wait_pool: ThreadPool,
 }
 
 impl<'list> TestRunner<'list> {
@@ -309,24 +314,37 @@ impl<'list> TestRunner<'list> {
 
         let now = Instant::now();
 
-        let output = loop {
-            let result = handle.try_wait();
-            if let Ok(None) = result {
-                sleep(Duration::new(5, 0));
-                if (now.elapsed().as_secs() > 60) {
-                    println!(
-                        "{}::{} elapsed time is {}",
-                        &test.binary,
-                        &test.name,
-                        now.elapsed().as_secs()
-                    );
+        self.wait_pool.scope(|s| {
+            let (sender, receiver) = crossbeam_channel::bounded::<()>(1);
+            let wait_handle = &handle;
+
+            // Spawn a task on the threadpool that waits for the test to finish.
+            s.spawn(move |_| {
+                // This thread is just waiting for the test to finish, we'll handle the output in the main thread
+                let _ = wait_handle.wait();
+                // We don't care if the receiver got the message or not
+                let _ = sender.send(());
+            });
+
+            // Continue waiting for the test to finish with a timeout, logging every 60 seconds
+            while let Err(error) = receiver.recv_timeout(Duration::from_secs(60)) {
+                match error {
+                    RecvTimeoutError::Timeout => {
+                        println!(
+                            "{}::{} elapsed time is {}",
+                            &test.binary,
+                            &test.name,
+                            now.elapsed().as_secs()
+                        );
+                    }
+                    RecvTimeoutError::Disconnected => {
+                        unreachable!("Waiting thread should never drop the sender")
+                    }
                 }
-            } else {
-                break result;
             }
-        }?
-        .unwrap()
-        .to_owned();
+        });
+
+        let output = handle.into_output()?;
 
         let status = if output.status.success() {
             TestStatus::Pass
