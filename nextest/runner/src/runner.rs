@@ -22,8 +22,7 @@ use std::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    thread::sleep,
-    time::{Duration, Instant, SystemTime},
+    time::{Duration, SystemTime},
 };
 use structopt::StructOpt;
 
@@ -315,26 +314,9 @@ impl<'list> TestRunner<'list> {
 
         let handle = cmd.start()?;
 
-        let now = Instant::now();
+        // TODO: timeout/kill logic
 
-        let output = loop {
-            let result = handle.try_wait();
-            if let Ok(None) = result {
-                sleep(Duration::new(5, 0));
-                if now.elapsed().as_secs() > 60 {
-                    println!(
-                        "{}::{} elapsed time is {}",
-                        &test.binary,
-                        &test.name,
-                        now.elapsed().as_secs()
-                    );
-                }
-            } else {
-                break result;
-            }
-        }?
-        .unwrap()
-        .to_owned();
+        let output = handle.into_output()?;
 
         let status = if output.status.success() {
             TestStatus::Pass
