@@ -51,7 +51,7 @@ impl TestRunnerOpts {
                 .build()
                 .expect("run pool built"),
             wait_pool: ThreadPoolBuilder::new()
-                .num_threads(test_threads + 1)
+                .num_threads(test_threads)
                 .thread_name(|idx| format!("testrunner-wait-{}", idx))
                 .build()
                 .expect("run pool built"),
@@ -314,7 +314,7 @@ impl<'list> TestRunner<'list> {
 
         let now = Instant::now();
 
-        self.wait_pool.scope(|s| {
+        self.wait_pool.in_place_scope(|s| {
             let (sender, receiver) = crossbeam_channel::bounded::<()>(1);
             let wait_handle = &handle;
 
