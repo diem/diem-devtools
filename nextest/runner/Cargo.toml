@@ -27,7 +27,7 @@ nextest-config = { path = "../config" }
 quick-junit = { path = "../../quick-junit" }
 
 [dev-dependencies]
-cargo_metadata = "0.13.1"
+cargo_metadata = "0.14.1"
 indoc = "1.0.3"
 maplit = "1.0.2"
 pretty_assertions = "0.7.2"
