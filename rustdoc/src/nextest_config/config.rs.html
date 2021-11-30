@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `nextest&#x2F;config&#x2F;src&#x2F;config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../nextest_config/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `nextest&#x2F;config&#x2F;src&#x2F;config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../nextest_config/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -319,13 +319,12 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright (c) The diem-devtools Contributors</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="doccomment">//! Configuration for nextest.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::errors</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::errors</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">anyhow::Context</span>;
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
@@ -389,7 +388,7 @@ Custom, repository-specific configuration is layered on top of the default confi
         <span class="ident">config_file</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Utf8Path</span><span class="op">&gt;</span>,
         <span class="ident">workspace_root</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8Path</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ConfigReadError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::read_from_sources</span>(<span class="ident">config_file</span>, <span class="ident">workspace_root</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_from_sources</span>(<span class="ident">config_file</span>, <span class="ident">workspace_root</span>)<span class="question-mark">?</span>;
         <span class="ident">config</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">config</span>)
     }
@@ -416,18 +415,18 @@ Custom, repository-specific configuration is layered on top of the default confi
         <span class="ident">workspace_root</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8Path</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ConfigReadError</span><span class="op">&gt;</span> {
         <span class="comment">// First, get the default config. Other configs are layered on top of it.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
 
         <span class="kw">let</span> <span class="ident">repo_config</span> <span class="op">=</span> {
             <span class="comment">// Read a file that&#39;s explicitly specified.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">file</span>) <span class="op">=</span> <span class="ident">file</span> {
-                <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::read_file</span>(<span class="ident">file</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_file</span>(<span class="ident">file</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Some</span>((<span class="ident">file</span>.<span class="ident">to_owned</span>(), <span class="ident">config</span>))
             } <span class="kw">else</span> {
                 <span class="comment">// Attempt to read Nextest.toml from the workspace root if it exists.</span>
-                <span class="kw">let</span> <span class="ident">default_file</span> <span class="op">=</span> <span class="ident">workspace_root</span>.<span class="ident">join</span>(<span class="self">Self</span><span class="ident">::NEXTEST_TOML</span>);
+                <span class="kw">let</span> <span class="ident">default_file</span> <span class="op">=</span> <span class="ident">workspace_root</span>.<span class="ident">join</span>(<span class="ident"><span class="self">Self</span>::NEXTEST_TOML</span>);
                 <span class="kw">if</span> <span class="ident">default_file</span>.<span class="ident">is_file</span>() {
-                    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::read_file</span>(<span class="kw-2">&amp;</span><span class="ident">default_file</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_file</span>(<span class="kw-2">&amp;</span><span class="ident">default_file</span>)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>((<span class="ident">default_file</span>, <span class="ident">config</span>))
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
@@ -450,8 +449,8 @@ Custom, repository-specific configuration is layered on top of the default confi
     <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">Utf8PathBuf</span>, <span class="ident">other</span>: <span class="ident">NextestConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ConfigReadError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">default_profile</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">default_profile</span>;
 
-        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::merge_entries</span>(<span class="ident">file</span>, <span class="string">&quot;profile&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">profiles</span>, <span class="ident">other</span>.<span class="ident">profiles</span>)<span class="question-mark">?</span>;
-        <span class="self">Self</span><span class="ident">::merge_entries</span>(<span class="ident">file</span>, <span class="string">&quot;metadata&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">metadata</span>, <span class="ident">other</span>.<span class="ident">metadata</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::merge_entries</span>(<span class="ident">file</span>, <span class="string">&quot;profile&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">profiles</span>, <span class="ident">other</span>.<span class="ident">profiles</span>)<span class="question-mark">?</span>;
+        <span class="ident"><span class="self">Self</span>::merge_entries</span>(<span class="ident">file</span>, <span class="string">&quot;metadata&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">metadata</span>, <span class="ident">other</span>.<span class="ident">metadata</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -513,7 +512,7 @@ Custom, repository-specific configuration is layered on top of the default confi
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NextestConfig</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">toml::de::from_str</span>(<span class="self">Self</span><span class="ident">::DEFAULT_CONFIG</span>).<span class="ident">expect</span>(<span class="string">&quot;default config should be valid&quot;</span>)
+        <span class="ident">toml::de::from_str</span>(<span class="ident"><span class="self">Self</span>::DEFAULT_CONFIG</span>).<span class="ident">expect</span>(<span class="string">&quot;default config should be valid&quot;</span>)
     }
 }
 
@@ -641,7 +640,7 @@ Custom, repository-specific configuration is layered on top of the default confi
         <span class="ident">default_config</span>.<span class="ident">validate</span>().<span class="ident">expect</span>(<span class="string">&quot;default config is valid&quot;</span>);
     }
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="nextest_config" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>
