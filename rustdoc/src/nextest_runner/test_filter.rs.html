@@ -313,23 +313,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RunIgnored</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() <span class="op">-</span><span class="op">&gt;</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">3</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">3</span>] {
         [<span class="string">&quot;default&quot;</span>, <span class="string">&quot;ignored-only&quot;</span>, <span class="string">&quot;all&quot;</span>]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RunIgnored</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">RunIgnored::Default</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RunIgnored</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RunIgnored::Default</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;default&quot;</span>),
-            <span class="ident">RunIgnored::IgnoredOnly</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ignored-only&quot;</span>),
-            <span class="ident">RunIgnored::All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;all&quot;</span>),
+            <span class="ident">RunIgnored::Default</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;default&quot;</span>),
+            <span class="ident">RunIgnored::IgnoredOnly</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ignored-only&quot;</span>),
+            <span class="ident">RunIgnored::All</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;all&quot;</span>),
         }
     }
 }
@@ -337,12 +337,12 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">RunIgnored</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">anyhow::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;default&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RunIgnored::Default</span>,
-            <span class="string">&quot;ignored-only&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RunIgnored::IgnoredOnly</span>,
-            <span class="string">&quot;all&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RunIgnored::All</span>,
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;unrecognized value for run-ignored: {}&quot;</span>, <span class="ident">other</span>),
+            <span class="string">&quot;default&quot;</span> =&gt; <span class="ident">RunIgnored::Default</span>,
+            <span class="string">&quot;ignored-only&quot;</span> =&gt; <span class="ident">RunIgnored::IgnoredOnly</span>,
+            <span class="string">&quot;all&quot;</span> =&gt; <span class="ident">RunIgnored::All</span>,
+            <span class="ident">other</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unrecognized value for run-ignored: {}&quot;</span>, <span class="ident">other</span>),
         };
         <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
     }
@@ -370,7 +370,7 @@
         <span class="ident">run_ignored</span>: <span class="ident">RunIgnored</span>,
         <span class="ident">partitioner_builder</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartitionerBuilder</span><span class="op">&gt;</span>,
         <span class="ident">patterns</span>: <span class="kw-2">&amp;</span>[<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">name_match</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">patterns</span>.<span class="ident">is_empty</span>() {
             <span class="ident">NameMatch::MatchAll</span>
         } <span class="kw">else</span> {
@@ -384,7 +384,7 @@
     }
 
     <span class="doccomment">/// Creates a new `TestFilterBuilder` that matches any pattern by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>(<span class="ident">run_ignored</span>: <span class="ident">RunIgnored</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>(<span class="ident">run_ignored</span>: <span class="ident">RunIgnored</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">run_ignored</span>,
             <span class="ident">partitioner_builder</span>: <span class="prelude-val">None</span>,
@@ -395,7 +395,7 @@
     <span class="doccomment">/// Creates a new test filter scoped to a single binary.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This test filter may be stateful.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test_binary</span>: <span class="kw-2">&amp;</span><span class="ident">TestBinary</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestFilter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test_binary</span>: <span class="kw-2">&amp;</span><span class="ident">TestBinary</span>) -&gt; <span class="ident">TestFilter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">partitioner</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">partitioner_builder</span>
             .<span class="ident">as_ref</span>()
@@ -416,28 +416,28 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;filter</span><span class="op">&gt;</span> <span class="ident">TestFilter</span><span class="op">&lt;</span><span class="lifetime">&#39;filter</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns an enum describing the match status of this filter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_match</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ignored</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterMatch</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_match</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ignored</span>: <span class="ident">bool</span>) -&gt; <span class="ident">FilterMatch</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">run_ignored</span> {
-            <span class="ident">RunIgnored::IgnoredOnly</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RunIgnored::IgnoredOnly</span> =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">ignored</span> {
                     <span class="kw">return</span> <span class="ident">FilterMatch::Mismatch</span> {
                         <span class="ident">reason</span>: <span class="ident">MismatchReason::Ignored</span>,
                     };
                 }
             }
-            <span class="ident">RunIgnored::Default</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RunIgnored::Default</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">ignored</span> {
                     <span class="kw">return</span> <span class="ident">FilterMatch::Mismatch</span> {
                         <span class="ident">reason</span>: <span class="ident">MismatchReason::Ignored</span>,
                     };
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         };
 
         <span class="kw">let</span> <span class="ident">string_match</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">name_match</span> {
-            <span class="ident">NameMatch::MatchAll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">NameMatch::MatchSet</span>(<span class="ident">set</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">set</span>.<span class="ident">is_match</span>(<span class="ident">test_name</span>),
+            <span class="ident">NameMatch::MatchAll</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">NameMatch::MatchSet</span>(<span class="ident">set</span>) =&gt; <span class="ident">set</span>.<span class="ident">is_match</span>(<span class="ident">test_name</span>),
         };
         <span class="kw">if</span> <span class="op">!</span><span class="ident">string_match</span> {
             <span class="kw">return</span> <span class="ident">FilterMatch::Mismatch</span> {
@@ -446,8 +446,8 @@
         }
 
         <span class="kw">let</span> <span class="ident">partition_match</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">partitioner</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">partitioner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">partitioner</span>.<span class="ident">test_matches</span>(<span class="ident">test_name</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">partitioner</span>) =&gt; <span class="ident">partitioner</span>.<span class="ident">test_matches</span>(<span class="ident">test_name</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
         };
         <span class="kw">if</span> <span class="op">!</span><span class="ident">partition_match</span> {
             <span class="kw">return</span> <span class="ident">FilterMatch::Mismatch</span> {
@@ -474,7 +474,7 @@
 
 <span class="kw">impl</span> <span class="ident">FilterMatch</span> {
     <span class="doccomment">/// Returns true if the filter doesn&#39;t match.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">FilterMatch::Matches</span>)
     }
 }
@@ -494,11 +494,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MismatchReason</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MismatchReason::Ignored</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;does not match the run-ignored option&quot;</span>),
-            <span class="ident">MismatchReason::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;does not match the provided string filters&quot;</span>),
-            <span class="ident">MismatchReason::Partition</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;is in a different partition&quot;</span>),
+            <span class="ident">MismatchReason::Ignored</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;does not match the run-ignored option&quot;</span>),
+            <span class="ident">MismatchReason::String</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;does not match the provided string filters&quot;</span>),
+            <span class="ident">MismatchReason::Partition</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;is in a different partition&quot;</span>),
         }
     }
 }
@@ -564,7 +564,7 @@
     }
 
     <span class="doccomment">/// Creates a fake test binary instance.</span>
-    <span class="kw">fn</span> <span class="ident">make_test_binary</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestBinary</span> {
+    <span class="kw">fn</span> <span class="ident">make_test_binary</span>() -&gt; <span class="ident">TestBinary</span> {
         <span class="ident">TestBinary</span> {
             <span class="ident">binary</span>: <span class="string">&quot;/fake/path&quot;</span>.<span class="ident">into</span>(),
             <span class="ident">binary_id</span>: <span class="string">&quot;fake-id&quot;</span>.<span class="ident">to_owned</span>(),

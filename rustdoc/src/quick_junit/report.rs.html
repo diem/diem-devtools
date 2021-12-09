@@ -703,7 +703,7 @@
 
 <span class="kw">impl</span> <span class="ident">Report</span> {
     <span class="doccomment">/// Creates a new `Testsuites`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
@@ -716,13 +716,13 @@
     }
 
     <span class="doccomment">/// Sets the start timestamp for the report.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the time taken for overall execution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
     }
@@ -731,7 +731,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
     <span class="doccomment">/// `self.testsuites` directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testsuite</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testsuite</span>: <span class="ident">Testsuite</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testsuite</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testsuite</span>: <span class="ident">Testsuite</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tests</span> <span class="op">+</span><span class="op">=</span> <span class="ident">testsuite</span>.<span class="ident">tests</span>;
         <span class="self">self</span>.<span class="ident">failures</span> <span class="op">+</span><span class="op">=</span> <span class="ident">testsuite</span>.<span class="ident">failures</span>;
         <span class="self">self</span>.<span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="ident">testsuite</span>.<span class="ident">errors</span>;
@@ -743,7 +743,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
     <span class="doccomment">/// `self.testsuites` directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testsuites</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testsuites</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Testsuite</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testsuites</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testsuites</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Testsuite</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">for</span> <span class="ident">testsuite</span> <span class="kw">in</span> <span class="ident">testsuites</span> {
             <span class="self">self</span>.<span class="ident">add_testsuite</span>(<span class="ident">testsuite</span>);
         }
@@ -751,12 +751,12 @@
     }
 
     <span class="doccomment">/// Serialize this report to the given writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">io::Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">quick_xml::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">io::Write</span>) -&gt; <span class="ident">quick_xml::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">serialize_report</span>(<span class="self">self</span>, <span class="ident">writer</span>)
     }
 
     <span class="doccomment">/// Serialize this report to a string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">quick_xml::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">quick_xml::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="self">self</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
         <span class="ident">String::from_utf8</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">utf8_err</span><span class="op">|</span> <span class="ident">quick_xml::Error::Utf8</span>(<span class="ident">utf8_err</span>.<span class="ident">utf8_error</span>()))
@@ -812,7 +812,7 @@
 
 <span class="kw">impl</span> <span class="ident">Testsuite</span> {
     <span class="doccomment">/// Creates a new `Testsuite`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">time</span>: <span class="prelude-val">None</span>,
@@ -830,19 +830,19 @@
     }
 
     <span class="doccomment">/// Sets the start timestamp for the testsuite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the time taken for the testsuite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Adds a property to this testsuite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_property</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">property</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Property</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_property</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">property</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Property</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">properties</span>.<span class="ident">push</span>(<span class="ident">property</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -850,7 +850,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_properties</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">properties</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Property</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">for</span> <span class="ident">property</span> <span class="kw">in</span> <span class="ident">properties</span> {
             <span class="self">self</span>.<span class="ident">add_property</span>(<span class="ident">property</span>);
         }
@@ -861,21 +861,21 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
     <span class="doccomment">/// `self.testcases` directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testcase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testcase</span>: <span class="ident">Testcase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testcase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testcase</span>: <span class="ident">Testcase</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tests</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">testcase</span>.<span class="ident">status</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">kind</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">kind</span> {
-                <span class="ident">NonSuccessKind::Failure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">failures</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
-                <span class="ident">NonSuccessKind::Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; {}
+            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">kind</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">kind</span> {
+                <span class="ident">NonSuccessKind::Failure</span> =&gt; <span class="self">self</span>.<span class="ident">failures</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+                <span class="ident">NonSuccessKind::Error</span> =&gt; <span class="self">self</span>.<span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
             },
-            <span class="ident">TestcaseStatus::Skipped</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">disabled</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+            <span class="ident">TestcaseStatus::Skipped</span> { .. } =&gt; <span class="self">self</span>.<span class="ident">disabled</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
         }
         <span class="self">self</span>.<span class="ident">testcases</span>.<span class="ident">push</span>(<span class="ident">testcase</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testcases</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testcases</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Testcase</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testcases</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">testcases</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Testcase</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">for</span> <span class="ident">testcase</span> <span class="kw">in</span> <span class="ident">testcases</span> {
             <span class="self">self</span>.<span class="ident">add_testcase</span>(<span class="ident">testcase</span>);
         }
@@ -883,7 +883,7 @@
     }
 
     <span class="doccomment">/// Sets standard output.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_out</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Output</span> {
             <span class="ident">output</span>: <span class="ident">system_out</span>.<span class="ident">into</span>(),
         });
@@ -893,12 +893,12 @@
     <span class="doccomment">/// Sets standard output from a `Vec&lt;u8&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The output is converted to a string, lossily.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">set_system_out</span>(<span class="ident">from_utf8_lossy</span>(<span class="ident">system_out</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Sets standard error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Output</span> {
             <span class="ident">output</span>: <span class="ident">system_err</span>.<span class="ident">into</span>(),
         });
@@ -908,7 +908,7 @@
     <span class="doccomment">/// Sets standard error from a `Vec&lt;u8&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The output is converted to a string, lossily.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">set_system_err</span>(<span class="ident">from_utf8_lossy</span>(<span class="ident">system_err</span>.<span class="ident">into</span>()))
     }
 }
@@ -952,7 +952,7 @@
 
 <span class="kw">impl</span> <span class="ident">Testcase</span> {
     <span class="doccomment">/// Creates a new testcase.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">TestcaseStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">TestcaseStatus</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">classname</span>: <span class="prelude-val">None</span>,
@@ -967,31 +967,31 @@
     }
 
     <span class="doccomment">/// Sets the classname of the test.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_classname</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">classname</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_classname</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">classname</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">classname</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">classname</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the number of assertions in the testcase.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_assertions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">assertions</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_assertions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">assertions</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">assertions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">assertions</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the start timestamp for the testcase.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the time taken for the testcase.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets standard output.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_out</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Output</span> {
             <span class="ident">output</span>: <span class="ident">system_out</span>.<span class="ident">into</span>(),
         });
@@ -1001,12 +1001,12 @@
     <span class="doccomment">/// Sets standard output from a `Vec&lt;u8&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The output is assumed to be UTF-8 and is converted to a string, lossily.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">set_system_out</span>(<span class="ident">from_utf8_lossy</span>(<span class="ident">system_out</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Sets standard error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Output</span> {
             <span class="ident">output</span>: <span class="ident">system_err</span>.<span class="ident">into</span>(),
         });
@@ -1016,7 +1016,7 @@
     <span class="doccomment">/// Sets standard error from a `Vec&lt;u8&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The output is assumed to be UTF-8 and is converted to a string, lossily.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">set_system_err</span>(<span class="ident">from_utf8_lossy</span>(<span class="ident">system_err</span>.<span class="ident">into</span>()))
     }
 }
@@ -1068,12 +1068,12 @@
 
 <span class="kw">impl</span> <span class="ident">TestcaseStatus</span> {
     <span class="doccomment">/// Creates a new `TestcaseStatus` that represents a successful test.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">success</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">success</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">TestcaseStatus::Success</span> { <span class="ident">flaky_runs</span>: <span class="macro">vec!</span>[] }
     }
 
     <span class="doccomment">/// Creates a new `TestcaseStatus` that represents an unsuccessful test.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_success</span>(<span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_success</span>(<span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">TestcaseStatus::NonSuccess</span> {
             <span class="ident">kind</span>,
             <span class="ident">message</span>: <span class="prelude-val">None</span>,
@@ -1084,7 +1084,7 @@
     }
 
     <span class="doccomment">/// Creates a new `TestcaseStatus` that represents a skipped test.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skipped</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skipped</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">TestcaseStatus::Skipped</span> {
             <span class="ident">message</span>: <span class="prelude-val">None</span>,
             <span class="ident">ty</span>: <span class="prelude-val">None</span>,
@@ -1093,49 +1093,49 @@
     }
 
     <span class="doccomment">/// Sets the message. No-op if this is a success case.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">message_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">message</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">message</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>,
+            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">message</span>,
+            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">message</span>,
         };
         <span class="kw-2">*</span><span class="ident">message_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the type. No-op if this is a success case.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">ty_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">ty</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ty</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">ty</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ty</span>,
+            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">ty</span>, .. } =&gt; <span class="ident">ty</span>,
+            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">ty</span>, .. } =&gt; <span class="ident">ty</span>,
         };
         <span class="kw-2">*</span><span class="ident">ty_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ty</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the description (text node). No-op if this is a success case.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_description</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_description</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">description_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">description</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">description</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">description</span>, .. } =&gt; <span class="ident">description</span>,
+            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">description</span>, .. } =&gt; <span class="ident">description</span>,
         };
         <span class="kw-2">*</span><span class="ident">description_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Adds a rerun or flaky run. No-op if this test was skipped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_rerun</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rerun</span>: <span class="ident">TestRerun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_rerun</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rerun</span>: <span class="ident">TestRerun</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">add_reruns</span>(<span class="ident">iter::once</span>(<span class="ident">rerun</span>))
     }
 
     <span class="doccomment">/// Adds reruns or flaky runs. No-op if this test was skipped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_reruns</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reruns</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestRerun</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_reruns</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reruns</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestRerun</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">reruns_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { <span class="ident">flaky_runs</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">flaky_runs</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">reruns</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reruns</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestcaseStatus::Success</span> { <span class="ident">flaky_runs</span> } =&gt; <span class="ident">flaky_runs</span>,
+            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">reruns</span>, .. } =&gt; <span class="ident">reruns</span>,
+            <span class="ident">TestcaseStatus::Skipped</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
         };
         <span class="ident">reruns_mut</span>.<span class="ident">extend</span>(<span class="ident">reruns</span>);
         <span class="self">self</span>
@@ -1184,7 +1184,7 @@
 
 <span class="kw">impl</span> <span class="ident">TestRerun</span> {
     <span class="doccomment">/// Creates a new `TestRerun` of the given kind.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">TestRerun</span> {
             <span class="ident">kind</span>,
             <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
@@ -1199,37 +1199,37 @@
     }
 
     <span class="doccomment">/// Sets the start timestamp for this rerun.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the time taken for this rerun.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">ty</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ty</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the stack trace.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_stack_trace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stack_trace</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_stack_trace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stack_trace</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">stack_trace</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">stack_trace</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets standard output.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_out</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Output</span> {
             <span class="ident">output</span>: <span class="ident">system_out</span>.<span class="ident">into</span>(),
         });
@@ -1239,12 +1239,12 @@
     <span class="doccomment">/// Sets standard output from a `Vec&lt;u8&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The output is converted to a string, lossily.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_out_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_out</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">set_system_out</span>(<span class="ident">from_utf8_lossy</span>(<span class="ident">system_out</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Sets standard error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Output</span> {
             <span class="ident">output</span>: <span class="ident">system_err</span>.<span class="ident">into</span>(),
         });
@@ -1254,12 +1254,12 @@
     <span class="doccomment">/// Sets standard error from a `Vec&lt;u8&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The output is converted to a string, lossily.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_system_err_lossy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_err</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">set_system_err</span>(<span class="ident">from_utf8_lossy</span>(<span class="ident">system_err</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Sets the description of the failure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_description</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_description</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -1288,7 +1288,7 @@
 
 <span class="kw">impl</span> <span class="ident">Property</span> {
     <span class="doccomment">/// Creates a new `Property` instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
@@ -1300,7 +1300,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">k</span>, <span class="ident">v</span>): (<span class="ident">T</span>, <span class="ident">T</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">k</span>, <span class="ident">v</span>): (<span class="ident">T</span>, <span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
         <span class="ident">Property::new</span>(<span class="ident">k</span>, <span class="ident">v</span>)
     }
 }
@@ -1318,14 +1318,14 @@
     <span class="kw">pub</span> <span class="ident">output</span>: <span class="ident">String</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">from_utf8_lossy</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">from_utf8_lossy</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">match</span> <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">into_bytes</span>();
             <span class="kw">match</span> <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>) {
-                <span class="ident">Cow::Owned</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">Cow::Borrowed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;non-utf8 =&gt; always lossy =&gt; always owned&quot;</span>),
+                <span class="ident">Cow::Owned</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                <span class="ident">Cow::Borrowed</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;non-utf8 =&gt; always lossy =&gt; always owned&quot;</span>),
             }
         }
     }

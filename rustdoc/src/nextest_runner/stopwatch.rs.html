@@ -58,7 +58,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">StopwatchStart</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="comment">// These two syscalls will happen imperceptibly close to each other, which is good</span>
             <span class="comment">// enough for our purposes.</span>
@@ -67,7 +67,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StopwatchEnd</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StopwatchEnd</span> {
         <span class="ident">StopwatchEnd</span> {
             <span class="ident">start_time</span>: <span class="self">self</span>.<span class="ident">start_time</span>,
             <span class="ident">duration</span>: <span class="self">self</span>.<span class="ident">instant</span>.<span class="ident">elapsed</span>(),

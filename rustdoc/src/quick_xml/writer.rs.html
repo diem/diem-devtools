@@ -448,7 +448,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a Writer from a generic Write</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">W</span>) -&gt; <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="ident">Writer</span> {
             <span class="ident">writer</span>: <span class="ident">inner</span>,
             <span class="ident">indent</span>: <span class="prelude-val">None</span>,
@@ -456,7 +456,7 @@
     }
 
     <span class="doccomment">/// Creates a Writer with configured whitespace indents from a generic Write</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_indent</span>(<span class="ident">inner</span>: <span class="ident">W</span>, <span class="ident">indent_char</span>: <span class="ident">u8</span>, <span class="ident">indent_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_indent</span>(<span class="ident">inner</span>: <span class="ident">W</span>, <span class="ident">indent_char</span>: <span class="ident">u8</span>, <span class="ident">indent_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="ident">Writer</span> {
             <span class="ident">writer</span>: <span class="ident">inner</span>,
             <span class="ident">indent</span>: <span class="prelude-val">Some</span>(<span class="ident">Indentation::new</span>(<span class="ident">indent_char</span>, <span class="ident">indent_size</span>)),
@@ -464,48 +464,48 @@
     }
 
     <span class="doccomment">/// Consumes this `Writer`, returning the underlying writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">W</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">W</span> {
         <span class="self">self</span>.<span class="ident">writer</span>
     }
 
     <span class="doccomment">/// Get inner writer, keeping ownership</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">writer</span>
     }
 
     <span class="doccomment">/// Writes the given event to the underlying writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">E</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_should_line_break</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">event</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">Event::Start</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::Start</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;&gt;&quot;</span>);
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span>.<span class="ident">as_mut</span>() {
                     <span class="ident">i</span>.<span class="ident">grow</span>();
                 }
                 <span class="ident">result</span>
             }
-            <span class="ident">Event::End</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::End</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span>.<span class="ident">as_mut</span>() {
                     <span class="ident">i</span>.<span class="ident">shrink</span>();
                 }
                 <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;/&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;&gt;&quot;</span>)
             }
-            <span class="ident">Event::Empty</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;/&gt;&quot;</span>),
-            <span class="ident">Event::Text</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::Empty</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;/&gt;&quot;</span>),
+            <span class="ident">Event::Text</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
                 <span class="ident">next_should_line_break</span> <span class="op">=</span> <span class="bool-val">false</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">escaped</span>())
             }
-            <span class="ident">Event::Comment</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;!--&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;--&gt;&quot;</span>),
-            <span class="ident">Event::CData</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::Comment</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;!--&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;--&gt;&quot;</span>),
+            <span class="ident">Event::CData</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
                 <span class="ident">next_should_line_break</span> <span class="op">=</span> <span class="bool-val">false</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">b&quot;&lt;![CDATA[&quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">e</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">b&quot;]]&gt;&quot;</span>)
             }
-            <span class="ident">Event::Decl</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;?&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;?&gt;&quot;</span>),
-            <span class="ident">Event::PI</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;?&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;?&gt;&quot;</span>),
-            <span class="ident">Event::DocType</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;!DOCTYPE&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;&gt;&quot;</span>),
-            <span class="ident">Event::Eof</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="ident">Event::Decl</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;?&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;?&gt;&quot;</span>),
+            <span class="ident">Event::PI</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;?&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;?&gt;&quot;</span>),
+            <span class="ident">Event::DocType</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">write_wrapped</span>(<span class="string">b&quot;&lt;!DOCTYPE&quot;</span>, <span class="ident">e</span>, <span class="string">b&quot;&gt;&quot;</span>),
+            <span class="ident">Event::Eof</span> =&gt; <span class="prelude-val">Ok</span>(()),
         };
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span>.<span class="ident">as_mut</span>() {
             <span class="ident">i</span>.<span class="ident">should_line_break</span> <span class="op">=</span> <span class="ident">next_should_line_break</span>;
@@ -515,12 +515,12 @@
 
     <span class="doccomment">/// Writes bytes</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">Error::Io</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_wrapped</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">before</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">after</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_wrapped</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">before</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">after</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span> {
             <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">should_line_break</span> {
                 <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\n&quot;</span>).<span class="ident">map_err</span>(<span class="ident">Error::Io</span>)<span class="question-mark">?</span>;
@@ -544,7 +544,7 @@
     <span class="doccomment">/// [Event]: events/enum.Event.html</span>
     <span class="doccomment">/// [Text]: events/enum.Event.html#variant.Text</span>
     <span class="doccomment">/// [Start]: events/enum.Event.html#variant.Start</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_indent</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_indent</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span> {
             <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\n&quot;</span>).<span class="ident">map_err</span>(<span class="ident">Error::Io</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">writer</span>
@@ -565,7 +565,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Indentation</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">indent_char</span>: <span class="ident">u8</span>, <span class="ident">indent_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Indentation</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">indent_char</span>: <span class="ident">u8</span>, <span class="ident">indent_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Indentation</span> {
         <span class="ident">Indentation</span> {
             <span class="ident">should_line_break</span>: <span class="bool-val">false</span>,
             <span class="ident">indent_char</span>,
@@ -584,8 +584,8 @@
 
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">indents_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">indents_len</span>.<span class="ident">checked_sub</span>(<span class="self">self</span>.<span class="ident">indent_size</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">result</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">result</span>) =&gt; <span class="ident">result</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
         };
     }
 }

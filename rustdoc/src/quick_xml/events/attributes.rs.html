@@ -552,7 +552,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new attribute iterator from a buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">Attributes</span> {
             <span class="ident">bytes</span>: <span class="ident">buf</span>,
             <span class="ident">position</span>: <span class="ident">pos</span>,
@@ -563,7 +563,7 @@
     }
 
     <span class="doccomment">/// Creates a new attribute iterator from a buffer, allowing HTML attribute syntax.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">html</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">html</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">Attributes</span> {
             <span class="ident">bytes</span>: <span class="ident">buf</span>,
             <span class="ident">position</span>: <span class="ident">pos</span>,
@@ -579,7 +579,7 @@
     <span class="doccomment">/// can be disabled to improve performance slightly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// (`true` by default)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_checks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_checks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">with_checks</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
@@ -614,7 +614,7 @@
     <span class="doccomment">/// This will allocate if the value contains any escape sequences.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See also [`unescaped_value_with_custom_entities()`](#method.unescaped_value_with_custom_entities)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescaped_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescaped_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">make_unescaped_value</span>(<span class="prelude-val">None</span>)
     }
 
@@ -634,14 +634,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescaped_value_with_custom_entities</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">custom_entities</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">make_unescaped_value</span>(<span class="prelude-val">Some</span>(<span class="ident">custom_entities</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">make_unescaped_value</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">custom_entities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">do_unescape</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>, <span class="ident">custom_entities</span>).<span class="ident">map_err</span>(<span class="ident">Error::EscapeError</span>)
     }
 
@@ -655,7 +655,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`unescaped_value()`]: #method.unescaped_value</span>
     <span class="doccomment">/// [`Reader::decode()`]: ../../reader/struct.Reader.html#method.decode</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescape_and_decode_value</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BufRead</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescape_and_decode_value</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BufRead</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">do_unescape_and_decode_value</span>(<span class="ident">reader</span>, <span class="prelude-val">None</span>)
     }
 
@@ -677,7 +677,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">do_unescape_and_decode_value</span>(<span class="ident">reader</span>, <span class="prelude-val">Some</span>(<span class="ident">custom_entities</span>))
     }
 
@@ -687,7 +687,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>);
         <span class="kw">let</span> <span class="ident">unescaped</span> <span class="op">=</span>
             <span class="ident">do_unescape</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">custom_entities</span>).<span class="ident">map_err</span>(<span class="ident">Error::EscapeError</span>)<span class="question-mark">?</span>;
@@ -699,7 +699,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">unescaped</span> <span class="op">=</span>
             <span class="ident">do_unescape</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">custom_entities</span>).<span class="ident">map_err</span>(<span class="ident">Error::EscapeError</span>)<span class="question-mark">?</span>;
@@ -717,7 +717,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescape_and_decode_without_bom</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BufRead</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">do_unescape_and_decode_without_bom</span>(<span class="ident">reader</span>, <span class="prelude-val">None</span>)
     }
 
@@ -732,7 +732,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unescape_and_decode_without_bom</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BufRead</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">do_unescape_and_decode_without_bom</span>(<span class="ident">reader</span>, <span class="prelude-val">None</span>)
     }
 
@@ -752,7 +752,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">do_unescape_and_decode_without_bom</span>(<span class="ident">reader</span>, <span class="prelude-val">Some</span>(<span class="ident">custom_entities</span>))
     }
 
@@ -772,7 +772,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">do_unescape_and_decode_without_bom</span>(<span class="ident">reader</span>, <span class="prelude-val">Some</span>(<span class="ident">custom_entities</span>))
     }
 
@@ -781,7 +781,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">decode_without_bom</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>);
         <span class="kw">let</span> <span class="ident">unescaped</span> <span class="op">=</span>
             <span class="ident">do_unescape</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">custom_entities</span>).<span class="ident">map_err</span>(<span class="ident">Error::EscapeError</span>)<span class="question-mark">?</span>;
@@ -793,7 +793,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">custom_entities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">decode_without_bom</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">unescaped</span> <span class="op">=</span>
             <span class="ident">do_unescape</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">custom_entities</span>).<span class="ident">map_err</span>(<span class="ident">Error::EscapeError</span>)<span class="question-mark">?</span>;
@@ -802,7 +802,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::write_byte_string</span>;
 
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Attribute {{ key: &quot;</span>)<span class="question-mark">?</span>;
@@ -825,7 +825,7 @@
     <span class="doccomment">/// let features = Attribute::from((&quot;features&quot;.as_bytes(), &quot;Bells &amp;amp; whistles&quot;.as_bytes()));</span>
     <span class="doccomment">/// assert_eq!(features.value, &quot;Bells &amp;amp; whistles&quot;.as_bytes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])) -&gt; <span class="ident">Attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">Attribute</span> {
             <span class="ident">key</span>: <span class="ident">val</span>.<span class="number">0</span>,
             <span class="ident">value</span>: <span class="ident">Cow::from</span>(<span class="ident">val</span>.<span class="number">1</span>),
@@ -845,7 +845,7 @@
     <span class="doccomment">/// let features = Attribute::from((&quot;features&quot;, &quot;Bells &amp; whistles&quot;));</span>
     <span class="doccomment">/// assert_eq!(features.value, &quot;Bells &amp;amp; whistles&quot;.as_bytes());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)) -&gt; <span class="ident">Attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">Attribute</span> {
             <span class="ident">key</span>: <span class="ident">val</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>(),
             <span class="ident">value</span>: <span class="ident">escape</span>(<span class="ident">val</span>.<span class="number">1</span>.<span class="ident">as_bytes</span>()),
@@ -855,18 +855,18 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>();
 
         <span class="macro">macro_rules!</span> <span class="ident">err</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>:<span class="ident">expr</span>) =&gt; {{
                 <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">len</span>;
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>.<span class="ident">into</span>()));
             }};
         }
 
         <span class="macro">macro_rules!</span> <span class="ident">attr</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>) =&gt; {{
                 <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">len</span>;
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> {
                     <span class="macro">attr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>, <span class="number">0</span>..<span class="number">0</span>)
@@ -874,7 +874,7 @@
                     <span class="kw">return</span> <span class="prelude-val">None</span>;
                 };
             }};
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Attribute</span> {
                     <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>],
                     <span class="ident">value</span>: <span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>]),
@@ -894,44 +894,44 @@
             .<span class="ident">skip_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_whitespace</span>(<span class="ident">b</span>))
             .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_whitespace</span>(<span class="ident">b</span>))
         {
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">attr!</span>(<span class="self">self</span>.<span class="ident">position</span>..<span class="ident">len</span>),
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="macro">attr!</span>(<span class="self">self</span>.<span class="ident">position</span>..<span class="ident">len</span>),
         };
 
         <span class="comment">// key ends with either whitespace or =</span>
         <span class="kw">let</span> <span class="ident">end_key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>
             .<span class="ident">by_ref</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;=&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_whitespace</span>(<span class="ident">b</span>))
+            .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;=&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_whitespace</span>(<span class="ident">b</span>))
         {
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;=&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;\&#39;&#39;</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;&quot;&#39;</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">with_checks</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;=&#39;</span>)) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;\&#39;&#39;</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;&quot;&#39;</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">with_checks</span> =&gt; {
                 <span class="macro">err!</span>(<span class="ident">Error::NameWithQuote</span>(<span class="ident">i</span>));
             }
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; {
                 <span class="comment">// consume until `=` or return if html</span>
                 <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">by_ref</span>().<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_whitespace</span>(<span class="ident">b</span>)) {
-                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;=&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-                    <span class="prelude-val">Some</span>((<span class="ident">j</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="string">b&#39;=&#39;</span>)) =&gt; <span class="ident">i</span>,
+                    <span class="prelude-val">Some</span>((<span class="ident">j</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> =&gt; {
                         <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">j</span> <span class="op">-</span> <span class="number">1</span>;
                         <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">i</span>, <span class="number">0</span>..<span class="number">0</span>);
                     }
-                    <span class="prelude-val">Some</span>((<span class="ident">j</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">err!</span>(<span class="ident">Error::NoEqAfterName</span>(<span class="ident">j</span>)),
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>((<span class="ident">j</span>, <span class="kw">_</span>)) =&gt; <span class="macro">err!</span>(<span class="ident">Error::NoEqAfterName</span>(<span class="ident">j</span>)),
+                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> =&gt; {
                         <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">len</span>;
                         <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">len</span>, <span class="number">0</span>..<span class="number">0</span>);
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">err!</span>(<span class="ident">Error::NoEqAfterName</span>(<span class="ident">len</span>)),
+                    <span class="prelude-val">None</span> =&gt; <span class="macro">err!</span>(<span class="ident">Error::NoEqAfterName</span>(<span class="ident">len</span>)),
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">len</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">len</span>),
         };
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">with_checks</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">start</span>) <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">consumed</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">end_key</span> <span class="op">-</span> <span class="ident">start_key</span>)
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bytes</span>[(<span class="kw-2">*</span><span class="ident">r</span>).<span class="ident">clone</span>()] <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">start_key</span>..<span class="ident">end_key</span>])
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">end_key</span> <span class="op">-</span> <span class="ident">start_key</span>)
+                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bytes</span>[(<span class="kw-2">*</span><span class="ident">r</span>).<span class="ident">clone</span>()] <span class="op">==</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">start_key</span>..<span class="ident">end_key</span>])
                 .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">ref</span> <span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">start</span>)
             {
                 <span class="macro">err!</span>(<span class="ident">Error::DuplicatedAttribute</span>(<span class="ident">start_key</span>, <span class="ident">start</span>));
@@ -941,16 +941,16 @@
 
         <span class="comment">// value has quote if not html</span>
         <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">by_ref</span>().<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_whitespace</span>(<span class="ident">b</span>)) {
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">quote</span> @ <span class="kw-2">&amp;</span><span class="string">b&#39;\&#39;&#39;</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">quote</span> @ <span class="kw-2">&amp;</span><span class="string">b&#39;&quot;&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">by_ref</span>().<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">quote</span>) {
-                    <span class="prelude-val">Some</span>((<span class="ident">j</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">quote</span> @ <span class="kw-2">&amp;</span><span class="string">b&#39;\&#39;&#39;</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">quote</span> @ <span class="kw-2">&amp;</span><span class="string">b&#39;&quot;&#39;</span>)) =&gt; {
+                <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">by_ref</span>().<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">quote</span>) {
+                    <span class="prelude-val">Some</span>((<span class="ident">j</span>, <span class="kw">_</span>)) =&gt; {
                         <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">j</span> <span class="op">+</span> <span class="number">1</span>;
                         <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">end_key</span>, <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">j</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">err!</span>(<span class="ident">Error::UnquotedValue</span>(<span class="ident">i</span>)),
+                    <span class="prelude-val">None</span> =&gt; <span class="macro">err!</span>(<span class="ident">Error::UnquotedValue</span>(<span class="ident">i</span>)),
                 }
             }
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">html</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">bytes</span>
                     .<span class="ident">by_ref</span>()
                     .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>)<span class="op">|</span> <span class="ident">is_whitespace</span>(<span class="ident">b</span>))
@@ -958,8 +958,8 @@
                 <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">j</span>;
                 <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">end_key</span>, <span class="ident">i</span>..<span class="ident">j</span>)
             }
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">err!</span>(<span class="ident">Error::UnquotedValue</span>(<span class="ident">i</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">end_key</span>),
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="macro">err!</span>(<span class="ident">Error::UnquotedValue</span>(<span class="ident">i</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">attr!</span>(<span class="ident">start_key</span>..<span class="ident">end_key</span>),
         }
     }
 }

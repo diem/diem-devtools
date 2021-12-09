@@ -372,6 +372,7 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
+<span id="375">375</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The Diem Core Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -392,6 +393,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
 <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">about</span> <span class="op">=</span> <span class="string">&quot;Datatest-harness for running data-driven tests&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">struct</span> <span class="ident">TestOpts</span> {
     <span class="doccomment">/// The FILTER string is tested against the name of all tests, and only those tests whose names</span>
     <span class="doccomment">/// contain the filter are run.</span>
@@ -467,7 +469,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Format</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Format::Pretty</span>
     }
 }
@@ -490,7 +492,7 @@
             <span class="macro">println!</span>(<span class="string">&quot;{}: test&quot;</span>, <span class="ident">test</span>.<span class="ident">name</span>);
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">format</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Format::Pretty</span> {
+        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">format</span> <span class="op">==</span> <span class="ident">Format::Pretty</span> {
             <span class="macro">println!</span>();
             <span class="macro">println!</span>(<span class="string">&quot;{} tests, 0 benchmarks&quot;</span>, <span class="ident">tests</span>.<span class="ident">len</span>());
         }
@@ -498,9 +500,9 @@
     }
 
     <span class="kw">match</span> <span class="ident">run_tests</span>(<span class="ident">options</span>, <span class="ident">tests</span>) {
-        <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">process::exit</span>(<span class="number">101</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; {}
+        <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; <span class="ident">process::exit</span>(<span class="number">101</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
             <span class="macro">eprintln!</span>(<span class="string">&quot;error: io error when running tests: {:?}&quot;</span>, <span class="ident">e</span>);
             <span class="ident">process::exit</span>(<span class="number">101</span>);
         }
@@ -508,7 +510,7 @@
 }
 
 <span class="kw">struct</span> <span class="ident">Test</span> {
-    <span class="ident">testfn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>,
+    <span class="ident">testfn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>,
     <span class="ident">name</span>: <span class="ident">String</span>,
 }
 
@@ -518,17 +520,17 @@
     <span class="ident">FailedWithMsg</span>(<span class="ident">String</span>),
 }
 
-<span class="kw">fn</span> <span class="ident">run_tests</span>(<span class="ident">options</span>: <span class="ident">TestOpts</span>, <span class="ident">tests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">run_tests</span>(<span class="ident">options</span>: <span class="ident">TestOpts</span>, <span class="ident">tests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">tests</span>.<span class="ident">len</span>();
 
     <span class="comment">// Filter out tests</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">options</span>.<span class="ident">filter</span> {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tests</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tests</span>
+        <span class="prelude-val">None</span> =&gt; <span class="ident">tests</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; <span class="ident">tests</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">test</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">filter_exact</span> {
-                    <span class="ident">test</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">filter</span>[..]
+                    <span class="ident">test</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">filter</span>[..]
                 } <span class="kw">else</span> {
                     <span class="ident">test</span>.<span class="ident">name</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>[..])
                 }
@@ -573,10 +575,10 @@
 
     <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">thread::Builder::new</span>().<span class="ident">name</span>(<span class="ident">name</span>.<span class="ident">clone</span>());
     <span class="ident">cfg</span>.<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">testfn</span>())) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TestResult::Ok</span>,
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TestResult::FailedWithMsg</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>)),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TestResult::Failed</span>,
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="ident">testfn</span>)) {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) =&gt; <span class="ident">TestResult::Ok</span>,
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="ident">TestResult::FailedWithMsg</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>)),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">TestResult::Failed</span>,
         };
 
         <span class="ident">channel</span>.<span class="ident">send</span>((<span class="ident">name</span>, <span class="ident">result</span>)).<span class="ident">unwrap</span>();
@@ -593,7 +595,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TestSummary</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">total</span>: <span class="ident">usize</span>, <span class="ident">filtered_out</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">total</span>: <span class="ident">usize</span>, <span class="ident">filtered_out</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">stdout</span>: <span class="ident">StandardStream::stdout</span>(<span class="ident">ColorChoice::Auto</span>),
             <span class="ident">total</span>,
@@ -603,18 +605,18 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">result</span>: <span class="ident">TestResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">handle_result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">result</span>: <span class="ident">TestResult</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">stdout</span>, <span class="string">&quot;test {} ... &quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="ident">TestResult::Ok</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TestResult::Ok</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">passed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="self">self</span>.<span class="ident">write_ok</span>()<span class="question-mark">?</span>;
             }
-            <span class="ident">TestResult::Failed</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TestResult::Failed</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">failed</span>.<span class="ident">push</span>(<span class="ident">name</span>);
                 <span class="self">self</span>.<span class="ident">write_failed</span>()<span class="question-mark">?</span>;
             }
-            <span class="ident">TestResult::FailedWithMsg</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TestResult::FailedWithMsg</span>(<span class="ident">msg</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">failed</span>.<span class="ident">push</span>(<span class="ident">name</span>);
                 <span class="self">self</span>.<span class="ident">write_failed</span>()<span class="question-mark">?</span>;
                 <span class="macro">writeln!</span>(<span class="self">self</span>.<span class="ident">stdout</span>)<span class="question-mark">?</span>;
@@ -626,7 +628,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_ok</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_ok</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">stdout</span>
             .<span class="ident">set_color</span>(<span class="ident">ColorSpec::new</span>().<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">Color::Green</span>)))<span class="question-mark">?</span>;
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">stdout</span>, <span class="string">&quot;ok&quot;</span>)<span class="question-mark">?</span>;
@@ -634,7 +636,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_failed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_failed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">stdout</span>
             .<span class="ident">set_color</span>(<span class="ident">ColorSpec::new</span>().<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">Color::Red</span>)))<span class="question-mark">?</span>;
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">stdout</span>, <span class="string">&quot;FAILED&quot;</span>)<span class="question-mark">?</span>;
@@ -642,7 +644,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_starting_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_starting_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">writeln!</span>(<span class="self">self</span>.<span class="ident">stdout</span>)<span class="question-mark">?</span>;
         <span class="macro">writeln!</span>(
             <span class="self">self</span>.<span class="ident">stdout</span>,
@@ -652,7 +654,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_summary</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_summary</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Print out the failing tests</span>
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">failed</span>.<span class="ident">is_empty</span>() {
             <span class="macro">writeln!</span>(<span class="self">self</span>.<span class="ident">stdout</span>)<span class="question-mark">?</span>;
@@ -680,14 +682,14 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">failed</span>.<span class="ident">is_empty</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Requirements</span> {
-    <span class="ident">test</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="ident">test</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
     <span class="ident">test_name</span>: <span class="ident">String</span>,
     <span class="ident">root</span>: <span class="ident">String</span>,
     <span class="ident">pattern</span>: <span class="ident">String</span>,
@@ -696,11 +698,11 @@
 <span class="kw">impl</span> <span class="ident">Requirements</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">test</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+        <span class="ident">test</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
         <span class="ident">test_name</span>: <span class="ident">String</span>,
         <span class="ident">root</span>: <span class="ident">String</span>,
         <span class="ident">pattern</span>: <span class="ident">String</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">test</span>,
             <span class="ident">test_name</span>,
@@ -714,7 +716,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Scans all files in a given directory, finds matching ones and generates a test descriptor</span>
     <span class="doccomment">/// for each of them.</span>
-    <span class="kw">fn</span> <span class="ident">expand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">expand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>).<span class="ident">to_path_buf</span>();
 
         <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">regex::Regex::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pattern</span>)

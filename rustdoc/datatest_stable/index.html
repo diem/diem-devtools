@@ -28,28 +28,28 @@ relative to the root of the crate.</li>
 </ul>
 <p>The three parameters can be repeated if you have multiple sets of data-driven tests to be run:
 <code>datatest_stable::harness!(testfn1, root1, pattern1, testfn2, root2, pattern2)</code></p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>This is an example test. Use it with <code>harness = false</code>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
-<span class="kw">fn</span> <span class="ident">my_test</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">datatest_stable::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">my_test</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">datatest_stable::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="comment">// ... write test here</span>
 
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="macro">datatest_stable::harness!</span>(<span class="ident">my_test</span>, <span class="string">&quot;path/to/fixtures&quot;</span>, <span class="string">r&quot;^.*/*&quot;</span>);</code></pre></div>
-<h1 id="see-also" class="section-header"><a href="#see-also">See also</a></h1>
+<h2 id="see-also" class="section-header"><a href="#see-also">See also</a></h2>
 <ul>
 <li><a href="https://crates.io/crates/datatest"><code>datatest</code></a>: the original inspiration for this crate,
 with a better UI and more features but targeting nightly Rust</li>
 <li><a href="https://en.wikipedia.org/wiki/Data-driven_testing">Data-driven testing</a></li>
 </ul>
 </div></details><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.harness.html" title="datatest_stable::harness macro">harness</a></div><div class="item-right docblock-short"><p><code>datatest-stable</code> test harness entry point. Should be declared in the test module.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="datatest_stable::Result type">Result</a></div><div class="item-right docblock-short"><p>The result type for <code>datatest-stable</code> tests.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="datatest_stable" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.harness.html" title="datatest_stable::harness macro">harness</a></div><div class="item-right docblock-short"><p><code>datatest-stable</code> test harness entry point. Should be declared in the test module.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="datatest_stable::Result type">Result</a></div><div class="item-right docblock-short"><p>The result type for <code>datatest-stable</code> tests.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="datatest_stable" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>
