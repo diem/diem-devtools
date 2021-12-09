@@ -777,88 +777,24 @@
 <span id="777">777</span>
 <span id="778">778</span>
 <span id="779">779</span>
-<span id="780">780</span>
-<span id="781">781</span>
-<span id="782">782</span>
-<span id="783">783</span>
-<span id="784">784</span>
-<span id="785">785</span>
-<span id="786">786</span>
-<span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
-<span id="804">804</span>
-<span id="805">805</span>
-<span id="806">806</span>
-<span id="807">807</span>
-<span id="808">808</span>
-<span id="809">809</span>
-<span id="810">810</span>
-<span id="811">811</span>
-<span id="812">812</span>
-<span id="813">813</span>
-<span id="814">814</span>
-<span id="815">815</span>
-<span id="816">816</span>
-<span id="817">817</span>
-<span id="818">818</span>
-<span id="819">819</span>
-<span id="820">820</span>
-<span id="821">821</span>
-<span id="822">822</span>
-<span id="823">823</span>
-<span id="824">824</span>
-<span id="825">825</span>
-<span id="826">826</span>
-<span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
-<span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
-<span id="838">838</span>
-<span id="839">839</span>
-<span id="840">840</span>
-<span id="841">841</span>
-<span id="842">842</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">TestEvent</span>},
+    <span class="ident">signal</span>::{<span class="ident">SignalEvent</span>, <span class="ident">SignalHandler</span>},
     <span class="ident">stopwatch</span>::{<span class="ident">StopwatchEnd</span>, <span class="ident">StopwatchStart</span>},
     <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
 };
 <span class="kw">use</span> <span class="ident">anyhow::Result</span>;
-<span class="kw">use</span> <span class="ident">crossbeam_channel</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">Sender</span>};
+<span class="kw">use</span> <span class="ident">crossbeam_channel::RecvTimeoutError</span>;
 <span class="kw">use</span> <span class="ident">duct::cmd</span>;
 <span class="kw">use</span> <span class="ident">nextest_config::NextestProfile</span>;
 <span class="kw">use</span> <span class="ident">rayon</span>::{<span class="ident">ThreadPool</span>, <span class="ident">ThreadPoolBuilder</span>};
-<span class="kw">use</span> <span class="ident">signal_hook</span>::{<span class="ident">iterator::Handle</span>, <span class="ident">low_level::emulate_default_handler</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert::Infallible</span>,
     <span class="ident">marker::PhantomData</span>,
-    <span class="ident">os::raw::c_int</span>,
     <span class="ident">path::Path</span>,
     <span class="ident">sync</span>::{
         <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>},
@@ -887,6 +823,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
         <span class="ident">profile</span>: <span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">handler</span>: <span class="ident">SignalHandler</span>,
     ) -&gt; <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">test_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus::get</span>);
         <span class="kw">let</span> <span class="ident">retries</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">retries</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">retries</span>());
@@ -905,6 +842,7 @@
                 .<span class="ident">thread_name</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;testrunner-wait-{}&quot;</span>, <span class="ident">idx</span>))
                 .<span class="ident">build</span>()
                 .<span class="ident">expect</span>(<span class="string">&quot;run pool built&quot;</span>),
+            <span class="ident">handler</span>,
         }
     }
 }
@@ -915,6 +853,7 @@
     <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
     <span class="ident">run_pool</span>: <span class="ident">ThreadPool</span>,
     <span class="ident">wait_pool</span>: <span class="ident">ThreadPool</span>,
+    <span class="ident">handler</span>: <span class="ident">SignalHandler</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
@@ -951,13 +890,6 @@
         <span class="kw">let</span> <span class="ident">canceled</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
         <span class="kw">let</span> <span class="ident">canceled_ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">canceled</span>;
 
-        <span class="comment">// ---</span>
-        <span class="comment">// Spawn the signal handler thread.</span>
-        <span class="comment">// ---</span>
-        <span class="kw">let</span> (<span class="ident">srp_sender</span>, <span class="ident">srp_receiver</span>) <span class="op">=</span> <span class="ident">crossbeam_channel::bounded</span>(<span class="number">1</span>);
-        <span class="kw">let</span> (<span class="ident">signal_sender</span>, <span class="ident">signal_receiver</span>) <span class="op">=</span> <span class="ident">crossbeam_channel::unbounded</span>();
-        <span class="ident">spawn_signal_thread</span>(<span class="ident">signal_sender</span>, <span class="ident">srp_sender</span>);
-
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">CallbackContext::new</span>(<span class="ident">callback</span>, <span class="self">self</span>.<span class="ident">test_list</span>.<span class="ident">run_count</span>());
 
         <span class="comment">// Send the initial event.</span>
@@ -977,9 +909,6 @@
         <span class="comment">// XXX rayon requires its scope callback to be Send, there&#39;s no good reason for it but</span>
         <span class="comment">// there&#39;s also no other well-maintained scoped threadpool :(</span>
         <span class="self">self</span>.<span class="ident">run_pool</span>.<span class="ident">scope</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">run_scope</span><span class="op">|</span> {
-            <span class="comment">// Block until signals are set up.</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">srp_receiver</span>.<span class="ident">recv</span>();
-
             <span class="self">self</span>.<span class="ident">test_list</span>.<span class="ident">iter_tests</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">test_instance</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="ident">canceled_ref</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) {
                     <span class="comment">// Check for test cancellation.</span>
@@ -1056,12 +985,12 @@
                             }
                         }
                     },
-                    <span class="ident">recv</span>(<span class="ident">signal_receiver</span>) -&gt; <span class="ident">internal_event</span> =&gt; {
+                    <span class="ident">recv</span>(<span class="self">self</span>.<span class="ident">handler</span>.<span class="ident">receiver</span>) -&gt; <span class="ident">internal_event</span> =&gt; {
                         <span class="kw">match</span> <span class="ident">internal_event</span> {
                             <span class="prelude-val">Ok</span>(<span class="ident">event</span>) =&gt; <span class="ident">InternalEvent::Signal</span>(<span class="ident">event</span>),
                             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                                <span class="comment">// Ignore the signal thread being dropped.</span>
-                                <span class="comment">// XXX is this correct?</span>
+                                <span class="comment">// Ignore the signal thread being dropped. This is done for</span>
+                                <span class="comment">// noop signal handlers.</span>
                                 <span class="kw">continue</span>;
                             }
                         }
@@ -1407,42 +1336,11 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">spawn_signal_thread</span>(<span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalSignalEvent</span><span class="op">&gt;</span>, <span class="ident">srp_sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) {
-    <span class="ident">std::thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="kw">use</span> <span class="ident">signal_hook</span>::{
-            <span class="ident">consts</span>::<span class="kw-2">*</span>,
-            <span class="ident">iterator</span>::{<span class="ident">exfiltrator::SignalOnly</span>, <span class="ident">SignalsInfo</span>},
-        };
-
-        <span class="comment">// Register the SignalsInfo.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signals</span> <span class="op">=</span>
-            <span class="ident">SignalsInfo</span>::<span class="op">&lt;</span><span class="ident">SignalOnly</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">TERM_SIGNALS</span>).<span class="ident">expect</span>(<span class="string">&quot;SignalsInfo created&quot;</span>);
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">InternalSignalEvent::Handle</span> {
-            <span class="ident">handle</span>: <span class="ident">signals</span>.<span class="ident">handle</span>(),
-        });
-        <span class="comment">// Let the run pool know that the signal has been sent.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">srp_sender</span>.<span class="ident">send</span>(());
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">term_once</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-        <span class="kw">for</span> <span class="ident">signal</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">signals</span> {
-            <span class="kw">if</span> <span class="ident">term_once</span> {
-                <span class="comment">// TODO: handle this error better?</span>
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emulate_default_handler</span>(<span class="ident">signal</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">term_once</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">InternalSignalEvent::Canceled</span> { <span class="ident">signal</span> });
-            }
-        }
-    });
-}
-
 <span class="kw">struct</span> <span class="ident">CallbackContext</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="ident">callback</span>: <span class="ident">F</span>,
     <span class="ident">stopwatch</span>: <span class="ident">StopwatchStart</span>,
     <span class="ident">run_stats</span>: <span class="ident">RunStats</span>,
     <span class="ident">running</span>: <span class="ident">usize</span>,
-    <span class="ident">signal_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Handle</span><span class="op">&gt;</span>,
     <span class="ident">cancel_state</span>: <span class="ident">CancelState</span>,
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
 }
@@ -1460,7 +1358,6 @@
                 ..<span class="ident">RunStats::default</span>()
             },
             <span class="ident">running</span>: <span class="number">0</span>,
-            <span class="ident">signal_handle</span>: <span class="prelude-val">None</span>,
             <span class="ident">cancel_state</span>: <span class="ident">CancelState::None</span>,
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
         }
@@ -1472,10 +1369,6 @@
 
     <span class="kw">fn</span> <span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">event</span> {
-            <span class="ident">InternalEvent::Signal</span>(<span class="ident">InternalSignalEvent::Handle</span> { <span class="ident">handle</span> }) =&gt; {
-                <span class="self">self</span>.<span class="ident">signal_handle</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handle</span>);
-                <span class="prelude-val">Ok</span>(())
-            }
             <span class="ident">InternalEvent::Test</span>(<span class="ident">InternalTestEvent::Started</span> { <span class="ident">test_instance</span> }) =&gt; {
                 <span class="self">self</span>.<span class="ident">running</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::TestStarted</span> { <span class="ident">test_instance</span> })
@@ -1513,17 +1406,13 @@
                 })
                 .<span class="ident">map_err</span>(<span class="ident">InternalError::Error</span>)
             }
-            <span class="ident">InternalEvent::Signal</span>(<span class="ident">InternalSignalEvent::Canceled</span> { <span class="ident">signal</span>: <span class="ident">_signal</span> }) =&gt; {
-                <span class="macro">debug_assert_ne!</span>(
-                    <span class="self">self</span>.<span class="ident">cancel_state</span>,
-                    <span class="ident">CancelState::SignalCanceled</span>,
-                    <span class="string">&quot;can&#39;t receive signal-canceled twice&quot;</span>
-                );
+            <span class="ident">InternalEvent::Signal</span>(<span class="ident">SignalEvent::Interrupted</span>) =&gt; {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">==</span> <span class="ident">CancelState::SignalCanceled</span> {
+                    <span class="comment">// Ctrl-C was pressed twice -- panic in this case.</span>
+                    <span class="macro">panic!</span>(<span class="string">&quot;Ctrl-C pressed twice, exiting immediately&quot;</span>);
+                }
 
                 <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">=</span> <span class="ident">CancelState::SignalCanceled</span>;
-                <span class="comment">// Don&#39;t close the signal handle because we&#39;re still interested in the second</span>
-                <span class="comment">// ctrl-c.</span>
-
                 <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::RunBeginCancel</span> {
                     <span class="ident">running</span>: <span class="self">self</span>.<span class="ident">running</span>,
                     <span class="ident">reason</span>: <span class="ident">CancelReason::Signal</span>,
@@ -1553,21 +1442,12 @@
             <span class="ident">run_stats</span>: <span class="self">self</span>.<span class="ident">run_stats</span>,
         })
     }
-
-    <span class="comment">// TODO: do we ever want to actually close the handle?</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">close_handle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handle</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signal_handle</span> {
-            <span class="ident">handle</span>.<span class="ident">close</span>();
-        }
-        <span class="self">self</span>.<span class="ident">signal_handle</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
     <span class="ident">Test</span>(<span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>),
-    <span class="ident">Signal</span>(<span class="ident">InternalSignalEvent</span>),
+    <span class="ident">Signal</span>(<span class="ident">SignalEvent</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1587,12 +1467,6 @@
         <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
         <span class="ident">reason</span>: <span class="ident">MismatchReason</span>,
     },
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InternalSignalEvent</span> {
-    <span class="ident">Handle</span> { <span class="ident">handle</span>: <span class="ident">Handle</span> },
-    <span class="ident">Canceled</span> { <span class="ident">signal</span>: <span class="ident">c_int</span> },
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
