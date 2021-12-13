@@ -782,7 +782,7 @@
 ) -&gt; <span class="ident">quick_xml::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">serialize_empty_start_tag</span>(<span class="ident">tag_name</span>, <span class="ident">writer</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">BytesText::from_plain_str</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>.<span class="ident">output</span>);
+    <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">BytesText::from_plain_str</span>(<span class="ident">output</span>.<span class="ident">as_str</span>());
     <span class="ident">writer</span>.<span class="ident">write_event</span>(<span class="ident">Event::Text</span>(<span class="ident">text</span>))<span class="question-mark">?</span>;
 
     <span class="ident">serialize_end_tag</span>(<span class="ident">tag_name</span>, <span class="ident">writer</span>)<span class="question-mark">?</span>;
