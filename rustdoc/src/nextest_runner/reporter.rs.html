@@ -526,43 +526,6 @@
 <span id="526">526</span>
 <span id="527">527</span>
 <span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -570,17 +533,19 @@
     <span class="ident">metadata::MetadataReporter</span>,
     <span class="ident">runner</span>::{<span class="ident">RunDescribe</span>, <span class="ident">RunStats</span>, <span class="ident">RunStatuses</span>, <span class="ident">TestRunStatus</span>, <span class="ident">TestStatus</span>},
     <span class="ident">test_filter::MismatchReason</span>,
-    <span class="ident">test_list</span>::{<span class="ident">test_bin_spec</span>, <span class="ident">test_name_spec</span>, <span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
+    <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
 };
-<span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="ident">color_eyre::eyre::Result</span>;
+<span class="kw">use</span> <span class="ident">debug_ignore::DebugIgnore</span>;
 <span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">FailureOutput</span>, <span class="ident">NextestProfile</span>};
+<span class="kw">use</span> <span class="ident">owo_colors</span>::{<span class="ident">OwoColorize</span>, <span class="ident">Style</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">fmt</span>, <span class="ident">io</span>,
     <span class="ident">io::Write</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>},
 };
 <span class="kw">use</span> <span class="ident">structopt::clap::arg_enum</span>;
-<span class="kw">use</span> <span class="ident">termcolor</span>::{<span class="ident">BufferWriter</span>, <span class="ident">ColorChoice</span>, <span class="ident">ColorSpec</span>, <span class="ident">NoColor</span>, <span class="ident">WriteColor</span>};
+<span class="kw">use</span> <span class="ident">supports_color::Stream</span>;
 
 <span class="macro">arg_enum!</span> {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
@@ -598,42 +563,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Color</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">color_choice</span>(<span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">atty::Stream</span>) -&gt; <span class="ident">ColorChoice</span> {
-        <span class="comment">// https://docs.rs/termcolor/1.1.2/termcolor/index.html#detecting-presence-of-a-terminal</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">should_colorize</span>(<span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Color::Always</span> =&gt; <span class="ident">ColorChoice::Always</span>,
-            <span class="ident">Color::Auto</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">atty::is</span>(<span class="ident">stream</span>) {
-                    <span class="ident">ColorChoice::Auto</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">ColorChoice::Never</span>
-                }
-            }
-            <span class="ident">Color::Never</span> =&gt; <span class="ident">ColorChoice::Never</span>,
+            <span class="ident">Color::Always</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">Color::Auto</span> =&gt; <span class="ident">supports_color::on_cached</span>(<span class="ident">stream</span>).<span class="ident">is_some</span>(),
+            <span class="ident">Color::Never</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="doccomment">/// Functionality to report test results to stdout and JUnit</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestReporter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">stdout</span>: <span class="ident">BufferWriter</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">stderr</span>: <span class="ident">BufferWriter</span>,
     <span class="ident">failure_output</span>: <span class="ident">FailureOutput</span>,
     <span class="ident">binary_id_width</span>: <span class="ident">usize</span>,
+    <span class="ident">styles</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Styles</span><span class="op">&gt;</span>,
 
     <span class="comment">// TODO: too many concerns mixed up here. Should have a better model, probably in conjunction</span>
     <span class="comment">// with factoring out the different reporters below.</span>
-    <span class="ident">failing_tests</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">TestRunStatus</span>)<span class="op">&gt;</span>,
+    <span class="ident">failing_tests</span>: <span class="ident">DebugIgnore</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">TestRunStatus</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
 
     <span class="ident">metadata_reporter</span>: <span class="ident">MetadataReporter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TestReporter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new instance with the given color choice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="ident">TestList</span>, <span class="ident">color</span>: <span class="ident">Color</span>, <span class="ident">profile</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">BufferWriter::stdout</span>(<span class="ident">color</span>.<span class="ident">color_choice</span>(<span class="ident">atty::Stream::Stdout</span>));
-        <span class="kw">let</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">BufferWriter::stderr</span>(<span class="ident">color</span>.<span class="ident">color_choice</span>(<span class="ident">atty::Stream::Stderr</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="ident">TestList</span>, <span class="ident">profile</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">Styles::default</span>());
         <span class="kw">let</span> <span class="ident">binary_id_width</span> <span class="op">=</span> <span class="ident">test_list</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">info</span>)<span class="op">|</span> <span class="ident">info</span>.<span class="ident">binary_id</span>.<span class="ident">len</span>())
@@ -641,20 +596,21 @@
             .<span class="ident">unwrap_or_default</span>();
         <span class="kw">let</span> <span class="ident">metadata_reporter</span> <span class="op">=</span> <span class="ident">MetadataReporter::new</span>(<span class="ident">profile</span>);
         <span class="self">Self</span> {
-            <span class="ident">stdout</span>,
-            <span class="ident">stderr</span>,
             <span class="ident">failure_output</span>: <span class="ident">profile</span>.<span class="ident">failure_output</span>(),
-            <span class="ident">failing_tests</span>: <span class="macro">vec!</span>[],
+            <span class="ident">failing_tests</span>: <span class="ident">DebugIgnore</span>(<span class="macro">vec!</span>[]),
+            <span class="ident">styles</span>,
             <span class="ident">binary_id_width</span>,
             <span class="ident">metadata_reporter</span>,
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colorize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">colorize</span>();
+    }
+
     <span class="doccomment">/// Report a test event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">report_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stdout</span>.<span class="ident">buffer</span>();
-        <span class="self">self</span>.<span class="ident">write_event</span>(<span class="ident">event</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">stdout</span>.<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>).<span class="ident">context</span>(<span class="string">&quot;error writing output&quot;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">report_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">write_event</span>(<span class="ident">event</span>, <span class="ident">writer</span>)
     }
 
     <span class="comment">// ---</span>
@@ -662,31 +618,23 @@
     <span class="comment">// ---</span>
 
     <span class="doccomment">/// Report this test event to the given writer.</span>
-    <span class="kw">fn</span> <span class="ident">write_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span> {
             <span class="ident">TestEvent::RunStarted</span> { <span class="ident">test_list</span> } =&gt; {
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::pass_spec</span>())<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Starting&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Starting&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">pass</span>))<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">count_spec</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::count_spec</span>();
+                <span class="kw">let</span> <span class="ident">count_style</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>;
 
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_list</span>.<span class="ident">run_count</span>())<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; tests across &quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">test_list</span>.<span class="ident">binary_count</span>())<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; binaries&quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(
+                    <span class="ident">writer</span>,
+                    <span class="string">&quot;{} tests across {} binaries&quot;</span>,
+                    <span class="ident">test_list</span>.<span class="ident">run_count</span>().<span class="ident">style</span>(<span class="ident">count_style</span>),
+                    <span class="ident">test_list</span>.<span class="ident">binary_count</span>().<span class="ident">style</span>(<span class="ident">count_style</span>),
+                )<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">skip_count</span> <span class="op">=</span> <span class="ident">test_list</span>.<span class="ident">skip_count</span>();
                 <span class="kw">if</span> <span class="ident">skip_count</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; (&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">skip_count</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; skipped)&quot;</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; ({} skipped)&quot;</span>, <span class="ident">skip_count</span>.<span class="ident">style</span>(<span class="ident">count_style</span>))<span class="question-mark">?</span>;
                 }
 
                 <span class="macro">writeln!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
@@ -698,11 +646,9 @@
                 <span class="ident">test_instance</span>,
                 <span class="ident">run_status</span>,
             } =&gt; {
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::retry_spec</span>())<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">retry_string</span> <span class="op">=</span>
                     <span class="macro">format!</span>(<span class="string">&quot;{}/{} RETRY&quot;</span>, <span class="ident">run_status</span>.<span class="ident">attempt</span>, <span class="ident">run_status</span>.<span class="ident">total_attempts</span>);
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="ident">retry_string</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="ident">retry_string</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">retry</span>))<span class="question-mark">?</span>;
 
                 <span class="comment">// Next, print the time taken.</span>
                 <span class="self">self</span>.<span class="ident">write_duration</span>(<span class="ident">run_status</span>.<span class="ident">time_taken</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
@@ -729,41 +675,38 @@
                 <span class="comment">// First, print the status.</span>
                 <span class="kw">let</span> <span class="ident">last_status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">run_statuses</span>.<span class="ident">describe</span>() {
                     <span class="ident">RunDescribe::Success</span> { <span class="ident">run_status</span> } =&gt; {
-                        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::pass_spec</span>())<span class="question-mark">?</span>;
-                        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;PASS&quot;</span>)<span class="question-mark">?</span>;
+                        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;PASS&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">pass</span>))<span class="question-mark">?</span>;
                         <span class="ident">run_status</span>
                     }
                     <span class="ident">RunDescribe::Flaky</span> { <span class="ident">last_status</span>, .. } =&gt; {
                         <span class="comment">// Use the skip color to also represent a flaky test.</span>
-                        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::skip_spec</span>())<span class="question-mark">?</span>;
                         <span class="macro">write!</span>(
                             <span class="ident">writer</span>,
                             <span class="string">&quot;{:&gt;12} &quot;</span>,
-                            <span class="macro">format!</span>(<span class="string">&quot;TRY {} PASS&quot;</span>, <span class="ident">last_status</span>.<span class="ident">attempt</span>)
+                            <span class="macro">format!</span>(<span class="string">&quot;TRY {} PASS&quot;</span>, <span class="ident">last_status</span>.<span class="ident">attempt</span>).<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">skip</span>)
                         )<span class="question-mark">?</span>;
                         <span class="ident">last_status</span>
                     }
                     <span class="ident">RunDescribe::Failure</span> { <span class="ident">last_status</span>, .. } =&gt; {
-                        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::fail_spec</span>())<span class="question-mark">?</span>;
                         <span class="kw">let</span> <span class="ident">status_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">last_status</span>.<span class="ident">status</span> {
                             <span class="ident">TestStatus::Fail</span> =&gt; <span class="string">&quot;FAIL&quot;</span>,
                             <span class="ident">TestStatus::ExecFail</span> =&gt; <span class="string">&quot;XFAIL&quot;</span>,
                             <span class="ident">TestStatus::Pass</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;this is a failing test&quot;</span>),
                         };
+
                         <span class="kw">if</span> <span class="ident">last_status</span>.<span class="ident">attempt</span> <span class="op">==</span> <span class="number">1</span> {
-                            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="ident">status_str</span>)<span class="question-mark">?</span>;
+                            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="ident">status_str</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>))<span class="question-mark">?</span>;
                         } <span class="kw">else</span> {
                             <span class="macro">write!</span>(
                                 <span class="ident">writer</span>,
                                 <span class="string">&quot;{:&gt;12} &quot;</span>,
                                 <span class="macro">format!</span>(<span class="string">&quot;TRY {} {}&quot;</span>, <span class="ident">last_status</span>.<span class="ident">attempt</span>, <span class="ident">status_str</span>)
+                                    .<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>)
                             )<span class="question-mark">?</span>;
                         }
                         <span class="ident">last_status</span>
                     }
                 };
-
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
 
                 <span class="comment">// Next, print the time taken.</span>
                 <span class="self">self</span>.<span class="ident">write_duration</span>(<span class="ident">last_status</span>.<span class="ident">time_taken</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
@@ -787,9 +730,7 @@
                 <span class="ident">test_instance</span>,
                 <span class="ident">reason</span>: <span class="ident">_reason</span>,
             } =&gt; {
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::skip_spec</span>())<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;SKIP&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;SKIP&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">skip</span>))<span class="question-mark">?</span>;
                 <span class="comment">// same spacing [   0.034s]</span>
                 <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;[         ] &quot;</span>)<span class="question-mark">?</span>;
 
@@ -797,24 +738,19 @@
                 <span class="macro">writeln!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">TestEvent::RunBeginCancel</span> { <span class="ident">running</span>, <span class="ident">reason</span> } =&gt; {
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::fail_spec</span>())<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Canceling&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;due to &quot;</span>)<span class="question-mark">?</span>;
-
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::count_spec</span>())<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">reason</span> {
-                    <span class="ident">CancelReason::Signal</span> =&gt; <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;signal&quot;</span>)<span class="question-mark">?</span>,
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Canceling&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">reason_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">reason</span> {
+                    <span class="ident">CancelReason::Signal</span> =&gt; <span class="string">&quot;signal&quot;</span>,
                     <span class="comment">// TODO: differentiate between control errors (e.g. fail-fast) and report errors</span>
-                    <span class="ident">CancelReason::ReportError</span> =&gt; <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;error&quot;</span>)<span class="question-mark">?</span>,
-                }
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    <span class="ident">CancelReason::ReportError</span> =&gt; <span class="string">&quot;error&quot;</span>,
+                };
 
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::count_spec</span>())<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">running</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot; tests still running&quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">writeln!</span>(
+                    <span class="ident">writer</span>,
+                    <span class="string">&quot;due to {}: {} tests still running&quot;</span>,
+                    <span class="ident">reason_str</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>),
+                    <span class="ident">running</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>)
+                )<span class="question-mark">?</span>;
             }
 
             <span class="ident">TestEvent::RunFinished</span> {
@@ -831,14 +767,12 @@
                         <span class="ident">skipped</span>,
                     },
             } =&gt; {
-                <span class="kw">let</span> <span class="ident">summary_spec</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">failed</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">exec_failed</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident"><span class="self">Self</span>::fail_spec</span>()
+                <span class="kw">let</span> <span class="ident">summary_style</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">failed</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">exec_failed</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                    <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>
                 } <span class="kw">else</span> {
-                    <span class="ident"><span class="self">Self</span>::pass_spec</span>()
+                    <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">pass</span>
                 };
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">summary_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Summary&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:&gt;12} &quot;</span>, <span class="string">&quot;Summary&quot;</span>.<span class="ident">style</span>(<span class="ident">summary_style</span>))<span class="question-mark">?</span>;
 
                 <span class="comment">// Next, print the total time taken.</span>
                 <span class="comment">// * &gt; means right-align.</span>
@@ -847,59 +781,54 @@
                 <span class="comment">// TODO: better time printing mechanism than this</span>
                 <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;[{:&gt;8.3?}s] &quot;</span>, <span class="ident">elapsed</span>.<span class="ident">as_secs_f64</span>())<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">count_spec</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::count_spec</span>();
-
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">final_run_count</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">final_run_count</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>))<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">final_run_count</span> <span class="op">!</span><span class="op">=</span> <span class="ident">initial_run_count</span> {
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;/{}&quot;</span>, <span class="ident">initial_run_count</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;/{}&quot;</span>, <span class="ident">initial_run_count</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>))<span class="question-mark">?</span>;
                 }
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; tests run: &quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(
+                    <span class="ident">writer</span>,
+                    <span class="string">&quot; tests run: {} passed&quot;</span>,
+                    <span class="ident">passed</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">pass</span>)
+                )<span class="question-mark">?</span>;
 
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">passed</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::pass_spec</span>())<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; passed&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">flaky</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; (&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">flaky</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::skip_spec</span>())<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; flaky&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(
+                        <span class="ident">writer</span>,
+                        <span class="string">&quot; ({} {})&quot;</span>,
+                        <span class="ident">flaky</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>),
+                        <span class="string">&quot;flaky&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">skip</span>),
+                    )<span class="question-mark">?</span>;
                 }
                 <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">failed</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">failed</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::fail_spec</span>())<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; failed&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(
+                        <span class="ident">writer</span>,
+                        <span class="string">&quot;{} {}, &quot;</span>,
+                        <span class="ident">failed</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>),
+                        <span class="string">&quot;failed&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>),
+                    )<span class="question-mark">?</span>;
                 }
 
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">exec_failed</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">exec_failed</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::fail_spec</span>())<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; exec failed&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(
+                        <span class="ident">writer</span>,
+                        <span class="string">&quot;{} {}, &quot;</span>,
+                        <span class="ident">exec_failed</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>),
+                        <span class="string">&quot;exec failed&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>),
+                    )<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">count_spec</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">skipped</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::skip_spec</span>())<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; skipped&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(
+                    <span class="ident">writer</span>,
+                    <span class="string">&quot;{} {}&quot;</span>,
+                    <span class="ident">skipped</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">count</span>),
+                    <span class="string">&quot;skipped&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">skip</span>),
+                )<span class="question-mark">?</span>;
 
                 <span class="macro">writeln!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">for</span> (<span class="ident">test_instance</span>, <span class="ident">run_status</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">failing_tests</span> {
+                <span class="kw">for</span> (<span class="ident">test_instance</span>, <span class="ident">run_status</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">failing_tests</span> {
                     <span class="self">self</span>.<span class="ident">write_run_status</span>(<span class="ident">test_instance</span>, <span class="ident">run_status</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
                 }
             }
@@ -909,20 +838,13 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_instance</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">test_bin_spec</span>())<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">write_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">write!</span>(
             <span class="ident">writer</span>,
-            <span class="string">&quot;{:&gt;width$}&quot;</span>,
-            <span class="ident">instance</span>.<span class="ident">binary_id</span>,
+            <span class="string">&quot;{:&gt;width$} &quot;</span>,
+            <span class="ident">instance</span>.<span class="ident">binary_id</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">test_list</span>.<span class="ident">test_bin</span>),
             <span class="ident">width</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">binary_id_width</span>
         )<span class="question-mark">?</span>;
-        <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;  &quot;</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Now look for the part of the test after the last ::, if any.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">splits</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">name</span>.<span class="ident">rsplitn</span>(<span class="number">2</span>, <span class="string">&quot;::&quot;</span>);
@@ -930,14 +852,16 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rest</span>) <span class="op">=</span> <span class="ident">splits</span>.<span class="ident">next</span>() {
             <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}::&quot;</span>, <span class="ident">rest</span>)<span class="question-mark">?</span>;
         }
-        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">test_name_spec</span>())<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">trailing</span>)<span class="question-mark">?</span>;
-        <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(
+            <span class="ident">writer</span>,
+            <span class="string">&quot;{}&quot;</span>,
+            <span class="ident">trailing</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">test_list</span>.<span class="ident">test_name</span>)
+        )<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_duration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_duration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// * &gt; means right-align.</span>
         <span class="comment">// * 8 is the number of characters to pad to.</span>
         <span class="comment">// * .3 means print two digits after the decimal point.</span>
@@ -950,93 +874,70 @@
         <span class="ident">test_instance</span>: <span class="kw-2">&amp;</span><span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">run_status</span>: <span class="kw-2">&amp;</span><span class="ident">TestRunStatus</span>,
         <span class="ident">is_retry</span>: <span class="ident">bool</span>,
-        <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">WriteColor</span>,
+        <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>,
     ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">header_spec</span>, <span class="ident">output_spec</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_retry</span> {
-            (<span class="ident"><span class="self">Self</span>::retry_spec</span>(), <span class="ident"><span class="self">Self</span>::retry_output_spec</span>())
+        <span class="kw">let</span> (<span class="ident">header_style</span>, <span class="ident">_output_style</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_retry</span> {
+            (<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">retry</span>, <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">retry_output</span>)
         } <span class="kw">else</span> {
-            (<span class="ident"><span class="self">Self</span>::fail_spec</span>(), <span class="ident"><span class="self">Self</span>::fail_output_spec</span>())
+            (<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail</span>, <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">fail_output</span>)
         };
 
-        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">header_spec</span>)<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;\n--- &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">write_attempt</span>(<span class="ident">run_status</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; STDOUT: &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">write_instance</span>(<span class="kw-2">*</span><span class="ident">test_instance</span>, <span class="ident">NoColor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>))<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot; ---&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="string">&quot;--- &quot;</span>.<span class="ident">style</span>(<span class="ident">header_style</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">write_attempt</span>(<span class="ident">run_status</span>, <span class="ident">header_style</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="string">&quot; STDOUT: &quot;</span>.<span class="ident">style</span>(<span class="ident">header_style</span>))<span class="question-mark">?</span>;
 
-        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">output_spec</span>)<span class="question-mark">?</span>;
-        <span class="ident">NoColor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>).<span class="ident">write_all</span>(<span class="ident">run_status</span>.<span class="ident">stdout</span>())<span class="question-mark">?</span>;
+        {
+            <span class="kw">let</span> <span class="ident">no_color</span> <span class="op">=</span> <span class="ident">strip_ansi_escapes::Writer::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>);
+            <span class="self">self</span>.<span class="ident">write_instance</span>(<span class="kw-2">*</span><span class="ident">test_instance</span>, <span class="ident">no_color</span>)<span class="question-mark">?</span>;
+        }
+        <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="string">&quot; ---&quot;</span>.<span class="ident">style</span>(<span class="ident">header_style</span>))<span class="question-mark">?</span>;
 
-        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">header_spec</span>)<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;--- &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">write_attempt</span>(<span class="ident">run_status</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; STDERR: &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">write_instance</span>(<span class="kw-2">*</span><span class="ident">test_instance</span>, <span class="ident">NoColor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>))<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot; ---&quot;</span>)<span class="question-mark">?</span>;
+        {
+            <span class="comment">// Strip ANSI escapes from the output in case some test framework doesn&#39;t check for</span>
+            <span class="comment">// ttys before producing color output.</span>
+            <span class="comment">// TODO: apply output style once https://github.com/jam1garner/owo-colors/issues/41 is</span>
+            <span class="comment">// fixed</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">no_color</span> <span class="op">=</span> <span class="ident">strip_ansi_escapes::Writer::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>);
+            <span class="ident">no_color</span>.<span class="ident">write_all</span>(<span class="ident">run_status</span>.<span class="ident">stdout</span>())<span class="question-mark">?</span>;
+        }
 
-        <span class="ident">writer</span>.<span class="ident">set_color</span>(<span class="kw-2">&amp;</span><span class="ident">output_spec</span>)<span class="question-mark">?</span>;
-        <span class="ident">NoColor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>).<span class="ident">write_all</span>(<span class="ident">run_status</span>.<span class="ident">stderr</span>())<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="string">&quot;--- &quot;</span>.<span class="ident">style</span>(<span class="ident">header_style</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">write_attempt</span>(<span class="ident">run_status</span>, <span class="ident">header_style</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="string">&quot; STDERR: &quot;</span>.<span class="ident">style</span>(<span class="ident">header_style</span>))<span class="question-mark">?</span>;
 
-        <span class="ident">writer</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
+        {
+            <span class="kw">let</span> <span class="ident">no_color</span> <span class="op">=</span> <span class="ident">strip_ansi_escapes::Writer::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>);
+            <span class="self">self</span>.<span class="ident">write_instance</span>(<span class="kw-2">*</span><span class="ident">test_instance</span>, <span class="ident">no_color</span>)<span class="question-mark">?</span>;
+        }
+        <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="string">&quot; ---&quot;</span>.<span class="ident">style</span>(<span class="ident">header_style</span>))<span class="question-mark">?</span>;
+
+        {
+            <span class="comment">// Strip ANSI escapes from the output in case some test framework doesn&#39;t check for</span>
+            <span class="comment">// ttys before producing color output.</span>
+            <span class="comment">// TODO: apply output style once https://github.com/jam1garner/owo-colors/issues/41 is</span>
+            <span class="comment">// fixed</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">no_color</span> <span class="op">=</span> <span class="ident">strip_ansi_escapes::Writer::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>);
+            <span class="ident">no_color</span>.<span class="ident">write_all</span>(<span class="ident">run_status</span>.<span class="ident">stderr</span>())<span class="question-mark">?</span>;
+        }
+
         <span class="macro">writeln!</span>(<span class="ident">writer</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">write_attempt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">run_status</span>: <span class="kw-2">&amp;</span><span class="ident">TestRunStatus</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_attempt</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">run_status</span>: <span class="kw-2">&amp;</span><span class="ident">TestRunStatus</span>,
+        <span class="ident">style</span>: <span class="ident">Style</span>,
+        <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>,
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">run_status</span>.<span class="ident">total_attempts</span> <span class="op">&gt;</span> <span class="number">1</span> {
-            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;TRY {}&quot;</span>, <span class="ident">run_status</span>.<span class="ident">attempt</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(
+                <span class="ident">writer</span>,
+                <span class="string">&quot;{} {}&quot;</span>,
+                <span class="string">&quot;TRY&quot;</span>.<span class="ident">style</span>(<span class="ident">style</span>),
+                <span class="ident">run_status</span>.<span class="ident">attempt</span>.<span class="ident">style</span>(<span class="ident">style</span>)
+            )<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">fn</span> <span class="ident">count_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>.<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
-        <span class="ident">color_spec</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">pass_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>
-            .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Green</span>))
-            .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
-        <span class="ident">color_spec</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">retry_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>
-            .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Magenta</span>))
-            .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
-        <span class="ident">color_spec</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">fail_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>
-            .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Red</span>))
-            .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
-        <span class="ident">color_spec</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">retry_output_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>.<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Magenta</span>));
-        <span class="ident">color_spec</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">fail_output_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>.<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Red</span>));
-        <span class="ident">color_spec</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">skip_spec</span>() -&gt; <span class="ident">ColorSpec</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color_spec</span> <span class="op">=</span> <span class="ident">ColorSpec::new</span>();
-        <span class="ident">color_spec</span>
-            .<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">termcolor::Color::Yellow</span>))
-            .<span class="ident">set_bold</span>(<span class="bool-val">true</span>);
-        <span class="ident">color_spec</span>
     }
 }
 
@@ -1127,6 +1028,31 @@
 
     <span class="doccomment">/// A termination signal was received.</span>
     <span class="ident">Signal</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Styles</span> {
+    <span class="ident">count</span>: <span class="ident">Style</span>,
+    <span class="ident">pass</span>: <span class="ident">Style</span>,
+    <span class="ident">retry</span>: <span class="ident">Style</span>,
+    <span class="ident">fail</span>: <span class="ident">Style</span>,
+    <span class="ident">retry_output</span>: <span class="ident">Style</span>,
+    <span class="ident">fail_output</span>: <span class="ident">Style</span>,
+    <span class="ident">skip</span>: <span class="ident">Style</span>,
+    <span class="ident">test_list</span>: <span class="ident"><span class="kw">crate</span>::test_list::Styles</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Styles</span> {
+    <span class="kw">fn</span> <span class="ident">colorize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">count</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">bold</span>();
+        <span class="self">self</span>.<span class="ident">pass</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">green</span>().<span class="ident">bold</span>();
+        <span class="self">self</span>.<span class="ident">retry</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">magenta</span>().<span class="ident">bold</span>();
+        <span class="self">self</span>.<span class="ident">fail</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">red</span>().<span class="ident">bold</span>();
+        <span class="self">self</span>.<span class="ident">retry_output</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">magenta</span>();
+        <span class="self">self</span>.<span class="ident">fail_output</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">magenta</span>();
+        <span class="self">self</span>.<span class="ident">skip</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">yellow</span>().<span class="ident">bold</span>();
+        <span class="self">self</span>.<span class="ident">test_list</span>.<span class="ident">colorize</span>();
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="nextest_runner" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

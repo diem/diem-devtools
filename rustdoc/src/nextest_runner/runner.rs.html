@@ -787,7 +787,7 @@
     <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
 };
-<span class="kw">use</span> <span class="ident">anyhow::Result</span>;
+<span class="kw">use</span> <span class="ident">color_eyre::eyre::Result</span>;
 <span class="kw">use</span> <span class="ident">crossbeam_channel::RecvTimeoutError</span>;
 <span class="kw">use</span> <span class="ident">duct::cmd</span>;
 <span class="kw">use</span> <span class="ident">nextest_config::NextestProfile</span>;

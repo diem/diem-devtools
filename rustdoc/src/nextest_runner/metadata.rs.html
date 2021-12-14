@@ -192,6 +192,7 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -202,9 +203,10 @@
     <span class="ident">runner</span>::{<span class="ident">RunDescribe</span>, <span class="ident">TestRunStatus</span>, <span class="ident">TestStatus</span>},
     <span class="ident">test_list::TestInstance</span>,
 };
-<span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
 <span class="kw">use</span> <span class="ident">camino::Utf8Path</span>;
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">FixedOffset</span>, <span class="ident">Utc</span>};
+<span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="prelude-ty">Result</span>, <span class="ident">WrapErr</span>};
+<span class="kw">use</span> <span class="ident">debug_ignore::DebugIgnore</span>;
 <span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">NextestJunitConfig</span>, <span class="ident">NextestProfile</span>};
 <span class="kw">use</span> <span class="ident">quick_junit</span>::{<span class="ident">NonSuccessKind</span>, <span class="ident">Report</span>, <span class="ident">TestRerun</span>, <span class="ident">Testcase</span>, <span class="ident">TestcaseStatus</span>, <span class="ident">Testsuite</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">fs::File</span>, <span class="ident">time::SystemTime</span>};
@@ -243,7 +245,7 @@
 <span class="kw">struct</span> <span class="ident">MetadataJunit</span><span class="op">&lt;</span><span class="lifetime">&#39;cfg</span><span class="op">&gt;</span> {
     <span class="ident">metadata_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;cfg</span> <span class="ident">str</span>,
     <span class="ident">config</span>: <span class="ident">NextestJunitConfig</span><span class="op">&lt;</span><span class="lifetime">&#39;cfg</span><span class="op">&gt;</span>,
-    <span class="ident">testsuites</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;cfg</span> <span class="ident">str</span>, <span class="ident">Testsuite</span><span class="op">&gt;</span>,
+    <span class="ident">testsuites</span>: <span class="ident">DebugIgnore</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;cfg</span> <span class="ident">str</span>, <span class="ident">Testsuite</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;cfg</span><span class="op">&gt;</span> <span class="ident">MetadataJunit</span><span class="op">&lt;</span><span class="lifetime">&#39;cfg</span><span class="op">&gt;</span> {
@@ -251,7 +253,7 @@
         <span class="self">Self</span> {
             <span class="ident">metadata_name</span>,
             <span class="ident">config</span>,
-            <span class="ident">testsuites</span>: <span class="ident">HashMap::new</span>(),
+            <span class="ident">testsuites</span>: <span class="ident">DebugIgnore</span>(<span class="ident">HashMap::new</span>()),
         }
     }
 
@@ -358,16 +360,16 @@
 
                 <span class="kw">let</span> <span class="ident">junit_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">path</span>();
                 <span class="kw">let</span> <span class="ident">junit_dir</span> <span class="op">=</span> <span class="ident">junit_path</span>.<span class="ident">parent</span>().<span class="ident">expect</span>(<span class="string">&quot;junit path must have a parent&quot;</span>);
-                <span class="ident">std::fs::create_dir_all</span>(<span class="ident">junit_dir</span>).<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> {
+                <span class="ident">std::fs::create_dir_all</span>(<span class="ident">junit_dir</span>).<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> {
                     <span class="macro">format!</span>(<span class="string">&quot;failed to create junit output directory &#39;{}&#39;&quot;</span>, <span class="ident">junit_dir</span>)
                 })<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::create</span>(<span class="ident">junit_path</span>).<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::create</span>(<span class="ident">junit_path</span>).<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> {
                     <span class="macro">format!</span>(<span class="string">&quot;failed to open junit file &#39;{}&#39; for writing&quot;</span>, <span class="ident">junit_path</span>)
                 })<span class="question-mark">?</span>;
                 <span class="ident">report</span>
                     .<span class="ident">serialize</span>(<span class="ident">f</span>)
-                    .<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;failed to serialize junit to {}&quot;</span>, <span class="ident">junit_path</span>))<span class="question-mark">?</span>;
+                    .<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;failed to serialize junit to {}&quot;</span>, <span class="ident">junit_path</span>))<span class="question-mark">?</span>;
             }
         }
 

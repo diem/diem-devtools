@@ -168,6 +168,22 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -180,11 +196,12 @@
     <span class="ident">test_filter</span>::{<span class="ident">RunIgnored</span>, <span class="ident">TestFilterBuilder</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestBinary</span>, <span class="ident">TestList</span>},
 };
-<span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
+<span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="ident">bail</span>, <span class="prelude-ty">Result</span>, <span class="ident">WrapErr</span>};
 <span class="kw">use</span> <span class="ident">duct::cmd</span>;
 <span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">errors::ConfigReadError</span>, <span class="ident">NextestConfig</span>};
 <span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
+<span class="kw">use</span> <span class="ident">supports_color::Stream</span>;
 
 <span class="doccomment">/// This test runner accepts a Rust test binary and does fancy things with it.</span>
 <span class="doccomment">///</span>
@@ -285,10 +302,16 @@
 <span class="kw">impl</span> <span class="ident">Opts</span> {
     <span class="doccomment">/// Execute the command.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exec</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">std::io::stdout</span>();
+
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">command</span> {
             <span class="ident">Command::ListTests</span> { <span class="ident">bin_filter</span>, <span class="ident">format</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">bin_filter</span>.<span class="ident">compute</span>()<span class="question-mark">?</span>;
-                <span class="ident">test_list</span>.<span class="ident">write_to_stdout</span>(<span class="self">self</span>.<span class="ident">color</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">bin_filter</span>.<span class="ident">compute</span>()<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">color</span>.<span class="ident">should_colorize</span>(<span class="ident">Stream::Stdout</span>) {
+                    <span class="ident">test_list</span>.<span class="ident">colorize</span>();
+                }
+                <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">stdout</span>.<span class="ident">lock</span>();
+                <span class="ident">test_list</span>.<span class="ident">write</span>(<span class="ident">format</span>, <span class="ident">lock</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">Command::Run</span> {
                 <span class="kw-2">ref</span> <span class="ident">profile</span>,
@@ -300,15 +323,24 @@
                 <span class="kw">let</span> <span class="ident">profile</span> <span class="op">=</span>
                     <span class="ident">config</span>.<span class="ident">profile</span>(<span class="ident">profile</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="ident">NextestConfig::DEFAULT_PROFILE</span>))<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">metadata_dir</span> <span class="op">=</span> <span class="ident">profile</span>.<span class="ident">metadata_dir</span>();
-                <span class="ident">std::fs::create_dir_all</span>(<span class="kw-2">&amp;</span><span class="ident">metadata_dir</span>)
-                    .<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;failed to create metadata dir &#39;{}&#39;&quot;</span>, <span class="ident">metadata_dir</span>))<span class="question-mark">?</span>;
+                <span class="ident">std::fs::create_dir_all</span>(<span class="kw-2">&amp;</span><span class="ident">metadata_dir</span>).<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> {
+                    <span class="macro">format!</span>(<span class="string">&quot;failed to create metadata dir &#39;{}&#39;&quot;</span>, <span class="ident">metadata_dir</span>)
+                })<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">bin_filter</span>.<span class="ident">compute</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reporter</span> <span class="op">=</span> <span class="ident">TestReporter::new</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>, <span class="self">self</span>.<span class="ident">color</span>, <span class="kw-2">&amp;</span><span class="ident">profile</span>);
-                <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">SignalHandler::new</span>().<span class="ident">context</span>(<span class="string">&quot;failed to set up Ctrl-C handler&quot;</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reporter</span> <span class="op">=</span> <span class="ident">TestReporter::new</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>, <span class="kw-2">&amp;</span><span class="ident">profile</span>);
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">color</span>.<span class="ident">should_colorize</span>(<span class="ident">Stream::Stdout</span>) {
+                    <span class="ident">reporter</span>.<span class="ident">colorize</span>();
+                }
+
+                <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">SignalHandler::new</span>().<span class="ident">wrap_err</span>(<span class="string">&quot;failed to set up Ctrl-C handler&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">runner_opts</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_list</span>, <span class="kw-2">&amp;</span><span class="ident">profile</span>, <span class="ident">handler</span>);
                 <span class="kw">let</span> <span class="ident">run_stats</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">try_execute</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> {
-                    <span class="ident">reporter</span>.<span class="ident">report_event</span>(<span class="ident">event</span>)
+                    <span class="comment">// TODO: consider turning this into a trait, to initialize and carry the lock</span>
+                    <span class="comment">// across callback invocations</span>
+                    <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">stdout</span>.<span class="ident">lock</span>();
+                    <span class="ident">reporter</span>.<span class="ident">report_event</span>(<span class="ident">event</span>, <span class="ident">lock</span>)
                     <span class="comment">// TODO: no-fail-fast logic</span>
                 })<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">run_stats</span>.<span class="ident">is_success</span>() {
@@ -336,7 +368,7 @@
         <span class="ident">p</span>.<span class="ident">pop</span>();
         <span class="ident">p</span>
     })
-    .<span class="ident">with_context</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;cargo locate-project failed&quot;</span>)
+    .<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;cargo locate-project failed&quot;</span>)
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="nextest_runner" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
