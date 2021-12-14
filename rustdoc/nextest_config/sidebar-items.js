@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["FailureOutput",""]],"mod":[["errors",""]],"struct":[["MetadataConfig","Metadata configuration for nextest."],["NextestConfig","Configuration for nextest."],["NextestProfile","A representation of a nextest profile."]]});
+initSidebarItems({"enum":[["FailureOutput",""]],"mod":[["errors",""]],"struct":[["NextestConfig","Configuration for nextest."],["NextestJunitConfig","JUnit configuration for nextest."],["NextestProfile","A nextest profile. Contains configuration for a specific nextest run."]]});
