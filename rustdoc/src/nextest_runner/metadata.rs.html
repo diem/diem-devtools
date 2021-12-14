@@ -193,6 +193,7 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -261,6 +262,7 @@
         <span class="kw">match</span> <span class="ident">event</span> {
             <span class="ident">TestEvent::RunStarted</span> { .. } =&gt; {}
             <span class="ident">TestEvent::TestStarted</span> { .. } =&gt; {}
+            <span class="ident">TestEvent::TestSlow</span> { .. } =&gt; {}
             <span class="ident">TestEvent::TestRetry</span> { .. } =&gt; {
                 <span class="comment">// Retries are recorded in TestFinished.</span>
             }

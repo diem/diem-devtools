@@ -29,8 +29,11 @@ retries = 0
 # * &quot;immediate-final&quot;: output failures as soon as they happen and at the end of the test run
 # * &quot;never&quot;: don&#39;t output failures at all
 #
-# For large test suites and CI it may be useful to use &quot;immediate-final&quot;.
+# For large test suites and CI it is generally useful to use &quot;immediate-final&quot;.
 failure-output = &quot;immediate&quot;
+
+# Treat a test that takes longer than this as slow, and print a message.
+slow-timeout = &quot;60s&quot;
 
 [profile.default.junit]
 # Output metadata in the JUnit format into the given file inside &#39;metadata.dir/&lt;profile-name&gt;&#39;. If unspecified, JUnit

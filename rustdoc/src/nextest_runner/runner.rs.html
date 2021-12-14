@@ -777,6 +777,24 @@
 <span id="777">777</span>
 <span id="778">778</span>
 <span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -788,7 +806,7 @@
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
 };
 <span class="kw">use</span> <span class="ident">color_eyre::eyre::Result</span>;
-<span class="kw">use</span> <span class="ident">crossbeam_channel::RecvTimeoutError</span>;
+<span class="kw">use</span> <span class="ident">crossbeam_channel</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">Sender</span>};
 <span class="kw">use</span> <span class="ident">duct::cmd</span>;
 <span class="kw">use</span> <span class="ident">nextest_config::NextestProfile</span>;
 <span class="kw">use</span> <span class="ident">rayon</span>::{<span class="ident">ThreadPool</span>, <span class="ident">ThreadPoolBuilder</span>};
@@ -800,7 +818,7 @@
         <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>},
         <span class="ident">Arc</span>,
     },
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>, <span class="ident">SystemTime</span>},
+    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>},
 };
 <span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
 
@@ -827,9 +845,11 @@
     ) -&gt; <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">test_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus::get</span>);
         <span class="kw">let</span> <span class="ident">retries</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">retries</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">retries</span>());
+        <span class="kw">let</span> <span class="ident">slow_timeout</span> <span class="op">=</span> <span class="ident">profile</span>.<span class="ident">slow_timeout</span>();
         <span class="ident">TestRunner</span> {
             <span class="comment">// The number of tries = retries + 1.</span>
             <span class="ident">tries</span>: <span class="ident">retries</span> <span class="op">+</span> <span class="number">1</span>,
+            <span class="ident">slow_timeout</span>,
             <span class="ident">test_list</span>,
             <span class="ident">run_pool</span>: <span class="ident">ThreadPoolBuilder::new</span>()
                 <span class="comment">// The main run_pool closure will need its own thread.</span>
@@ -850,6 +870,7 @@
 <span class="doccomment">/// Context for running tests.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
     <span class="ident">tries</span>: <span class="ident">usize</span>,
+    <span class="ident">slow_timeout</span>: <span class="ident">Duration</span>,
     <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
     <span class="ident">run_pool</span>: <span class="ident">ThreadPool</span>,
     <span class="ident">wait_pool</span>: <span class="ident">ThreadPool</span>,
@@ -940,7 +961,7 @@
                         <span class="kw">let</span> <span class="ident">attempt</span> <span class="op">=</span> <span class="ident">run_statuses</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>;
 
                         <span class="kw">let</span> <span class="ident">run_status</span> <span class="op">=</span> <span class="self">self</span>
-                            .<span class="ident">run_test</span>(<span class="ident">test_instance</span>, <span class="ident">attempt</span>)
+                            .<span class="ident">run_test</span>(<span class="ident">test_instance</span>, <span class="ident">attempt</span>, <span class="kw-2">&amp;</span><span class="ident">this_run_sender</span>)
                             .<span class="ident">into_external</span>(<span class="ident">attempt</span>, <span class="self">self</span>.<span class="ident">tries</span>);
 
                         <span class="kw">if</span> <span class="ident">run_status</span>.<span class="ident">status</span>.<span class="ident">is_success</span>() {
@@ -1052,10 +1073,15 @@
     <span class="comment">// ---</span>
 
     <span class="doccomment">/// Run an individual test in its own process.</span>
-    <span class="kw">fn</span> <span class="ident">run_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>, <span class="ident">attempt</span>: <span class="ident">usize</span>) -&gt; <span class="ident">InternalRunStatus</span> {
+    <span class="kw">fn</span> <span class="ident">run_test</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">attempt</span>: <span class="ident">usize</span>,
+        <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">InternalRunStatus</span> {
         <span class="kw">let</span> <span class="ident">stopwatch</span> <span class="op">=</span> <span class="ident">StopwatchStart::now</span>();
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">run_test_inner</span>(<span class="ident">test</span>, <span class="ident">attempt</span>, <span class="kw-2">&amp;</span><span class="ident">stopwatch</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">run_test_inner</span>(<span class="ident">test</span>, <span class="ident">attempt</span>, <span class="kw-2">&amp;</span><span class="ident">stopwatch</span>, <span class="ident">run_sender</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">run_status</span>) =&gt; <span class="ident">run_status</span>,
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">InternalRunStatus</span> {
                 <span class="comment">// TODO: can we return more information in stdout/stderr? investigate this</span>
@@ -1072,6 +1098,7 @@
         <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
         <span class="ident">attempt</span>: <span class="ident">usize</span>,
         <span class="ident">stopwatch</span>: <span class="kw-2">&amp;</span><span class="ident">StopwatchStart</span>,
+        <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InternalRunStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;--exact&quot;</span>, <span class="ident">test</span>.<span class="ident">name</span>, <span class="string">&quot;--nocapture&quot;</span>];
         <span class="kw">if</span> <span class="ident">test</span>.<span class="ident">info</span>.<span class="ident">ignored</span> {
@@ -1091,8 +1118,6 @@
 
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">start</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-
         <span class="self">self</span>.<span class="ident">wait_pool</span>.<span class="ident">in_place_scope</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
             <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">crossbeam_channel::bounded</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>(<span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">wait_handle</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>;
@@ -1105,16 +1130,15 @@
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(());
             });
 
-            <span class="comment">// Continue waiting for the test to finish with a timeout, logging every 60 seconds</span>
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">recv_timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>)) {
+            <span class="comment">// Continue waiting for the test to finish with a timeout, logging at slow-timeout</span>
+            <span class="comment">// intervals</span>
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">recv_timeout</span>(<span class="self">self</span>.<span class="ident">slow_timeout</span>) {
                 <span class="kw">match</span> <span class="ident">error</span> {
                     <span class="ident">RecvTimeoutError::Timeout</span> =&gt; {
-                        <span class="macro">println!</span>(
-                            <span class="string">&quot;{}::{} elapsed time is {}&quot;</span>,
-                            <span class="kw-2">&amp;</span><span class="ident">test</span>.<span class="ident">binary</span>,
-                            <span class="kw-2">&amp;</span><span class="ident">test</span>.<span class="ident">name</span>,
-                            <span class="ident">now</span>.<span class="ident">elapsed</span>().<span class="ident">as_secs</span>()
-                        );
+                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">run_sender</span>.<span class="ident">send</span>(<span class="ident">InternalTestEvent::Slow</span> {
+                            <span class="ident">test_instance</span>: <span class="ident">test</span>,
+                            <span class="ident">elapsed</span>: <span class="ident">stopwatch</span>.<span class="ident">elapsed</span>(),
+                        });
                     }
                     <span class="ident">RecvTimeoutError::Disconnected</span> =&gt; {
                         <span class="macro">unreachable!</span>(<span class="string">&quot;Waiting thread should never drop the sender&quot;</span>)
@@ -1374,6 +1398,14 @@
                 (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::TestStarted</span> { <span class="ident">test_instance</span> })
                     .<span class="ident">map_err</span>(<span class="ident">InternalError::Error</span>)
             }
+            <span class="ident">InternalEvent::Test</span>(<span class="ident">InternalTestEvent::Slow</span> {
+                <span class="ident">test_instance</span>,
+                <span class="ident">elapsed</span>,
+            }) =&gt; (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::TestSlow</span> {
+                <span class="ident">test_instance</span>,
+                <span class="ident">elapsed</span>,
+            })
+            .<span class="ident">map_err</span>(<span class="ident">InternalError::Error</span>),
             <span class="ident">InternalEvent::Test</span>(<span class="ident">InternalTestEvent::Retry</span> {
                 <span class="ident">test_instance</span>,
                 <span class="ident">run_status</span>,
@@ -1454,6 +1486,10 @@
 <span class="kw">enum</span> <span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
     <span class="ident">Started</span> {
         <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">Slow</span> {
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">elapsed</span>: <span class="ident">Duration</span>,
     },
     <span class="ident">Retry</span> {
         <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
