@@ -795,6 +795,17 @@
 <span id="795">795</span>
 <span id="796">796</span>
 <span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -808,7 +819,7 @@
 <span class="kw">use</span> <span class="ident">color_eyre::eyre::Result</span>;
 <span class="kw">use</span> <span class="ident">crossbeam_channel</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">Sender</span>};
 <span class="kw">use</span> <span class="ident">duct::cmd</span>;
-<span class="kw">use</span> <span class="ident">nextest_config::NextestProfile</span>;
+<span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">NextestProfile</span>, <span class="ident">StatusLevel</span>};
 <span class="kw">use</span> <span class="ident">rayon</span>::{<span class="ident">ThreadPool</span>, <span class="ident">ThreadPoolBuilder</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert::Infallible</span>,
@@ -831,7 +842,7 @@
     <span class="kw">pub</span> <span class="ident">retries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Number of tests to run simultaneously [default: logical CPU count]</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;test-threads&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;j&quot;</span>, <span class="ident">long</span>, <span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;jobs&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">test_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 }
 
@@ -1245,6 +1256,17 @@
         <span class="doccomment">/// May be empty.</span>
         <span class="ident">retries</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">TestRunStatus</span>],
     },
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RunDescribe</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns the status level for this `RunDescribe`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StatusLevel</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">RunDescribe::Success</span> { .. } =&gt; <span class="ident">StatusLevel::Pass</span>,
+            <span class="ident">RunDescribe::Flaky</span> { .. } =&gt; <span class="ident">StatusLevel::Retry</span>,
+            <span class="ident">RunDescribe::Failure</span> { .. } =&gt; <span class="ident">StatusLevel::Fail</span>,
+        }
+    }
 }
 
 <span class="doccomment">/// Information about a single execution of a test.</span>

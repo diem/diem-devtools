@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["dispatch",""],["output",""],["partition","Support for partitioning test runs across several machines."],["reporter",""],["runner",""],["signal",""],["test_filter",""],["test_list",""]]});
+initSidebarItems({"mod":[["dispatch",""],["partition","Support for partitioning test runs across several machines."],["reporter",""],["runner",""],["signal",""],["test_filter",""],["test_list",""]]});

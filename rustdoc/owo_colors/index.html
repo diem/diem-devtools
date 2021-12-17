@@ -71,6 +71,8 @@ or <a href="trait.OwoColorize.html#method.on_color"><code>OwoColorize::on_color<
 interface mimicks that of <a href="trait.OwoColorize.html" title="OwoColorize"><code>OwoColorize</code></a>, but instead of chaining methods on your
 object, you instead chain them on the <code>Style</code> object before applying it.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Styled.html" title="owo_colors::Styled struct">Styled</a></div><div class="item-right docblock-short"><p>A wrapper type which applies a <a href="struct.Style.html" title="Style"><code>Style</code></a> when displaying the inner type</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SupportsColorsDisplay.html" title="owo_colors::SupportsColorsDisplay struct">SupportsColorsDisplay</a></div><div class="item-right docblock-short"><p>A display wrapper which applies a transformation based on if the given stream supports
+colored terminal output</p>
 </div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.AnsiColors.html" title="owo_colors::AnsiColors enum">AnsiColors</a></div><div class="item-right docblock-short"><p>Available standard ANSI colors for use with <a href="trait.OwoColorize.html#method.color"><code>OwoColorize::color</code></a>
 or <a href="trait.OwoColorize.html#method.on_color"><code>OwoColorize::on_color</code></a></p>
@@ -80,6 +82,7 @@ or <a href="trait.OwoColorize.html#method.on_color"><code>OwoColorize::on_color<
 or <a href="struct.BgDynColorDisplay.html"><code>BgDynColorDisplay</code></a>, allowing for multiple types of colors to be used
 at runtime.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Effect.html" title="owo_colors::Effect enum">Effect</a></div><div class="item-right docblock-short"><p>A runtime-configurable text effect for use with <a href="struct.Style.html" title="Style"><code>Style</code></a></p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Stream.html" title="owo_colors::Stream enum">Stream</a></div><div class="item-right docblock-short"><p>possible stream sources</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.XtermColors.html" title="owo_colors::XtermColors enum">XtermColors</a></div><div class="item-right docblock-short"><p>Available Xterm colors for use with <a href="trait.OwoColorize.html#method.color"><code>OwoColorize::color</code></a>
 or <a href="trait.OwoColorize.html#method.on_color"><code>OwoColorize::on_color</code></a></p>
 </div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
@@ -92,7 +95,11 @@ is recommended you avoid this.</p>
 (<a href="https://doc.rust-lang.org/1.57.0/core/fmt/trait.Display.html"><code>Display</code></a>, <a href="https://doc.rust-lang.org/1.57.0/core/fmt/trait.Debug.html"><code>Debug</code></a>, <a href="https://doc.rust-lang.org/1.57.0/core/fmt/trait.UpperHex.html"><code>UpperHex</code></a>,
 etc.)</p>
 </div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.style.html" title="owo_colors::style fn">style</a></div><div class="item-right docblock-short"><p>Helper to create <a href="struct.Style.html" title="Style"><code>Style</code></a>s more ergonomically</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.set_override.html" title="owo_colors::set_override fn">set_override</a></div><div class="item-right docblock-short"><p>Set an override value for whether or not colors are supported.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.style.html" title="owo_colors::style fn">style</a></div><div class="item-right docblock-short"><p>Helper to create <a href="struct.Style.html" title="Style"><code>Style</code></a>s more ergonomically</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.unset_override.html" title="owo_colors::unset_override fn">unset_override</a></div><div class="item-right docblock-short"><p>Remove any override value for whether or not colors are supported. This means
+<a href="trait.OwoColorize.html#method.if_supports_color"><code>if_supports_color</code></a> will resume checking if the given
+terminal output (<a href="enum.Stream.html"><code>Stream</code></a>) supports colors.</p>
 </div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="owo_colors" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>
