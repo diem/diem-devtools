@@ -289,11 +289,11 @@
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">errors::RunIgnoredParseError</span>,
     <span class="ident">partition</span>::{<span class="ident">Partitioner</span>, <span class="ident">PartitionerBuilder</span>},
     <span class="ident">test_list::TestBinary</span>,
 };
 <span class="kw">use</span> <span class="ident">aho_corasick::AhoCorasick</span>;
-<span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="ident">bail</span>, <span class="ident">Report</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
@@ -313,8 +313,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RunIgnored</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">3</span>] {
-        [<span class="string">&quot;default&quot;</span>, <span class="string">&quot;ignored-only&quot;</span>, <span class="string">&quot;all&quot;</span>]
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
+        <span class="kw-2">&amp;</span>[<span class="string">&quot;default&quot;</span>, <span class="string">&quot;ignored-only&quot;</span>, <span class="string">&quot;all&quot;</span>]
     }
 }
 
@@ -335,14 +335,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">RunIgnored</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Report</span>;
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">RunIgnoredParseError</span>;
 
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
             <span class="string">&quot;default&quot;</span> =&gt; <span class="ident">RunIgnored::Default</span>,
             <span class="string">&quot;ignored-only&quot;</span> =&gt; <span class="ident">RunIgnored::IgnoredOnly</span>,
             <span class="string">&quot;all&quot;</span> =&gt; <span class="ident">RunIgnored::All</span>,
-            <span class="ident">other</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unrecognized value for run-ignored: {}&quot;</span>, <span class="ident">other</span>),
+            <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RunIgnoredParseError::new</span>(<span class="ident">other</span>)),
         };
         <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
     }

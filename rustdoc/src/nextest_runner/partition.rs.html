@@ -252,19 +252,6 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -274,8 +261,7 @@
 <span class="doccomment">//! be made smarter: e.g. using data to pick different sets of binaries and tests to run, with</span>
 <span class="doccomment">//! an aim to minimize total build and test times.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_list::TestBinary</span>;
-<span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="ident">bail</span>, <span class="ident">eyre</span>, <span class="ident">Report</span>, <span class="prelude-ty">Result</span>, <span class="ident">WrapErr</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">errors::PartitionerBuilderParseError</span>, <span class="ident">test_list::TestBinary</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">fmt</span>,
     <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
@@ -330,92 +316,80 @@
             } =&gt; <span class="ident">Box::new</span>(<span class="ident">HashPartitioner::new</span>(<span class="kw-2">*</span><span class="ident">shard</span>, <span class="kw-2">*</span><span class="ident">total_shards</span>)),
         }
     }
+}
 
-    <span class="comment">// ---</span>
-    <span class="comment">// Helper methods</span>
-    <span class="comment">// ---</span>
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">PartitionerBuilder</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">PartitionerBuilderParseError</span>;
 
-    <span class="kw">fn</span> <span class="ident">parse_impl</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="comment">// Parse the string: it looks like &quot;hash:&lt;shard&gt;/&lt;total_shards&gt;&quot;.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">input</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;hash:&quot;</span>) {
-            <span class="kw">let</span> (<span class="ident">shard</span>, <span class="ident">total_shards</span>) <span class="op">=</span>
-                <span class="ident">parse_shards</span>(<span class="ident">input</span>).<span class="ident">wrap_err</span>(<span class="string">&quot;partition must be in the format \&quot;hash:M/N\&quot;&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="ident">shard</span>, <span class="ident">total_shards</span>) <span class="op">=</span> <span class="ident">parse_shards</span>(<span class="ident">input</span>, <span class="string">&quot;hash:M/N&quot;</span>)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">PartitionerBuilder::Hash</span> {
                 <span class="ident">shard</span>,
                 <span class="ident">total_shards</span>,
             })
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">input</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;count:&quot;</span>) {
-            <span class="kw">let</span> (<span class="ident">shard</span>, <span class="ident">total_shards</span>) <span class="op">=</span>
-                <span class="ident">parse_shards</span>(<span class="ident">input</span>).<span class="ident">wrap_err</span>(<span class="string">&quot;partition must be in the format \&quot;count:M/N\&quot;&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="ident">shard</span>, <span class="ident">total_shards</span>) <span class="op">=</span> <span class="ident">parse_shards</span>(<span class="ident">input</span>, <span class="string">&quot;count:M/N&quot;</span>)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">PartitionerBuilder::Count</span> {
                 <span class="ident">shard</span>,
                 <span class="ident">total_shards</span>,
             })
         } <span class="kw">else</span> {
-            <span class="macro">bail!</span>(
-                <span class="string">&quot;partition input &#39;{}&#39; must begin with \&quot;hash:\&quot; or \&quot;count:\&quot;&quot;</span>,
-                <span class="ident">s</span>
-            )
+            <span class="prelude-val">Err</span>(<span class="ident">PartitionerBuilderParseError::new</span>(
+                <span class="prelude-val">None</span>,
+                <span class="macro">format!</span>(
+                    <span class="string">&quot;partition input &#39;{}&#39; must begin with \&quot;hash:\&quot; or \&quot;count:\&quot;&quot;</span>,
+                    <span class="ident">s</span>
+                ),
+            ))
         }
     }
 }
 
-<span class="doccomment">/// An error that occurs while parsing a `PartitionerBuilder` input.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseError</span>(<span class="ident">Report</span>);
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">chain</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">chain</span>();
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">chain</span>.<span class="ident">len</span>();
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">err</span>) <span class="kw">in</span> <span class="ident">chain</span>.<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span> {
-                <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;({})&quot;</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="comment">// Skip the last newline since that&#39;s what looks best with structopt.</span>
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({})&quot;</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
-            }
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">PartitionerBuilder</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseError</span>;
-
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::parse_impl</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="ident">ParseError</span>)
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">parse_shards</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_shards</span>(
+    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="ident">expected_format</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">u64</span>), <span class="ident">PartitionerBuilderParseError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
     <span class="comment">// First &quot;next&quot; always returns a value.</span>
     <span class="kw">let</span> <span class="ident">shard_str</span> <span class="op">=</span> <span class="ident">split</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;split should have at least 1 element&quot;</span>);
     <span class="comment">// Second &quot;next&quot; may or may not return a value.</span>
-    <span class="kw">let</span> <span class="ident">total_shards_str</span> <span class="op">=</span> <span class="ident">split</span>
-        .<span class="ident">next</span>()
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">eyre!</span>(<span class="string">&quot;expected input &#39;{}&#39; to be in the format M/N&quot;</span>, <span class="ident">input</span>))<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">total_shards_str</span> <span class="op">=</span> <span class="ident">split</span>.<span class="ident">next</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+        <span class="ident">PartitionerBuilderParseError::new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">expected_format</span>),
+            <span class="macro">format!</span>(<span class="string">&quot;expected input &#39;{}&#39; to be in the format M/N&quot;</span>, <span class="ident">input</span>),
+        )
+    })<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">shard</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">shard_str</span>
-        .<span class="ident">parse</span>()
-        .<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;failed to parse shard &#39;{}&#39; as u64&quot;</span>, <span class="ident">shard_str</span>))<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">shard</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">shard_str</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+        <span class="ident">PartitionerBuilderParseError::new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">expected_format</span>),
+            <span class="macro">format!</span>(<span class="string">&quot;failed to parse shard &#39;{}&#39; as u64: {}&quot;</span>, <span class="ident">shard_str</span>, <span class="ident">err</span>),
+        )
+    })<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">total_shards</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">total_shards_str</span>
-        .<span class="ident">parse</span>()
-        .<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;failed to parse total_shards &#39;{}&#39; as u64&quot;</span>, <span class="ident">total_shards_str</span>))<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">total_shards</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">total_shards_str</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+        <span class="ident">PartitionerBuilderParseError::new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">expected_format</span>),
+            <span class="macro">format!</span>(
+                <span class="string">&quot;failed to parse total_shards &#39;{}&#39; as u64: {}&quot;</span>,
+                <span class="ident">total_shards_str</span>, <span class="ident">err</span>
+            ),
+        )
+    })<span class="question-mark">?</span>;
 
     <span class="comment">// Check that shard &gt; 0 and &lt;= total_shards.</span>
     <span class="kw">if</span> <span class="op">!</span>(<span class="number">1</span>..<span class="op">=</span><span class="ident">total_shards</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">shard</span>) {
-        <span class="macro">bail!</span>(
-            <span class="string">&quot;shard {} must be a number between 1 and total shards {}, inclusive&quot;</span>,
-            <span class="ident">shard</span>,
-            <span class="ident">total_shards</span>
-        );
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PartitionerBuilderParseError::new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">expected_format</span>),
+            <span class="macro">format!</span>(
+                <span class="string">&quot;shard {} must be a number between 1 and total shards {}, inclusive&quot;</span>,
+                <span class="ident">shard</span>, <span class="ident">total_shards</span>
+            ),
+        ));
     }
 
     <span class="prelude-val">Ok</span>((<span class="ident">shard</span>, <span class="ident">total_shards</span>))

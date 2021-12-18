@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["dispatch",""],["partition","Support for partitioning test runs across several machines."],["reporter",""],["runner",""],["signal",""],["test_filter",""],["test_list",""]]});
+initSidebarItems({"mod":[["errors",""],["partition","Support for partitioning test runs across several machines."],["reporter",""],["runner",""],["test_filter",""],["test_list",""]],"struct":[["SignalHandler","A receiver that generates signals if ctrl-c is pressed."]]});
