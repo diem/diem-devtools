@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 camino = { version = "1.0.5", features = ["serde1"] }
-serde = { version = "1.0.130", features = ["derive"] }
+serde = { version = "1.0.132", features = ["derive"] }
