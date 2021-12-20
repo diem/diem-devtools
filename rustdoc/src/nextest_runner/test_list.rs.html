@@ -583,6 +583,101 @@
 <span id="583">583</span>
 <span id="584">584</span>
 <span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -591,15 +686,18 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors</span>::{<span class="ident">FromMessagesError</span>, <span class="ident">ParseTestListError</span>, <span class="ident">WriteTestListError</span>},
-    <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">TestFilterBuilder</span>},
+    <span class="ident">test_filter::TestFilterBuilder</span>,
 };
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
 <span class="kw">use</span> <span class="ident">cargo_metadata::Message</span>;
-<span class="kw">use</span> <span class="ident">duct::cmd</span>;
-<span class="kw">use</span> <span class="ident">guppy</span>::{<span class="ident">graph::PackageGraph</span>, <span class="ident">PackageId</span>};
+<span class="kw">use</span> <span class="ident">duct</span>::{<span class="ident">cmd</span>, <span class="ident">Expression</span>};
+<span class="kw">use</span> <span class="ident">guppy</span>::{
+    <span class="ident">graph</span>::{<span class="ident">PackageGraph</span>, <span class="ident">PackageMetadata</span>},
+    <span class="ident">PackageId</span>,
+};
+<span class="kw">use</span> <span class="ident">nextest_summaries</span>::{<span class="ident">RustTestcase</span>, <span class="ident">RustTestsuite</span>, <span class="ident">TestListSummary</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
 <span class="kw">use</span> <span class="ident">owo_colors</span>::{<span class="ident">OwoColorize</span>, <span class="ident">Style</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">io</span>, <span class="ident">io::Write</span>, <span class="ident">path::Path</span>};
 
 <span class="comment">// TODO: capture ignored and not-ignored tests</span>
@@ -607,25 +705,30 @@
 <span class="doccomment">/// Represents a test binary.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Accepted as input to `TestList::new`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestBinary</span> {
-    <span class="doccomment">/// The test binary.</span>
-    <span class="kw">pub</span> <span class="ident">binary</span>: <span class="ident">Utf8PathBuf</span>,
-
-    <span class="doccomment">/// A unique identifier for this binary, typically the package + binary name defined in</span>
-    <span class="doccomment">/// `Cargo.toml`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// A unique identifier for this test binary.</span>
     <span class="kw">pub</span> <span class="ident">binary_id</span>: <span class="ident">String</span>,
+
+    <span class="doccomment">/// Metadata for the package this binary is part of. This is used to set the correct</span>
+    <span class="doccomment">/// environment variables.</span>
+    <span class="kw">pub</span> <span class="ident">package</span>: <span class="ident">PackageMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The test binary.</span>
+    <span class="kw">pub</span> <span class="ident">binary_path</span>: <span class="ident">Utf8PathBuf</span>,
+
+    <span class="doccomment">/// The unique binary name defined in `Cargo.toml` or inferred by the filename.</span>
+    <span class="kw">pub</span> <span class="ident">binary_name</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The working directory that this test should be executed in. If None, the current directory</span>
     <span class="doccomment">/// will not be changed.</span>
-    <span class="kw">pub</span> <span class="ident">cwd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cwd</span>: <span class="ident">Utf8PathBuf</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TestBinary</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> <span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Parse Cargo messages from the given `BufRead` and return a list of test binaries.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_messages</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">PackageGraph</span>,
+        <span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">PackageGraph</span>,
         <span class="ident">reader</span>: <span class="kw">impl</span> <span class="ident">io::BufRead</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">FromMessagesError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">binaries</span> <span class="op">=</span> <span class="macro">vec!</span>[];
@@ -661,9 +764,11 @@
                         }
 
                         <span class="ident">binaries</span>.<span class="ident">push</span>(<span class="ident">TestBinary</span> {
-                            <span class="ident">binary</span>,
                             <span class="ident">binary_id</span>,
-                            <span class="ident">cwd</span>: <span class="prelude-val">Some</span>(<span class="ident">cwd</span>),
+                            <span class="ident">package</span>,
+                            <span class="ident">binary_path</span>: <span class="ident">binary</span>,
+                            <span class="ident">binary_name</span>: <span class="ident">artifact</span>.<span class="ident">target</span>.<span class="ident">name</span>,
+                            <span class="ident">cwd</span>,
                         })
                     }
                 }
@@ -678,54 +783,39 @@
 }
 
 <span class="doccomment">/// List of tests, gotten by executing a test binary with the `--list` command.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestList</span> {
-    <span class="doccomment">/// Number of tests (including skipped and ignored) across all binaries.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestList</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
     <span class="ident">test_count</span>: <span class="ident">usize</span>,
-    <span class="ident">test_binaries</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span>, <span class="ident">TestBinInfo</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
+    <span class="ident">test_binaries</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span>, <span class="ident">TestBinInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">styles</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Styles</span><span class="op">&gt;</span>,
-    <span class="comment">// Values computed on first access.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
+    <span class="comment">// Computed on first access.</span>
     <span class="ident">skip_count</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Information about a test binary.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestBinInfo</span> {
-    <span class="doccomment">/// A unique identifier for this binary, typically the package + binary name defined in</span>
-    <span class="doccomment">/// `Cargo.toml`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestBinInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// A unique identifier for this binary.</span>
     <span class="kw">pub</span> <span class="ident">binary_id</span>: <span class="ident">String</span>,
 
+    <span class="doccomment">/// Package metadata.</span>
+    <span class="kw">pub</span> <span class="ident">package</span>: <span class="ident">PackageMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The unique binary name defined in `Cargo.toml` or inferred by the filename.</span>
+    <span class="kw">pub</span> <span class="ident">binary_name</span>: <span class="ident">String</span>,
+
     <span class="doccomment">/// Test names and other information.</span>
-    <span class="kw">pub</span> <span class="ident">tests</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RustTestInfo</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">tests</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RustTestcase</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The working directory that this test binary will be executed in. If None, the current directory</span>
     <span class="doccomment">/// will not be changed.</span>
-    <span class="kw">pub</span> <span class="ident">cwd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cwd</span>: <span class="ident">Utf8PathBuf</span>,
 }
 
-<span class="doccomment">/// Information about a single Rust test.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RustTestInfo</span> {
-    <span class="doccomment">/// Returns true if this test is marked ignored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ignored tests, if run, are executed with the `--ignored` argument.</span>
-    <span class="kw">pub</span> <span class="ident">ignored</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Whether the test matches the provided test filter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only tests that match the filter are run.</span>
-    <span class="kw">pub</span> <span class="ident">filter_match</span>: <span class="ident">FilterMatch</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">TestList</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> <span class="ident">TestList</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new test list by running the given command and applying the specified filter.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">test_binaries</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestBinary</span><span class="op">&gt;</span>,
+        <span class="ident">test_binaries</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilterBuilder</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseTestListError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">test_count</span> <span class="op">=</span> <span class="number">0</span>;
@@ -755,7 +845,7 @@
 
     <span class="doccomment">/// Creates a new test list with the given binary names and outputs.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_outputs</span>(
-        <span class="ident">test_bin_outputs</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TestBinary</span>, <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+        <span class="ident">test_bin_outputs</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilterBuilder</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseTestListError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">test_count</span> <span class="op">=</span> <span class="number">0</span>;
@@ -796,7 +886,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">skip_count</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="self">self</span>.<span class="ident">iter_tests</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">instance</span><span class="op">|</span> <span class="op">!</span><span class="ident">instance</span>.<span class="ident">info</span>.<span class="ident">filter_match</span>.<span class="ident">is_match</span>())
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">instance</span><span class="op">|</span> <span class="op">!</span><span class="ident">instance</span>.<span class="ident">test_info</span>.<span class="ident">filter_match</span>.<span class="ident">is_match</span>())
                 .<span class="ident">count</span>()
         })
     }
@@ -818,6 +908,29 @@
         <span class="self">self</span>.<span class="ident">test_binaries</span>.<span class="ident">get</span>(<span class="ident">test_bin</span>.<span class="ident">as_ref</span>())
     }
 
+    <span class="doccomment">/// Constructs a serializble summary for this test list.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_summary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TestListSummary</span> {
+        <span class="kw">let</span> <span class="ident">rust_testsuites</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">test_binaries</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">binary_path</span>, <span class="ident">info</span>)<span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">testsuite</span> <span class="op">=</span> <span class="ident">RustTestsuite</span> {
+                    <span class="ident">package_name</span>: <span class="ident">info</span>.<span class="ident">package</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">binary_name</span>: <span class="ident">info</span>.<span class="ident">binary_name</span>.<span class="ident">clone</span>(),
+                    <span class="ident">package_id</span>: <span class="ident">info</span>.<span class="ident">package</span>.<span class="ident">id</span>().<span class="ident">repr</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">binary_path</span>: <span class="ident">binary_path</span>.<span class="ident">clone</span>(),
+                    <span class="ident">cwd</span>: <span class="ident">info</span>.<span class="ident">cwd</span>.<span class="ident">clone</span>(),
+                    <span class="ident">testcases</span>: <span class="ident">info</span>.<span class="ident">tests</span>.<span class="ident">clone</span>(),
+                };
+                (<span class="ident">info</span>.<span class="ident">binary_id</span>.<span class="ident">clone</span>(), <span class="ident">testsuite</span>)
+            })
+            .<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">TestListSummary::default</span>();
+        <span class="ident">summary</span>.<span class="ident">test_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_count</span>;
+        <span class="ident">summary</span>.<span class="ident">rust_testsuites</span> <span class="op">=</span> <span class="ident">rust_testsuites</span>;
+        <span class="ident">summary</span>
+    }
+
     <span class="doccomment">/// Outputs this list to the given writer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -827,7 +940,7 @@
         <span class="kw">match</span> <span class="ident">output_format</span> {
             <span class="ident">OutputFormat::Plain</span> =&gt; <span class="self">self</span>.<span class="ident">write_plain</span>(<span class="ident">writer</span>).<span class="ident">map_err</span>(<span class="ident">WriteTestListError::Io</span>),
             <span class="ident">OutputFormat::Serializable</span>(<span class="ident">format</span>) =&gt; <span class="ident">format</span>
-                .<span class="ident">to_writer</span>(<span class="self">self</span>, <span class="ident">writer</span>)
+                .<span class="ident">to_writer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_summary</span>(), <span class="ident">writer</span>)
                 .<span class="ident">map_err</span>(<span class="ident">WriteTestListError::Json</span>),
         }
     }
@@ -842,14 +955,8 @@
     <span class="doccomment">/// Iterates over the list of tests, returning the path and test name.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_tests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">test_binaries</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">test_bin</span>, <span class="ident">bin_info</span>)<span class="op">|</span> {
-            <span class="ident">bin_info</span>.<span class="ident">tests</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">name</span>, <span class="ident">info</span>)<span class="op">|</span> {
-                <span class="ident">TestInstance::new</span>(
-                    <span class="ident">name</span>,
-                    <span class="ident">test_bin</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">bin_info</span>.<span class="ident">binary_id</span>,
-                    <span class="ident">info</span>,
-                    <span class="ident">bin_info</span>.<span class="ident">cwd</span>.<span class="ident">as_deref</span>(),
-                )
+            <span class="ident">bin_info</span>.<span class="ident">tests</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">name</span>, <span class="ident">test_info</span>)<span class="op">|</span> {
+                <span class="ident">TestInstance::new</span>(<span class="ident">name</span>, <span class="ident">test_bin</span>, <span class="ident">bin_info</span>, <span class="ident">test_info</span>)
             })
         })
     }
@@ -867,32 +974,32 @@
     <span class="comment">// ---</span>
 
     <span class="kw">fn</span> <span class="ident">process_output</span>(
-        <span class="ident">test_binary</span>: <span class="ident">TestBinary</span>,
+        <span class="ident">test_binary</span>: <span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>,
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">TestFilterBuilder</span>,
         <span class="ident">non_ignored</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">ignored</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Utf8PathBuf</span>, <span class="ident">TestBinInfo</span>), <span class="ident">ParseTestListError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Utf8PathBuf</span>, <span class="ident">TestBinInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>), <span class="ident">ParseTestListError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tests</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="comment">// Treat ignored and non-ignored as separate sets of single filters, so that partitioning</span>
         <span class="comment">// based on one doesn&#39;t affect the other.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">non_ignored_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_binary</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">non_ignored_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">build</span>();
         <span class="kw">for</span> <span class="ident">test_name</span> <span class="kw">in</span> <span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">non_ignored</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
             <span class="ident">tests</span>.<span class="ident">insert</span>(
                 <span class="ident">test_name</span>.<span class="ident">into</span>(),
-                <span class="ident">RustTestInfo</span> {
+                <span class="ident">RustTestcase</span> {
                     <span class="ident">ignored</span>: <span class="bool-val">false</span>,
                     <span class="ident">filter_match</span>: <span class="ident">non_ignored_filter</span>.<span class="ident">filter_match</span>(<span class="ident">test_name</span>, <span class="bool-val">false</span>),
                 },
             );
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ignored_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">test_binary</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ignored_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">build</span>();
         <span class="kw">for</span> <span class="ident">test_name</span> <span class="kw">in</span> <span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">ignored</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
             <span class="comment">// TODO: catch dups</span>
             <span class="ident">tests</span>.<span class="ident">insert</span>(
                 <span class="ident">test_name</span>.<span class="ident">into</span>(),
-                <span class="ident">RustTestInfo</span> {
+                <span class="ident">RustTestcase</span> {
                     <span class="ident">ignored</span>: <span class="bool-val">true</span>,
                     <span class="ident">filter_match</span>: <span class="ident">ignored_filter</span>.<span class="ident">filter_match</span>(<span class="ident">test_name</span>, <span class="bool-val">true</span>),
                 },
@@ -900,15 +1007,19 @@
         }
 
         <span class="kw">let</span> <span class="ident">TestBinary</span> {
-            <span class="ident">binary</span>,
-            <span class="ident">cwd</span>,
             <span class="ident">binary_id</span>,
+            <span class="ident">package</span>,
+            <span class="ident">binary_path</span>,
+            <span class="ident">binary_name</span>,
+            <span class="ident">cwd</span>,
         } <span class="op">=</span> <span class="ident">test_binary</span>;
 
         <span class="prelude-val">Ok</span>((
-            <span class="ident">binary</span>,
+            <span class="ident">binary_path</span>,
             <span class="ident">TestBinInfo</span> {
                 <span class="ident">binary_id</span>,
+                <span class="ident">package</span>,
+                <span class="ident">binary_name</span>,
                 <span class="ident">tests</span>,
                 <span class="ident">cwd</span>,
             },
@@ -942,11 +1053,9 @@
 
     <span class="kw">fn</span> <span class="ident">write_plain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw">impl</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> (<span class="ident">test_bin</span>, <span class="ident">info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">test_binaries</span> {
-            <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}:&quot;</span>, <span class="ident">test_bin</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">test_bin</span>))<span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cwd</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">cwd</span> {
-                <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;  {} {}&quot;</span>, <span class="string">&quot;cwd:&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">field</span>), <span class="ident">cwd</span>)<span class="question-mark">?</span>;
-            }
+            <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}:&quot;</span>, <span class="ident">info</span>.<span class="ident">binary_id</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">binary_id</span>))<span class="question-mark">?</span>;
+            <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;  {} {}&quot;</span>, <span class="string">&quot;bin:&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">field</span>), <span class="ident">test_bin</span>)<span class="question-mark">?</span>;
+            <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;  {} {}&quot;</span>, <span class="string">&quot;cwd:&quot;</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">field</span>), <span class="ident">info</span>.<span class="ident">cwd</span>)<span class="question-mark">?</span>;
 
             <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">tests</span> {
                 <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;    {}&quot;</span>, <span class="ident">name</span>.<span class="ident">style</span>(<span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">test_name</span>))<span class="question-mark">?</span>;
@@ -960,7 +1069,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TestBinary</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> <span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Run this binary with and without --ignored and get the corresponding outputs.</span>
     <span class="kw">fn</span> <span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>), <span class="ident">ParseTestListError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">non_ignored</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exec_single</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
@@ -973,16 +1082,15 @@
         <span class="kw">if</span> <span class="ident">ignored</span> {
             <span class="ident">argv</span>.<span class="ident">push</span>(<span class="string">&quot;--ignored&quot;</span>);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binary</span>), <span class="ident">argv</span>).<span class="ident">stdout_capture</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cwd</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cwd</span> {
-            <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">dir</span>(<span class="ident">cwd</span>);
-        };
+        <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binary_path</span>), <span class="ident">argv</span>)
+            .<span class="ident">dir</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cwd</span>)
+            .<span class="ident">stdout_capture</span>();
 
         <span class="ident">cmd</span>.<span class="ident">read</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> {
             <span class="ident">ParseTestListError::command</span>(
                 <span class="macro">format!</span>(
                     <span class="string">&quot;&#39;{} --list --format --terse{}&#39;&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">binary</span>,
+                    <span class="self">self</span>.<span class="ident">binary_path</span>,
                     <span class="kw">if</span> <span class="ident">ignored</span> { <span class="string">&quot; --ignored&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }
                 ),
                 <span class="ident">error</span>,
@@ -1000,15 +1108,11 @@
     <span class="doccomment">/// The test binary.</span>
     <span class="kw">pub</span> <span class="ident">binary</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Utf8Path</span>,
 
-    <span class="doccomment">/// A unique identifier for this binary, typically the package + binary name defined in</span>
-    <span class="doccomment">/// `Cargo.toml`.</span>
-    <span class="kw">pub</span> <span class="ident">binary_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="doccomment">/// Information about the binary.</span>
+    <span class="kw">pub</span> <span class="ident">bin_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestBinInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Information about the test.</span>
-    <span class="kw">pub</span> <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RustTestInfo</span>,
-
-    <span class="doccomment">/// The working directory for this test. If None, the test will not be changed.</span>
-    <span class="kw">pub</span> <span class="ident">cwd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Utf8Path</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">test_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RustTestcase</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -1016,30 +1120,83 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
         <span class="ident">binary</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Utf8Path</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
-        <span class="ident">binary_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RustTestInfo</span>,
-        <span class="ident">cwd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Utf8Path</span><span class="op">&gt;</span>,
+        <span class="ident">bin_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestBinInfo</span>,
+        <span class="ident">test_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RustTestcase</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">as_ref</span>(),
             <span class="ident">binary</span>: <span class="ident">binary</span>.<span class="ident">as_ref</span>(),
-            <span class="ident">binary_id</span>,
-            <span class="ident">info</span>,
-            <span class="ident">cwd</span>,
+            <span class="ident">bin_info</span>,
+            <span class="ident">test_info</span>,
         }
+    }
+
+    <span class="doccomment">/// Creates the command expression for this test instance.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">make_expression</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Expression</span> {
+        <span class="comment">// TODO: non-rust tests</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;--exact&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="string">&quot;--nocapture&quot;</span>];
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">test_info</span>.<span class="ident">ignored</span> {
+            <span class="ident">args</span>.<span class="ident">push</span>(<span class="string">&quot;--ignored&quot;</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">package</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bin_info</span>.<span class="ident">package</span>;
+
+        <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="self">self</span>.<span class="ident">binary</span>), <span class="ident">args</span>)
+            .<span class="ident">dir</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bin_info</span>.<span class="ident">cwd</span>)
+            <span class="comment">// These environment variables are set at runtime by cargo test:</span>
+            <span class="comment">// https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates</span>
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>,
+                <span class="ident">package</span>.<span class="ident">manifest_path</span>().<span class="ident">parent</span>().<span class="ident">unwrap</span>(),
+            )
+            .<span class="ident">env</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">package</span>.<span class="ident">version</span>()))
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_VERSION_MAJOR&quot;</span>,
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">package</span>.<span class="ident">version</span>().<span class="ident">major</span>),
+            )
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_VERSION_MINOR&quot;</span>,
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">package</span>.<span class="ident">version</span>().<span class="ident">minor</span>),
+            )
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_VERSION_PATCH&quot;</span>,
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">package</span>.<span class="ident">version</span>().<span class="ident">patch</span>),
+            )
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_VERSION_PRE&quot;</span>,
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">package</span>.<span class="ident">version</span>().<span class="ident">pre</span>),
+            )
+            .<span class="ident">env</span>(<span class="string">&quot;CARGO_PKG_AUTHORS&quot;</span>, <span class="ident">package</span>.<span class="ident">authors</span>().<span class="ident">join</span>(<span class="string">&quot;:&quot;</span>))
+            .<span class="ident">env</span>(<span class="string">&quot;CARGO_PKG_NAME&quot;</span>, <span class="ident">package</span>.<span class="ident">name</span>())
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_DESCRIPTION&quot;</span>,
+                <span class="ident">package</span>.<span class="ident">description</span>().<span class="ident">unwrap_or_default</span>(),
+            )
+            .<span class="ident">env</span>(<span class="string">&quot;CARGO_PKG_HOMEPAGE&quot;</span>, <span class="ident">package</span>.<span class="ident">homepage</span>().<span class="ident">unwrap_or_default</span>())
+            .<span class="ident">env</span>(<span class="string">&quot;CARGO_PKG_LICENSE&quot;</span>, <span class="ident">package</span>.<span class="ident">license</span>().<span class="ident">unwrap_or_default</span>())
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_LICENSE_FILE&quot;</span>,
+                <span class="ident">package</span>.<span class="ident">license_file</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;&quot;</span>.<span class="ident">as_ref</span>()),
+            )
+            .<span class="ident">env</span>(
+                <span class="string">&quot;CARGO_PKG_REPOSITORY&quot;</span>,
+                <span class="ident">package</span>.<span class="ident">repository</span>().<span class="ident">unwrap_or_default</span>(),
+            );
+
+        <span class="ident">cmd</span>
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Styles</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">test_bin</span>: <span class="ident">Style</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">binary_id</span>: <span class="ident">Style</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">test_name</span>: <span class="ident">Style</span>,
     <span class="ident">field</span>: <span class="ident">Style</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Styles</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">colorize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">test_bin</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">magenta</span>().<span class="ident">bold</span>();
+        <span class="self">self</span>.<span class="ident">binary_id</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">magenta</span>().<span class="ident">bold</span>();
         <span class="self">self</span>.<span class="ident">test_name</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">blue</span>().<span class="ident">bold</span>();
         <span class="self">self</span>.<span class="ident">field</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">yellow</span>().<span class="ident">bold</span>();
     }
@@ -1048,9 +1205,12 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>, <span class="ident">RunIgnored</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_filter::RunIgnored</span>;
+    <span class="kw">use</span> <span class="ident">guppy::CargoMetadata</span>;
     <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
     <span class="kw">use</span> <span class="ident">maplit::btreemap</span>;
+    <span class="kw">use</span> <span class="ident">nextest_summaries</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>};
+    <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
     <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
     <span class="kw">use</span> <span class="ident">std::iter</span>;
 
@@ -1067,10 +1227,13 @@
 
         <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span> <span class="ident">TestFilterBuilder::any</span>(<span class="ident">RunIgnored::Default</span>);
         <span class="kw">let</span> <span class="ident">fake_cwd</span>: <span class="ident">Utf8PathBuf</span> <span class="op">=</span> <span class="string">&quot;/fake/cwd&quot;</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">fake_binary_id</span> <span class="op">=</span> <span class="string">&quot;fake-package&quot;</span>.<span class="ident">to_owned</span>();
+        <span class="kw">let</span> <span class="ident">fake_binary_name</span> <span class="op">=</span> <span class="string">&quot;fake-binary&quot;</span>.<span class="ident">to_owned</span>();
+        <span class="kw">let</span> <span class="ident">fake_binary_id</span> <span class="op">=</span> <span class="string">&quot;fake-package::fake-binary&quot;</span>.<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">test_binary</span> <span class="op">=</span> <span class="ident">TestBinary</span> {
-            <span class="ident">binary</span>: <span class="string">&quot;/fake/binary&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">cwd</span>: <span class="prelude-val">Some</span>(<span class="ident">fake_cwd</span>.<span class="ident">clone</span>()),
+            <span class="ident">binary_path</span>: <span class="string">&quot;/fake/binary&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">cwd</span>: <span class="ident">fake_cwd</span>.<span class="ident">clone</span>(),
+            <span class="ident">package</span>: <span class="ident">package_metadata</span>(),
+            <span class="ident">binary_name</span>: <span class="ident">fake_binary_name</span>.<span class="ident">clone</span>(),
             <span class="ident">binary_id</span>: <span class="ident">fake_binary_id</span>.<span class="ident">clone</span>(),
         };
         <span class="kw">let</span> <span class="ident">test_list</span> <span class="op">=</span> <span class="ident">TestList::new_with_outputs</span>(
@@ -1083,24 +1246,26 @@
             <span class="macro">btreemap!</span> {
                 <span class="string">&quot;/fake/binary&quot;</span>.<span class="ident">into</span>() =&gt; <span class="ident">TestBinInfo</span> {
                     <span class="ident">tests</span>: <span class="macro">btreemap!</span> {
-                        <span class="string">&quot;tests::foo::test_bar&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestInfo</span> {
+                        <span class="string">&quot;tests::foo::test_bar&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestcase</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">false</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Matches</span>,
                         },
-                        <span class="string">&quot;tests::baz::test_quux&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestInfo</span> {
+                        <span class="string">&quot;tests::baz::test_quux&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestcase</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">false</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Matches</span>,
                         },
-                        <span class="string">&quot;tests::ignored::test_bar&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestInfo</span> {
+                        <span class="string">&quot;tests::ignored::test_bar&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestcase</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">true</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason::Ignored</span> },
                         },
-                        <span class="string">&quot;tests::baz::test_ignored&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestInfo</span> {
+                        <span class="string">&quot;tests::baz::test_ignored&quot;</span>.<span class="ident">to_owned</span>() =&gt; <span class="ident">RustTestcase</span> {
                             <span class="ident">ignored</span>: <span class="bool-val">true</span>,
                             <span class="ident">filter_match</span>: <span class="ident">FilterMatch::Mismatch</span> { <span class="ident">reason</span>: <span class="ident">MismatchReason::Ignored</span> },
                         },
                     },
-                    <span class="ident">cwd</span>: <span class="prelude-val">Some</span>(<span class="ident">fake_cwd</span>),
+                    <span class="ident">cwd</span>: <span class="ident">fake_cwd</span>,
+                    <span class="ident">package</span>: <span class="ident">package_metadata</span>(),
+                    <span class="ident">binary_name</span>: <span class="ident">fake_binary_name</span>,
                     <span class="ident">binary_id</span>: <span class="ident">fake_binary_id</span>,
                 }
             }
@@ -1108,7 +1273,8 @@
 
         <span class="comment">// Check that the expected outputs are valid.</span>
         <span class="kw">static</span> <span class="ident">EXPECTED_PLAIN</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">&quot;
-            /fake/binary:
+            fake-package::fake-binary:
+              bin: /fake/binary
               cwd: /fake/cwd
                 tests::baz::test_ignored (skipped)
                 tests::baz::test_quux
@@ -1118,10 +1284,14 @@
         <span class="kw">static</span> <span class="ident">EXPECTED_JSON_PRETTY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             {
               &quot;test-count&quot;: 4,
-              &quot;test-binaries&quot;: {
-                &quot;/fake/binary&quot;: {
-                  &quot;binary-id&quot;: &quot;fake-package&quot;,
-                  &quot;tests&quot;: {
+              &quot;rust-testsuites&quot;: {
+                &quot;fake-package::fake-binary&quot;: {
+                  &quot;package-name&quot;: &quot;metadata-helper&quot;,
+                  &quot;binary-name&quot;: &quot;fake-binary&quot;,
+                  &quot;package-id&quot;: &quot;metadata-helper 0.1.0 (path+file:///Users/fakeuser/local/testcrates/metadata/metadata-helper)&quot;,
+                  &quot;binary-path&quot;: &quot;/fake/binary&quot;,
+                  &quot;cwd&quot;: &quot;/fake/cwd&quot;,
+                  &quot;testcases&quot;: {
                     &quot;tests::baz::test_ignored&quot;: {
                       &quot;ignored&quot;: true,
                       &quot;filter-match&quot;: {
@@ -1148,8 +1318,7 @@
                         &quot;reason&quot;: &quot;ignored&quot;
                       }
                     }
-                  },
-                  &quot;cwd&quot;: &quot;/fake/cwd&quot;
+                  }
                 }
               }
             }&quot;#</span>};
@@ -1160,12 +1329,33 @@
                 .<span class="ident">expect</span>(<span class="string">&quot;plain succeeded&quot;</span>),
             <span class="ident">EXPECTED_PLAIN</span>
         );
+        <span class="macro">println!</span>(
+            <span class="string">&quot;{}&quot;</span>,
+            <span class="ident">test_list</span>
+                .<span class="ident">to_string</span>(<span class="ident">OutputFormat::Serializable</span>(<span class="ident">SerializableFormat::JsonPretty</span>))
+                .<span class="ident">expect</span>(<span class="string">&quot;json-pretty succeeded&quot;</span>)
+        );
         <span class="macro">assert_eq!</span>(
             <span class="ident">test_list</span>
                 .<span class="ident">to_string</span>(<span class="ident">OutputFormat::Serializable</span>(<span class="ident">SerializableFormat::JsonPretty</span>))
                 .<span class="ident">expect</span>(<span class="string">&quot;json-pretty succeeded&quot;</span>),
             <span class="ident">EXPECTED_JSON_PRETTY</span>
         );
+    }
+
+    <span class="kw">static</span> <span class="ident">PACKAGE_GRAPH_FIXTURE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">PackageGraph</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+        <span class="kw">static</span> <span class="ident">FIXTURE_JSON</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../fixtures/cargo-metadata.json&quot;</span>);
+        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">CargoMetadata::parse_json</span>(<span class="ident">FIXTURE_JSON</span>).<span class="ident">expect</span>(<span class="string">&quot;fixture is valid JSON&quot;</span>);
+        <span class="ident">metadata</span>
+            .<span class="ident">build_graph</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;fixture is valid PackageGraph&quot;</span>)
+    });
+
+    <span class="kw">static</span> <span class="ident">PACKAGE_METADATA_ID</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;metadata-helper 0.1.0 (path+file:///Users/fakeuser/local/testcrates/metadata/metadata-helper)&quot;</span>;
+    <span class="kw">fn</span> <span class="ident">package_metadata</span>() -&gt; <span class="ident">PackageMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="ident">PACKAGE_GRAPH_FIXTURE</span>
+            .<span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="ident">PackageId::new</span>(<span class="ident">PACKAGE_METADATA_ID</span>))
+            .<span class="ident">expect</span>(<span class="string">&quot;package ID is valid&quot;</span>)
     }
 }
 </code></pre></div>

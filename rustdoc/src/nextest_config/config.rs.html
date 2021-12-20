@@ -406,11 +406,39 @@
 <span id="406">406</span>
 <span id="407">407</span>
 <span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::errors</span>::{
-    <span class="ident">ConfigReadError</span>, <span class="ident">FailureOutputParseError</span>, <span class="ident">ProfileNotFound</span>, <span class="ident">StatusLevelParseError</span>,
+    <span class="ident">ConfigReadError</span>, <span class="ident">ProfileNotFound</span>, <span class="ident">StatusLevelParseError</span>, <span class="ident">TestOutputDisplayParseError</span>,
 };
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
 <span class="kw">use</span> <span class="ident">config</span>::{<span class="ident">Config</span>, <span class="ident">Environment</span>, <span class="ident">File</span>, <span class="ident">FileFormat</span>};
@@ -583,11 +611,27 @@
     }
 
     <span class="doccomment">/// Returns the failure output config for this profile.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">failure_output</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FailureOutput</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">failure_output</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TestOutputDisplay</span> {
         <span class="self">self</span>.<span class="ident">custom_profile</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">profile</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">failure_output</span>)
             .<span class="ident">flatten</span>()
             .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_profile</span>.<span class="ident">failure_output</span>)
+    }
+
+    <span class="doccomment">/// Returns the failure output config for this profile.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">success_output</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TestOutputDisplay</span> {
+        <span class="self">self</span>.<span class="ident">custom_profile</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">profile</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">success_output</span>)
+            .<span class="ident">flatten</span>()
+            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_profile</span>.<span class="ident">success_output</span>)
+    }
+
+    <span class="doccomment">/// Returns the fail-fast config for this profile.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fail_fast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">custom_profile</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">profile</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">fail_fast</span>)
+            .<span class="ident">flatten</span>()
+            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_profile</span>.<span class="ident">fail_fast</span>)
     }
 
     <span class="doccomment">/// Returns the JUnit configuration for this profile.</span>
@@ -610,55 +654,55 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FailureOutput</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TestOutputDisplay</span> {
     <span class="ident">Immediate</span>,
     <span class="ident">ImmediateFinal</span>,
     <span class="ident">Final</span>,
     <span class="ident">Never</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">FailureOutput</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">4</span>] {
-        [<span class="string">&quot;immediate&quot;</span>, <span class="string">&quot;immediate-final&quot;</span>, <span class="string">&quot;final&quot;</span>, <span class="string">&quot;never&quot;</span>]
+<span class="kw">impl</span> <span class="ident">TestOutputDisplay</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
+        <span class="kw-2">&amp;</span>[<span class="string">&quot;immediate&quot;</span>, <span class="string">&quot;immediate-final&quot;</span>, <span class="string">&quot;final&quot;</span>, <span class="string">&quot;never&quot;</span>]
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_immediate</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FailureOutput::Immediate</span> <span class="op">|</span> <span class="ident">FailureOutput::ImmediateFinal</span> =&gt; <span class="bool-val">true</span>,
-            <span class="ident">FailureOutput::Final</span> <span class="op">|</span> <span class="ident">FailureOutput::Never</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident">TestOutputDisplay::Immediate</span> <span class="op">|</span> <span class="ident">TestOutputDisplay::ImmediateFinal</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">TestOutputDisplay::Final</span> <span class="op">|</span> <span class="ident">TestOutputDisplay::Never</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_final</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FailureOutput::Final</span> <span class="op">|</span> <span class="ident">FailureOutput::ImmediateFinal</span> =&gt; <span class="bool-val">true</span>,
-            <span class="ident">FailureOutput::Immediate</span> <span class="op">|</span> <span class="ident">FailureOutput::Never</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident">TestOutputDisplay::Final</span> <span class="op">|</span> <span class="ident">TestOutputDisplay::ImmediateFinal</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">TestOutputDisplay::Immediate</span> <span class="op">|</span> <span class="ident">TestOutputDisplay::Never</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">FailureOutput</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">FailureOutputParseError</span>;
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">TestOutputDisplay</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">TestOutputDisplayParseError</span>;
 
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;immediate&quot;</span> =&gt; <span class="ident">FailureOutput::Immediate</span>,
-            <span class="string">&quot;immediate-final&quot;</span> =&gt; <span class="ident">FailureOutput::ImmediateFinal</span>,
-            <span class="string">&quot;final&quot;</span> =&gt; <span class="ident">FailureOutput::Final</span>,
-            <span class="string">&quot;never&quot;</span> =&gt; <span class="ident">FailureOutput::Never</span>,
-            <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FailureOutputParseError::new</span>(<span class="ident">other</span>)),
+            <span class="string">&quot;immediate&quot;</span> =&gt; <span class="ident">TestOutputDisplay::Immediate</span>,
+            <span class="string">&quot;immediate-final&quot;</span> =&gt; <span class="ident">TestOutputDisplay::ImmediateFinal</span>,
+            <span class="string">&quot;final&quot;</span> =&gt; <span class="ident">TestOutputDisplay::Final</span>,
+            <span class="string">&quot;never&quot;</span> =&gt; <span class="ident">TestOutputDisplay::Never</span>,
+            <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TestOutputDisplayParseError::new</span>(<span class="ident">other</span>)),
         };
         <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FailureOutput</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TestOutputDisplay</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FailureOutput::Immediate</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;immediate&quot;</span>),
-            <span class="ident">FailureOutput::ImmediateFinal</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;immediate-final&quot;</span>),
-            <span class="ident">FailureOutput::Final</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;final&quot;</span>),
-            <span class="ident">FailureOutput::Never</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;never&quot;</span>),
+            <span class="ident">TestOutputDisplay::Immediate</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;immediate&quot;</span>),
+            <span class="ident">TestOutputDisplay::ImmediateFinal</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;immediate-final&quot;</span>),
+            <span class="ident">TestOutputDisplay::Final</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;final&quot;</span>),
+            <span class="ident">TestOutputDisplay::Never</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;never&quot;</span>),
         }
     }
 }
@@ -779,7 +823,9 @@
 <span class="kw">struct</span> <span class="ident">DefaultProfileImpl</span> {
     <span class="ident">retries</span>: <span class="ident">usize</span>,
     <span class="ident">status_level</span>: <span class="ident">StatusLevel</span>,
-    <span class="ident">failure_output</span>: <span class="ident">FailureOutput</span>,
+    <span class="ident">failure_output</span>: <span class="ident">TestOutputDisplay</span>,
+    <span class="ident">success_output</span>: <span class="ident">TestOutputDisplay</span>,
+    <span class="ident">fail_fast</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;humantime_serde&quot;</span>)]</span>
     <span class="ident">slow_timeout</span>: <span class="ident">Duration</span>,
     <span class="ident">junit</span>: <span class="ident">JunitImpl</span>,
@@ -788,17 +834,27 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="kw">struct</span> <span class="ident">CustomProfileImpl</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="ident">retries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="ident">status_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StatusLevel</span><span class="op">&gt;</span>,
-    <span class="ident">failure_output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FailureOutput</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="ident">failure_output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestOutputDisplay</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="ident">success_output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestOutputDisplay</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="ident">fail_fast</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;humantime_serde&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="ident">slow_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="ident">junit</span>: <span class="ident">JunitImpl</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="kw">struct</span> <span class="ident">JunitImpl</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span><span class="op">&gt;</span>,
 }
 

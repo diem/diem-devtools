@@ -261,7 +261,7 @@
 <span class="doccomment">//! be made smarter: e.g. using data to pick different sets of binaries and tests to run, with</span>
 <span class="doccomment">//! an aim to minimize total build and test times.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">errors::PartitionerBuilderParseError</span>, <span class="ident">test_list::TestBinary</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::errors::PartitionerBuilderParseError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">fmt</span>,
     <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
@@ -303,7 +303,7 @@
 
 <span class="kw">impl</span> <span class="ident">PartitionerBuilder</span> {
     <span class="doccomment">/// Creates a new `Partitioner` from this `PartitionerBuilder`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_test_binary</span>: <span class="kw-2">&amp;</span><span class="ident">TestBinary</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Partitioner</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Partitioner</span><span class="op">&gt;</span> {
         <span class="comment">// Note we don&#39;t use test_binary at the moment but might in the future.</span>
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">PartitionerBuilder::Count</span> {

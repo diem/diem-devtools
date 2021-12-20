@@ -805,24 +805,66 @@
 <span id="805">805</span>
 <span id="806">806</span>
 <span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">TestEvent</span>},
     <span class="ident">stopwatch</span>::{<span class="ident">StopwatchEnd</span>, <span class="ident">StopwatchStart</span>},
-    <span class="ident">test_filter</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
     <span class="ident">SignalEvent</span>, <span class="ident">SignalHandler</span>,
 };
 <span class="kw">use</span> <span class="ident">crossbeam_channel</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">duct::cmd</span>;
 <span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">NextestProfile</span>, <span class="ident">StatusLevel</span>};
+<span class="kw">use</span> <span class="ident">nextest_summaries</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>};
 <span class="kw">use</span> <span class="ident">rayon</span>::{<span class="ident">ThreadPool</span>, <span class="ident">ThreadPoolBuilder</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert::Infallible</span>,
     <span class="ident">marker::PhantomData</span>,
-    <span class="ident">path::Path</span>,
     <span class="ident">sync</span>::{
         <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>},
         <span class="ident">Arc</span>,
@@ -837,27 +879,64 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunnerOpts</span> {
     <span class="doccomment">/// Number of retries for failing tests [default: from profile]</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">retries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">retries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Cancel test run on the first failure</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
+    <span class="ident">fail_fast</span>: <span class="ident">bool</span>,
+
+    <span class="doccomment">/// Run all tests regardless of failure</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">overrides_with</span> <span class="op">=</span> <span class="string">&quot;fail-fast&quot;</span>)]</span>
+    <span class="ident">no_fail_fast</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// Number of tests to run simultaneously [default: logical CPU count]</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;j&quot;</span>, <span class="ident">long</span>, <span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;jobs&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">test_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">test_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TestRunnerOpts</span> {
+    <span class="doccomment">/// Sets the number of retries for this test runner.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_retries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">retries</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">retries</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">retries</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the fail-fast value for this test runner.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_fail_fast</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fail_fast</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">fail_fast</span> <span class="op">=</span> <span class="ident">fail_fast</span>;
+        <span class="self">self</span>.<span class="ident">no_fail_fast</span> <span class="op">=</span> <span class="op">!</span><span class="ident">fail_fast</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the number of tests to run simultaneously.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_test_threads</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_threads</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">test_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">test_threads</span>);
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Creates a new test runner.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
+        <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestList</span>,
         <span class="ident">profile</span>: <span class="kw-2">&amp;</span><span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">handler</span>: <span class="ident">SignalHandler</span>,
-    ) -&gt; <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">test_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus::get</span>);
         <span class="kw">let</span> <span class="ident">retries</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">retries</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">retries</span>());
+
+        <span class="kw">let</span> <span class="ident">fail_fast</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_fail_fast</span> {
+            <span class="bool-val">false</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fail_fast</span> {
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> {
+            <span class="ident">profile</span>.<span class="ident">fail_fast</span>()
+        };
+
         <span class="kw">let</span> <span class="ident">slow_timeout</span> <span class="op">=</span> <span class="ident">profile</span>.<span class="ident">slow_timeout</span>();
         <span class="ident">TestRunner</span> {
             <span class="comment">// The number of tries = retries + 1.</span>
             <span class="ident">tries</span>: <span class="ident">retries</span> <span class="op">+</span> <span class="number">1</span>,
+            <span class="ident">fail_fast</span>,
             <span class="ident">slow_timeout</span>,
             <span class="ident">test_list</span>,
             <span class="ident">run_pool</span>: <span class="ident">ThreadPoolBuilder::new</span>()
@@ -877,22 +956,23 @@
 }
 
 <span class="doccomment">/// Context for running tests.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">tries</span>: <span class="ident">usize</span>,
+    <span class="ident">fail_fast</span>: <span class="ident">bool</span>,
     <span class="ident">slow_timeout</span>: <span class="ident">Duration</span>,
-    <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>,
+    <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestList</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">run_pool</span>: <span class="ident">ThreadPool</span>,
     <span class="ident">wait_pool</span>: <span class="ident">ThreadPool</span>,
     <span class="ident">handler</span>: <span class="ident">SignalHandler</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Executes the listed tests, each one in its own process.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The callback is called with the results of each test.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="ident">RunStats</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="self">self</span>.<span class="ident">try_execute</span>::<span class="op">&lt;</span><span class="ident">Infallible</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">test_event</span><span class="op">|</span> {
             <span class="ident">callback</span>(<span class="ident">test_event</span>);
@@ -907,7 +987,7 @@
     <span class="doccomment">/// error, the callback is no longer called.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_execute</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RunStats</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
         <span class="ident">E</span>: <span class="ident">Send</span>,
     {
         <span class="comment">// TODO: add support for other test-running approaches, measure performance.</span>
@@ -920,7 +1000,7 @@
         <span class="kw">let</span> <span class="ident">canceled</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
         <span class="kw">let</span> <span class="ident">canceled_ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">canceled</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">CallbackContext::new</span>(<span class="ident">callback</span>, <span class="self">self</span>.<span class="ident">test_list</span>.<span class="ident">run_count</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">CallbackContext::new</span>(<span class="ident">callback</span>, <span class="self">self</span>.<span class="ident">test_list</span>.<span class="ident">run_count</span>(), <span class="self">self</span>.<span class="ident">fail_fast</span>);
 
         <span class="comment">// Send the initial event.</span>
         <span class="comment">// (Don&#39;t need to set the canceled atomic if this fails because the run hasn&#39;t started</span>
@@ -952,7 +1032,7 @@
                         <span class="kw">return</span>;
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FilterMatch::Mismatch</span> { <span class="ident">reason</span> } <span class="op">=</span> <span class="ident">test_instance</span>.<span class="ident">info</span>.<span class="ident">filter_match</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FilterMatch::Mismatch</span> { <span class="ident">reason</span> } <span class="op">=</span> <span class="ident">test_instance</span>.<span class="ident">test_info</span>.<span class="ident">filter_match</span> {
                         <span class="comment">// Failure to send means the receiver was dropped.</span>
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">this_run_sender</span>.<span class="ident">send</span>(<span class="ident">InternalTestEvent::Skipped</span> {
                             <span class="ident">test_instance</span>,
@@ -1041,18 +1121,20 @@
                                 <span class="kw">if</span> <span class="ident">first_error_mut</span>.<span class="ident">is_none</span>() {
                                     <span class="kw-2">*</span><span class="ident">first_error_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
                                 }
-                                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">ctx_mut</span>.<span class="ident">error_cancel</span>();
+                                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">ctx_mut</span>.<span class="ident">begin_cancel</span>(<span class="ident">CancelReason::ReportError</span>);
                             }
-                            <span class="ident">InternalError::SignalCanceled</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>)) =&gt; {
-                                <span class="comment">// Signal-based cancellation and an error was received during</span>
+                            <span class="ident">InternalError::TestFailureCanceled</span>(<span class="prelude-val">None</span>)
+                            <span class="op">|</span> <span class="ident">InternalError::SignalCanceled</span>(<span class="prelude-val">None</span>) =&gt; {
+                                <span class="comment">// Cancellation has begun and no error was returned during that.</span>
+                                <span class="comment">// Continue to handle events.</span>
+                            }
+                            <span class="ident">InternalError::TestFailureCanceled</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>))
+                            <span class="op">|</span> <span class="ident">InternalError::SignalCanceled</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>)) =&gt; {
+                                <span class="comment">// Cancellation has begun and an error was received during</span>
                                 <span class="comment">// cancellation.</span>
                                 <span class="kw">if</span> <span class="ident">first_error_mut</span>.<span class="ident">is_none</span>() {
                                     <span class="kw-2">*</span><span class="ident">first_error_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
                                 }
-                            }
-                            <span class="ident">InternalError::SignalCanceled</span>(<span class="prelude-val">None</span>) =&gt; {
-                                <span class="comment">// Signal-based cancellation and no error was returned during</span>
-                                <span class="comment">// cancellation. Continue to handle events.</span>
                             }
                         }
                     }
@@ -1084,9 +1166,9 @@
     <span class="doccomment">/// Run an individual test in its own process.</span>
     <span class="kw">fn</span> <span class="ident">run_test</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">attempt</span>: <span class="ident">usize</span>,
-        <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">InternalRunStatus</span> {
         <span class="kw">let</span> <span class="ident">stopwatch</span> <span class="op">=</span> <span class="ident">StopwatchStart::now</span>();
 
@@ -1104,26 +1186,19 @@
 
     <span class="kw">fn</span> <span class="ident">run_test_inner</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">attempt</span>: <span class="ident">usize</span>,
         <span class="ident">stopwatch</span>: <span class="kw-2">&amp;</span><span class="ident">StopwatchStart</span>,
-        <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">InternalRunStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;--exact&quot;</span>, <span class="ident">test</span>.<span class="ident">name</span>, <span class="string">&quot;--nocapture&quot;</span>];
-        <span class="kw">if</span> <span class="ident">test</span>.<span class="ident">info</span>.<span class="ident">ignored</span> {
-            <span class="ident">args</span>.<span class="ident">push</span>(<span class="string">&quot;--ignored&quot;</span>);
-        }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="ident">test</span>.<span class="ident">binary</span>), <span class="ident">args</span>)
+        <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">test</span>
+            .<span class="ident">make_expression</span>()
             <span class="comment">// Capture stdout and stderr.</span>
             .<span class="ident">stdout_capture</span>()
             .<span class="ident">stderr_capture</span>()
             .<span class="ident">unchecked</span>()
             <span class="comment">// Debug environment variable for testing.</span>
             .<span class="ident">env</span>(<span class="string">&quot;__NEXTEST_ATTEMPT&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">attempt</span>));
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cwd</span>) <span class="op">=</span> <span class="ident">test</span>.<span class="ident">cwd</span> {
-            <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">dir</span>(<span class="ident">cwd</span>);
-        }
 
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">start</span>()<span class="question-mark">?</span>;
 
@@ -1274,9 +1349,13 @@
     <span class="kw">pub</span> <span class="ident">attempt</span>: <span class="ident">usize</span>,
     <span class="doccomment">/// The total number of times this test can be run. Equal to `1 + retries`.</span>
     <span class="kw">pub</span> <span class="ident">total_attempts</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Standard output and standard error for this test.</span>
     <span class="kw">pub</span> <span class="ident">stdout_stderr</span>: <span class="ident">Arc</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// The status of this test: pass, fail or execution error.</span>
     <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">TestStatus</span>,
+    <span class="doccomment">/// The time at which the test started.</span>
     <span class="kw">pub</span> <span class="ident">start_time</span>: <span class="ident">SystemTime</span>,
+    <span class="doccomment">/// The time it took for the test to run.</span>
     <span class="kw">pub</span> <span class="ident">time_taken</span>: <span class="ident">Duration</span>,
 }
 
@@ -1384,16 +1463,17 @@
     <span class="ident">callback</span>: <span class="ident">F</span>,
     <span class="ident">stopwatch</span>: <span class="ident">StopwatchStart</span>,
     <span class="ident">run_stats</span>: <span class="ident">RunStats</span>,
+    <span class="ident">fail_fast</span>: <span class="ident">bool</span>,
     <span class="ident">running</span>: <span class="ident">usize</span>,
-    <span class="ident">cancel_state</span>: <span class="ident">CancelState</span>,
+    <span class="ident">cancel_state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CancelReason</span><span class="op">&gt;</span>,
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">CallbackContext</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">CallbackContext</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">callback</span>: <span class="ident">F</span>, <span class="ident">initial_run_count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">callback</span>: <span class="ident">F</span>, <span class="ident">initial_run_count</span>: <span class="ident">usize</span>, <span class="ident">fail_fast</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">callback</span>,
             <span class="ident">stopwatch</span>: <span class="ident">StopwatchStart::now</span>(),
@@ -1401,17 +1481,18 @@
                 <span class="ident">initial_run_count</span>,
                 ..<span class="ident">RunStats::default</span>()
             },
+            <span class="ident">fail_fast</span>,
             <span class="ident">running</span>: <span class="number">0</span>,
-            <span class="ident">cancel_state</span>: <span class="ident">CancelState::None</span>,
+            <span class="ident">cancel_state</span>: <span class="prelude-val">None</span>,
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">run_started</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;list</span> <span class="ident">TestList</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">run_started</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestList</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
         (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::RunStarted</span> { <span class="ident">test_list</span> })
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">event</span> {
             <span class="ident">InternalEvent::Test</span>(<span class="ident">InternalTestEvent::Started</span> { <span class="ident">test_instance</span> }) =&gt; {
                 <span class="self">self</span>.<span class="ident">running</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1441,11 +1522,23 @@
                 <span class="self">self</span>.<span class="ident">running</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="self">self</span>.<span class="ident">run_stats</span>.<span class="ident">on_test_finished</span>(<span class="kw-2">&amp;</span><span class="ident">run_statuses</span>);
 
+                <span class="comment">// should this run be canceled because of a failure?</span>
+                <span class="kw">let</span> <span class="ident">fail_cancel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fail_fast</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">run_statuses</span>.<span class="ident">last_status</span>().<span class="ident">status</span>.<span class="ident">is_success</span>();
+
                 (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::TestFinished</span> {
                     <span class="ident">test_instance</span>,
                     <span class="ident">run_statuses</span>,
                 })
-                .<span class="ident">map_err</span>(<span class="ident">InternalError::Error</span>)
+                .<span class="ident">map_err</span>(<span class="ident">InternalError::Error</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">if</span> <span class="ident">fail_cancel</span> {
+                    <span class="comment">// A test failed: start cancellation.</span>
+                    <span class="prelude-val">Err</span>(<span class="ident">InternalError::TestFailureCanceled</span>(
+                        <span class="self">self</span>.<span class="ident">begin_cancel</span>(<span class="ident">CancelReason::TestFailure</span>).<span class="ident">err</span>(),
+                    ))
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">Ok</span>(())
+                }
             }
             <span class="ident">InternalEvent::Test</span>(<span class="ident">InternalTestEvent::Skipped</span> {
                 <span class="ident">test_instance</span>,
@@ -1459,31 +1552,29 @@
                 .<span class="ident">map_err</span>(<span class="ident">InternalError::Error</span>)
             }
             <span class="ident">InternalEvent::Signal</span>(<span class="ident">SignalEvent::Interrupted</span>) =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">==</span> <span class="ident">CancelState::SignalCanceled</span> {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">CancelReason::Signal</span>) {
                     <span class="comment">// Ctrl-C was pressed twice -- panic in this case.</span>
                     <span class="macro">panic!</span>(<span class="string">&quot;Ctrl-C pressed twice, exiting immediately&quot;</span>);
                 }
 
-                <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">=</span> <span class="ident">CancelState::SignalCanceled</span>;
-                <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::RunBeginCancel</span> {
-                    <span class="ident">running</span>: <span class="self">self</span>.<span class="ident">running</span>,
-                    <span class="ident">reason</span>: <span class="ident">CancelReason::Signal</span>,
-                }) {
-                    <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">Err</span>(<span class="ident">InternalError::SignalCanceled</span>(<span class="prelude-val">None</span>)),
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">InternalError::SignalCanceled</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>))),
-                }
+                <span class="prelude-val">Err</span>(<span class="ident">InternalError::SignalCanceled</span>(
+                    <span class="self">self</span>.<span class="ident">begin_cancel</span>(<span class="ident">CancelReason::Signal</span>).<span class="ident">err</span>(),
+                ))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">error_cancel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">==</span> <span class="ident">CancelState::None</span> {
-            <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">=</span> <span class="ident">CancelState::ErrorCanceled</span>;
+    <span class="doccomment">/// Begin cancellation of a test run. Report it if the current cancel state is less than</span>
+    <span class="doccomment">/// the required one.</span>
+    <span class="kw">fn</span> <span class="ident">begin_cancel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">CancelReason</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">&lt;</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>) {
+            <span class="self">self</span>.<span class="ident">cancel_state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
+            (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::RunBeginCancel</span> {
+                <span class="ident">running</span>: <span class="self">self</span>.<span class="ident">running</span>,
+                <span class="ident">reason</span>,
+            })<span class="question-mark">?</span>;
         }
-        (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::RunBeginCancel</span> {
-            <span class="ident">running</span>: <span class="self">self</span>.<span class="ident">running</span>,
-            <span class="ident">reason</span>: <span class="ident">CancelReason::ReportError</span>,
-        })
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">run_finished</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
@@ -1497,30 +1588,30 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
-    <span class="ident">Test</span>(<span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>),
+<span class="kw">enum</span> <span class="ident">InternalEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">Test</span>(<span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
     <span class="ident">Signal</span>(<span class="ident">SignalEvent</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span> {
+<span class="kw">enum</span> <span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">Started</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     },
     <span class="ident">Slow</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">elapsed</span>: <span class="ident">Duration</span>,
     },
     <span class="ident">Retry</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">run_status</span>: <span class="ident">TestRunStatus</span>,
     },
     <span class="ident">Finished</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">run_statuses</span>: <span class="ident">RunStatuses</span>,
     },
     <span class="ident">Skipped</span> {
-        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;list</span><span class="op">&gt;</span>,
+        <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">reason</span>: <span class="ident">MismatchReason</span>,
     },
 }
@@ -1528,20 +1619,17 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">InternalError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
     <span class="ident">Error</span>(<span class="ident">E</span>),
+    <span class="ident">TestFailureCanceled</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
     <span class="ident">SignalCanceled</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">CancelState</span> {
-    <span class="prelude-val">None</span>,
-    <span class="ident">ErrorCanceled</span>,
-    <span class="ident">SignalCanceled</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TestStatus</span> {
+    <span class="doccomment">/// The test passed.</span>
     <span class="ident">Pass</span>,
+    <span class="doccomment">/// The test failed.</span>
     <span class="ident">Fail</span>,
+    <span class="doccomment">/// An error occurred while executing the test.</span>
     <span class="ident">ExecFail</span>,
 }
 
