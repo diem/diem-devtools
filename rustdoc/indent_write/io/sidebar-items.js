@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["IndentWriter","Adapter for writers to indent each line"]]});

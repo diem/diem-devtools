@@ -248,7 +248,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Command</span> {
     <span class="doccomment">/// List tests in binary</span>
-    <span class="ident">ListTests</span> {
+    <span class="ident">List</span> {
         <span class="doccomment">/// Output format</span>
         <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;T&quot;</span>, <span class="ident">long</span>, <span class="ident">default_value</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="ident">OutputFormat::variants</span>(), <span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
         <span class="ident">format</span>: <span class="ident">OutputFormat</span>,
@@ -328,7 +328,7 @@
         };
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">command</span> {
-            <span class="ident">Command::ListTests</span> {
+            <span class="ident">Command::List</span> {
                 <span class="ident">build_filter</span>,
                 <span class="ident">format</span>,
             } =&gt; {
