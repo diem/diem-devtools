@@ -686,9 +686,9 @@
 <span class="kw">mod</span> <span class="ident">output_format</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">output_format</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helpers::write_test_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors</span>::{<span class="ident">FromMessagesError</span>, <span class="ident">ParseTestListError</span>, <span class="ident">WriteTestListError</span>},
+    <span class="ident">helpers::write_test_name</span>,
     <span class="ident">test_filter::TestFilterBuilder</span>,
 };
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};

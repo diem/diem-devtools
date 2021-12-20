@@ -589,12 +589,31 @@
 <span id="589">589</span>
 <span id="590">590</span>
 <span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helpers::write_test_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors::WriteEventError</span>,
+    <span class="ident">helpers::write_test_name</span>,
     <span class="ident">metadata::MetadataReporter</span>,
     <span class="ident">runner</span>::{<span class="ident">RunDescribe</span>, <span class="ident">RunStats</span>, <span class="ident">RunStatuses</span>, <span class="ident">TestRunStatus</span>, <span class="ident">TestStatus</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
@@ -608,20 +627,64 @@
     <span class="ident">io::Write</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>},
 };
-<span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReporterOpts</span> {
-    <span class="doccomment">/// Output stdout and stderr on failure</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="ident">TestOutputDisplay::variants</span>(), <span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
+<span class="doccomment">/// Test reporter builder.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestReporterBuilder</span> {
     <span class="ident">failure_output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestOutputDisplay</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Output stdout and stderr on success</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="ident">TestOutputDisplay::variants</span>(), <span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
     <span class="ident">success_output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestOutputDisplay</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Test statuses to output</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="ident">StatusLevel::variants</span>(), <span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
     <span class="ident">status_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StatusLevel</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TestReporterBuilder</span> {
+    <span class="doccomment">/// Sets the conditions under which test failures are output.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_failure_output</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">failure_output</span>: <span class="ident">TestOutputDisplay</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">failure_output</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">failure_output</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the conditions under which test successes are output.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_success_output</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">success_output</span>: <span class="ident">TestOutputDisplay</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">success_output</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">success_output</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the kinds of statuses to output.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status_level</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status_level</span>: <span class="ident">StatusLevel</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">status_level</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">status_level</span>);
+        <span class="self">self</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">TestReporterBuilder</span> {
+    <span class="doccomment">/// Creates a new test reporter.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="ident">TestList</span>,
+        <span class="ident">profile</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">TestReporter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">Styles::default</span>());
+        <span class="kw">let</span> <span class="ident">binary_id_width</span> <span class="op">=</span> <span class="ident">test_list</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">info</span>)<span class="op">|</span> <span class="ident">info</span>.<span class="ident">binary_id</span>.<span class="ident">len</span>())
+            .<span class="ident">max</span>()
+            .<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let</span> <span class="ident">metadata_reporter</span> <span class="op">=</span> <span class="ident">MetadataReporter::new</span>(<span class="ident">profile</span>);
+        <span class="ident">TestReporter</span> {
+            <span class="ident">status_level</span>: <span class="self">self</span>.<span class="ident">status_level</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">status_level</span>()),
+            <span class="ident">failure_output</span>: <span class="self">self</span>
+                .<span class="ident">failure_output</span>
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">failure_output</span>()),
+            <span class="ident">success_output</span>: <span class="self">self</span>
+                .<span class="ident">success_output</span>
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">success_output</span>()),
+            <span class="ident">cancel_status</span>: <span class="prelude-val">None</span>,
+            <span class="ident">final_outputs</span>: <span class="ident">DebugIgnore</span>(<span class="macro">vec!</span>[]),
+            <span class="ident">styles</span>,
+            <span class="ident">binary_id_width</span>,
+            <span class="ident">metadata_reporter</span>,
+        }
+    }
 }
 
 <span class="doccomment">/// Functionality to report test results to stderr and JUnit</span>
@@ -641,31 +704,6 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TestReporter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new instance with the given profile.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">test_list</span>: <span class="kw-2">&amp;</span><span class="ident">TestList</span>, <span class="ident">profile</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">NextestProfile</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">ReporterOpts</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">Styles::default</span>());
-        <span class="kw">let</span> <span class="ident">binary_id_width</span> <span class="op">=</span> <span class="ident">test_list</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">info</span>)<span class="op">|</span> <span class="ident">info</span>.<span class="ident">binary_id</span>.<span class="ident">len</span>())
-            .<span class="ident">max</span>()
-            .<span class="ident">unwrap_or_default</span>();
-        <span class="kw">let</span> <span class="ident">metadata_reporter</span> <span class="op">=</span> <span class="ident">MetadataReporter::new</span>(<span class="ident">profile</span>);
-        <span class="self">Self</span> {
-            <span class="ident">status_level</span>: <span class="ident">opts</span>.<span class="ident">status_level</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">status_level</span>()),
-            <span class="ident">failure_output</span>: <span class="ident">opts</span>
-                .<span class="ident">failure_output</span>
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">failure_output</span>()),
-            <span class="ident">success_output</span>: <span class="ident">opts</span>
-                .<span class="ident">success_output</span>
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">success_output</span>()),
-            <span class="ident">cancel_status</span>: <span class="prelude-val">None</span>,
-            <span class="ident">final_outputs</span>: <span class="ident">DebugIgnore</span>(<span class="macro">vec!</span>[]),
-            <span class="ident">styles</span>,
-            <span class="ident">binary_id_width</span>,
-            <span class="ident">metadata_reporter</span>,
-        }
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colorize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">styles</span>.<span class="ident">colorize</span>();
     }
