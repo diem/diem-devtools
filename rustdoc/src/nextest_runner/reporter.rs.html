@@ -685,6 +685,7 @@
 <span id="685">685</span>
 <span id="686">686</span>
 <span id="687">687</span>
+<span id="688">688</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -764,6 +765,7 @@
             <span class="bool-val">true</span> =&gt; <span class="ident">status_level</span>.<span class="ident">max</span>(<span class="ident">StatusLevel::Pass</span>),
             <span class="bool-val">false</span> =&gt; <span class="ident">status_level</span>,
         };
+        <span class="macro">println!</span>(<span class="string">&quot;status level: {:?}&quot;</span>, <span class="ident">status_level</span>);
         <span class="comment">// failure_output and success_output are meaningless if the runner isn&#39;t capturing any</span>
         <span class="comment">// output.</span>
         <span class="kw">let</span> <span class="ident">failure_output</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">no_capture</span> {
@@ -776,7 +778,7 @@
             <span class="bool-val">true</span> =&gt; <span class="ident">TestOutputDisplay::Never</span>,
             <span class="bool-val">false</span> =&gt; <span class="self">self</span>
                 .<span class="ident">success_output</span>
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">failure_output</span>()),
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">profile</span>.<span class="ident">success_output</span>()),
         };
 
         <span class="ident">TestReporter</span> {
