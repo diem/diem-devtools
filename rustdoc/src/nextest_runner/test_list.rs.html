@@ -680,6 +680,17 @@
 <span id="680">680</span>
 <span id="681">681</span>
 <span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -975,6 +986,17 @@
     <span class="comment">// ---</span>
     <span class="comment">// Helper methods</span>
     <span class="comment">// ---</span>
+
+    <span class="comment">// Empty list for tests.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">test_count</span>: <span class="number">0</span>,
+            <span class="ident">test_binaries</span>: <span class="ident">BTreeMap::new</span>(),
+            <span class="ident">styles</span>: <span class="ident">Box::new</span>(<span class="ident">Styles::default</span>()),
+            <span class="ident">skip_count</span>: <span class="ident">OnceCell::new</span>(),
+        }
+    }
 
     <span class="kw">fn</span> <span class="ident">process_output</span>(
         <span class="ident">test_binary</span>: <span class="ident">TestBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>,
