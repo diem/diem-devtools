@@ -290,15 +290,25 @@
 <span id="290">290</span>
 <span id="291">291</span>
 <span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cargo_cli</span>::{<span class="ident">CargoCli</span>, <span class="ident">CargoOptions</span>},
     <span class="ident">output</span>::{<span class="ident">OutputContext</span>, <span class="ident">OutputOpts</span>},
+    <span class="ident">ExpectedError</span>,
 };
 <span class="kw">use</span> <span class="ident">camino</span>::{<span class="ident">Utf8Path</span>, <span class="ident">Utf8PathBuf</span>};
-<span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="ident">bail</span>, <span class="prelude-ty">Result</span>, <span class="ident">WrapErr</span>};
+<span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="ident">Report</span>, <span class="prelude-ty">Result</span>, <span class="ident">WrapErr</span>};
 <span class="kw">use</span> <span class="ident">guppy</span>::{<span class="ident">graph::PackageGraph</span>, <span class="ident">MetadataCommand</span>};
 <span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">errors::ConfigReadError</span>, <span class="ident">NextestConfig</span>, <span class="ident">StatusLevel</span>, <span class="ident">TestOutputDisplay</span>};
 <span class="kw">use</span> <span class="ident">nextest_runner</span>::{
@@ -411,8 +421,16 @@
         <span class="kw">let</span> <span class="ident">expression</span> <span class="op">=</span> <span class="ident">cargo_cli</span>.<span class="ident">to_expression</span>();
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">expression</span>
             .<span class="ident">stdout_capture</span>()
+            .<span class="ident">unchecked</span>()
             .<span class="ident">run</span>()
             .<span class="ident">wrap_err</span>(<span class="string">&quot;failed to build tests&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">output</span>.<span class="ident">status</span>.<span class="ident">success</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Report::new</span>(<span class="ident">ExpectedError::build_failed</span>(
+                <span class="ident">cargo_cli</span>.<span class="ident">all_args</span>(),
+                <span class="ident">output</span>.<span class="ident">status</span>.<span class="ident">code</span>(),
+            )));
+        }
+
         <span class="kw">let</span> <span class="ident">test_binaries</span> <span class="op">=</span> <span class="ident">TestBinary::from_messages</span>(<span class="ident">graph</span>, <span class="ident">Cursor::new</span>(<span class="ident">output</span>.<span class="ident">stdout</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span>
@@ -575,7 +593,7 @@
                     <span class="ident">reporter</span>.<span class="ident">report_event</span>(<span class="ident">event</span>, <span class="ident">lock</span>)
                 })<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">run_stats</span>.<span class="ident">is_success</span>() {
-                    <span class="macro">bail!</span>(<span class="string">&quot;test run failed&quot;</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Report::new</span>(<span class="ident">ExpectedError::test_run_failed</span>()));
                 }
             }
         }

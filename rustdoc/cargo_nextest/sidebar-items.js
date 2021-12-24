@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["dispatch",""]]});
+initSidebarItems({});
