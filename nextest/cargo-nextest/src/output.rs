@@ -1,23 +1,23 @@
 // Copyright (c) The cargo-guppy Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+use clap::{ArgEnum, Args};
 use env_logger::fmt::Formatter;
 use log::{Level, Record};
 use owo_colors::{OwoColorize, Style};
 use std::io::Write;
-use structopt::StructOpt;
 use supports_color::Stream;
 
-#[derive(Copy, Clone, Debug, StructOpt)]
+#[derive(Copy, Clone, Debug, Args)]
 #[must_use]
 pub(crate) struct OutputOpts {
     // TODO: quiet/verbose?
     /// Produce color output
-    #[structopt(
+    #[clap(
         long,
         global = true,
-        default_value = "auto",
-        possible_values = &["auto", "always", "never"],
+        arg_enum,
+        default_value_t = Color::Auto
     )]
     pub(crate) color: Color,
 }
@@ -38,7 +38,7 @@ pub(crate) struct OutputContext {
     pub(crate) color: Color,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, ArgEnum)]
 #[must_use]
 pub enum Color {
     Auto,
@@ -72,22 +72,6 @@ impl Color {
             Color::Auto => "--color=auto",
             Color::Always => "--color=always",
             Color::Never => "--color=never",
-        }
-    }
-}
-
-impl std::str::FromStr for Color {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "auto" => Ok(Color::Auto),
-            "always" => Ok(Color::Always),
-            "never" => Ok(Color::Never),
-            s => Err(format!(
-                "{} is not a valid option, expected `auto`, `always` or `never`",
-                s
-            )),
         }
     }
 }

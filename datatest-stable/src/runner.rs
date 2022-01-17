@@ -4,6 +4,7 @@
 #![allow(clippy::integer_arithmetic)]
 
 use crate::{utils, Result};
+use clap::{ArgEnum, Parser};
 use std::{
     io::{self, Write},
     num::NonZeroUsize,
@@ -13,84 +14,80 @@ use std::{
     sync::mpsc::{channel, Sender},
     thread,
 };
-use structopt::{clap::arg_enum, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
-#[derive(Debug, StructOpt)]
-#[structopt(about = "Datatest-harness for running data-driven tests")]
+/// Datatest-harness for running data-driven tests
+#[derive(Debug, Parser)]
 #[allow(dead_code)]
 struct TestOpts {
     /// The FILTER string is tested against the name of all tests, and only those tests whose names
     /// contain the filter are run.
     filter: Option<String>,
-    #[structopt(long = "exact")]
     /// Exactly match filters rather than by substring
+    #[clap(long = "exact")]
     filter_exact: bool,
-    #[structopt(long, default_value = "32", env = "RUST_TEST_THREADS")]
     /// Number of threads used for running tests in parallel
+    #[clap(long, default_value = "32", env = "RUST_TEST_THREADS")]
     test_threads: NonZeroUsize,
-    #[structopt(short = "q", long)]
     /// Output minimal information
+    #[clap(short = 'q', long)]
     quiet: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     nocapture: bool,
-    #[structopt(long)]
     /// List all tests
+    #[clap(long)]
     list: bool,
-    #[structopt(long)]
     /// List or run ignored tests (always empty: it is currently not possible to mark tests as
     /// ignored)
+    #[clap(long)]
     ignored: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     include_ignored: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     force_run_in_process: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     exclude_should_panic: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     test: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     bench: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     logfile: Option<String>,
-    #[structopt(long, number_of_values = 1)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long, number_of_values = 1)]
     skip: Vec<String>,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     show_output: bool,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     color: Option<String>,
-    #[structopt(long)]
     /// Configure formatting of output:
     ///   pretty = Print verbose output;
     ///   terse = Display one character per test;
     ///   (json is unsupported, exists for compatibility with the default test harness)
-    #[structopt(possible_values = &Format::variants(), default_value, case_insensitive = true)]
+    #[clap(long, arg_enum, default_value_t, ignore_case = true)]
     format: Format,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     report_time: Option<String>,
-    #[structopt(long)]
     /// NO-OP: unsupported option, exists for compatibility with the default test harness
+    #[clap(long)]
     ensure_time: bool,
 }
 
-arg_enum! {
-    #[derive(Debug, Eq, PartialEq)]
-    enum Format {
-        Pretty,
-        Terse,
-        Json,
-    }
+#[derive(Debug, Eq, PartialEq, Copy, Clone, ArgEnum)]
+enum Format {
+    Pretty,
+    Terse,
+    Json,
 }
 
 impl Default for Format {
@@ -101,7 +98,7 @@ impl Default for Format {
 
 #[doc(hidden)]
 pub fn runner(reqs: &[Requirements]) {
-    let options = TestOpts::from_args();
+    let options = TestOpts::parse();
 
     let mut tests: Vec<Test> = if options.ignored {
         // Currently impossible to mark tests as ignored.

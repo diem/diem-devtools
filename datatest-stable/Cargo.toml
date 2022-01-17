@@ -12,9 +12,9 @@ categories = ["development-tools::testing"]
 keywords = ["datatest", "data-driven-tests", "test-harness"]
 
 [dependencies]
+clap = { version = "3.0", features = ["derive", "env"] }
 regex = "1.5.4"
 walkdir = "2.3.2"
-structopt = "0.3.25"
 termcolor = "1.1.2"
 
 [[test]]
