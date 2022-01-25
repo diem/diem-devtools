@@ -873,13 +873,13 @@
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">TestEvent</span>},
+    <span class="ident">config::NextestProfile</span>,
+    <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">StatusLevel</span>, <span class="ident">TestEvent</span>},
     <span class="ident">stopwatch</span>::{<span class="ident">StopwatchEnd</span>, <span class="ident">StopwatchStart</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
     <span class="ident">SignalEvent</span>, <span class="ident">SignalHandler</span>,
 };
 <span class="kw">use</span> <span class="ident">crossbeam_channel</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">NextestProfile</span>, <span class="ident">StatusLevel</span>};
 <span class="kw">use</span> <span class="ident">nextest_metadata</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>};
 <span class="kw">use</span> <span class="ident">rayon</span>::{<span class="ident">ThreadPool</span>, <span class="ident">ThreadPoolBuilder</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -1661,7 +1661,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">nextest_config::NextestConfig</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::NextestConfig</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">no_capture_settings</span>() {

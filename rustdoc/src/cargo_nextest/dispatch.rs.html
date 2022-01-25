@@ -339,6 +339,8 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -351,10 +353,10 @@
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Args</span>, <span class="ident">Parser</span>, <span class="ident">Subcommand</span>};
 <span class="kw">use</span> <span class="ident">color_eyre::eyre</span>::{<span class="ident">Report</span>, <span class="prelude-ty">Result</span>, <span class="ident">WrapErr</span>};
 <span class="kw">use</span> <span class="ident">guppy::graph::PackageGraph</span>;
-<span class="kw">use</span> <span class="ident">nextest_config</span>::{<span class="ident">errors::ConfigReadError</span>, <span class="ident">NextestConfig</span>, <span class="ident">StatusLevel</span>, <span class="ident">TestOutputDisplay</span>};
 <span class="kw">use</span> <span class="ident">nextest_runner</span>::{
+    <span class="ident">config::NextestConfig</span>,
     <span class="ident">partition::PartitionerBuilder</span>,
-    <span class="ident">reporter::TestReporterBuilder</span>,
+    <span class="ident">reporter</span>::{<span class="ident">StatusLevel</span>, <span class="ident">TestOutputDisplay</span>, <span class="ident">TestReporterBuilder</span>},
     <span class="ident">runner::TestRunnerBuilder</span>,
     <span class="ident">test_filter</span>::{<span class="ident">RunIgnored</span>, <span class="ident">TestFilterBuilder</span>},
     <span class="ident">test_list</span>::{<span class="ident">OutputFormat</span>, <span class="ident">TestBinary</span>, <span class="ident">TestList</span>},
@@ -412,8 +414,9 @@
 
 <span class="kw">impl</span> <span class="ident">ConfigOpts</span> {
     <span class="doccomment">/// Creates a nextest config with the given options.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">workspace_root</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NextestConfig</span>, <span class="ident">ConfigReadError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">workspace_root</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NextestConfig</span>, <span class="ident">ExpectedError</span><span class="op">&gt;</span> {
         <span class="ident">NextestConfig::from_sources</span>(<span class="ident">workspace_root</span>, <span class="self">self</span>.<span class="ident">config_file</span>.<span class="ident">as_deref</span>())
+            .<span class="ident">map_err</span>(<span class="ident">ExpectedError::config_parse_error</span>)
     }
 }
 
@@ -623,8 +626,9 @@
                 <span class="kw-2">ref</span> <span class="ident">reporter_opts</span>,
             } =&gt; {
                 <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config_opts</span>.<span class="ident">make_config</span>(<span class="ident">graph</span>.<span class="ident">workspace</span>().<span class="ident">root</span>())<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">profile</span> <span class="op">=</span>
-                    <span class="ident">config</span>.<span class="ident">profile</span>(<span class="ident">profile</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="ident">NextestConfig::DEFAULT_PROFILE</span>))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">profile</span> <span class="op">=</span> <span class="ident">config</span>
+                    .<span class="ident">profile</span>(<span class="ident">profile</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="ident">NextestConfig::DEFAULT_PROFILE</span>))
+                    .<span class="ident">map_err</span>(<span class="ident">ExpectedError::profile_not_found</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">store_dir</span> <span class="op">=</span> <span class="ident">profile</span>.<span class="ident">store_dir</span>();
                 <span class="ident">std::fs::create_dir_all</span>(<span class="kw-2">&amp;</span><span class="ident">store_dir</span>)
                     .<span class="ident">wrap_err_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;failed to create store dir &#39;{}&#39;&quot;</span>, <span class="ident">store_dir</span>))<span class="question-mark">?</span>;
