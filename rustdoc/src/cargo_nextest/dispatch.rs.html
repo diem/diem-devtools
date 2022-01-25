@@ -311,6 +311,34 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -335,12 +363,32 @@
 <span class="kw">use</span> <span class="ident">std::io::Cursor</span>;
 <span class="kw">use</span> <span class="ident">supports_color::Stream</span>;
 
-<span class="doccomment">/// Next-generation test runner for Rust.</span>
+<span class="doccomment">/// A new test runner for Rust and Cargo.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// TODO: expand on this</span>
+<span class="doccomment">/// This binary should typically be invoked as `cargo nextest` (in which case</span>
+<span class="doccomment">/// this message will not be seen), not `cargo-nextest`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Parser</span>)]</span>
-<span class="attribute">#[<span class="ident">clap</span>(<span class="ident">author</span>, <span class="ident">version</span>)]</span>
+<span class="attribute">#[<span class="ident">clap</span>(<span class="ident">author</span>, <span class="ident">version</span>, <span class="ident">bin_name</span> <span class="op">=</span> <span class="string">&quot;cargo&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CargoNextestApp</span> {
+    <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">subcommand</span>)]</span>
+    <span class="ident">subcommand</span>: <span class="ident">NextestSubcommand</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">CargoNextestApp</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exec</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">NextestSubcommand::Nextest</span>(<span class="ident">app</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">subcommand</span>;
+        <span class="ident">app</span>.<span class="ident">exec</span>()
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Subcommand</span>)]</span>
+<span class="kw">enum</span> <span class="ident">NextestSubcommand</span> {
+    <span class="doccomment">/// A new test runner for Rust and Cargo.</span>
+    <span class="ident">Nextest</span>(<span class="ident">AppImpl</span>),
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Args</span>)]</span>
+<span class="kw">struct</span> <span class="ident">AppImpl</span> {
     <span class="doccomment">/// Path to Cargo.toml</span>
     <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">long</span>, <span class="ident">global</span> <span class="op">=</span> <span class="bool-val">true</span>, <span class="ident">value_name</span> <span class="op">=</span> <span class="string">&quot;PATH&quot;</span>)]</span>
     <span class="ident">manifest_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span><span class="op">&gt;</span>,
@@ -356,7 +404,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Args</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConfigOpts</span> {
+<span class="kw">struct</span> <span class="ident">ConfigOpts</span> {
     <span class="doccomment">/// Config file [default: workspace-root/.config/nextest.toml]</span>
     <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">long</span>, <span class="ident">global</span> <span class="op">=</span> <span class="bool-val">true</span>, <span class="ident">value_name</span> <span class="op">=</span> <span class="string">&quot;PATH&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">config_file</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Utf8PathBuf</span><span class="op">&gt;</span>,
@@ -370,15 +418,15 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Subcommand</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Command</span> {
+<span class="kw">enum</span> <span class="ident">Command</span> {
     <span class="doccomment">/// List tests in binary</span>
     <span class="ident">List</span> {
-        <span class="doccomment">/// Output format</span>
-        <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&#39;T&#39;</span>, <span class="ident">long</span>, <span class="ident">default_value_t</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="ident">OutputFormat::variants</span>())]</span>
-        <span class="ident">format</span>: <span class="ident">OutputFormat</span>,
-
         <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">flatten</span>)]</span>
         <span class="ident">build_filter</span>: <span class="ident">TestBuildFilter</span>,
+
+        <span class="doccomment">/// Output format</span>
+        <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&#39;T&#39;</span>, <span class="ident">long</span>, <span class="ident">default_value_t</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="ident">OutputFormat::variants</span>(), <span class="ident">help_heading</span> <span class="op">=</span> <span class="string">&quot;OUTPUT OPTIONS&quot;</span>)]</span>
+        <span class="ident">format</span>: <span class="ident">OutputFormat</span>,
     },
     <span class="doccomment">/// Run tests</span>
     <span class="ident">Run</span> {
@@ -387,7 +435,12 @@
         <span class="ident">profile</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 
         <span class="doccomment">/// Run tests serially and do not capture output</span>
-        <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">long</span>, <span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;nocapture&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">clap</span>(
+            <span class="ident">long</span>,
+            <span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;nocapture&quot;</span>,
+            <span class="ident">help_heading</span> <span class="op">=</span> <span class="string">&quot;RUNNER OPTIONS&quot;</span>,
+            <span class="ident">display_order</span> <span class="op">=</span> <span class="number">100</span>
+        )]</span>
         <span class="ident">no_capture</span>: <span class="ident">bool</span>,
 
         <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">flatten</span>)]</span>
@@ -402,7 +455,8 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Args</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestBuildFilter</span> {
+<span class="attribute">#[<span class="ident">clap</span>(<span class="ident">help_heading</span> <span class="op">=</span> <span class="string">&quot;FILTER OPTIONS&quot;</span>)]</span>
+<span class="kw">struct</span> <span class="ident">TestBuildFilter</span> {
     <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">flatten</span>)]</span>
     <span class="ident">cargo_options</span>: <span class="ident">CargoOptions</span>,
 
@@ -415,8 +469,8 @@
     <span class="ident">partition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartitionerBuilder</span><span class="op">&gt;</span>,
 
     <span class="comment">// TODO: add regex-based filtering in the future?</span>
-    <span class="doccomment">/// Test filter</span>
-    <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;FILTERS&quot;</span>)]</span>
+    <span class="doccomment">/// Test name filter</span>
+    <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;FILTERS&quot;</span>, <span class="ident">help_heading</span> <span class="op">=</span> <span class="prelude-val">None</span>)]</span>
     <span class="ident">filter</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
@@ -452,7 +506,18 @@
 
 <span class="doccomment">/// Test runner options.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Args</span>)]</span>
+<span class="attribute">#[<span class="ident">clap</span>(<span class="ident">help_heading</span> <span class="op">=</span> <span class="string">&quot;RUNNER OPTIONS&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunnerOpts</span> {
+    <span class="doccomment">/// Number of tests to run simultaneously [default: logical CPU count]</span>
+    <span class="attribute">#[<span class="ident">clap</span>(
+        <span class="ident">long</span>,
+        <span class="ident">short</span> <span class="op">=</span> <span class="string">&#39;j&#39;</span>,
+        <span class="ident">visible_alias</span> <span class="op">=</span> <span class="string">&quot;jobs&quot;</span>,
+        <span class="ident">value_name</span> <span class="op">=</span> <span class="string">&quot;THREADS&quot;</span>,
+        <span class="ident">conflicts_with</span> <span class="op">=</span> <span class="string">&quot;no-capture&quot;</span>
+    )]</span>
+    <span class="ident">test_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// Number of retries for failing tests [default: from profile]</span>
     <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">long</span>)]</span>
     <span class="ident">retries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -464,16 +529,6 @@
     <span class="doccomment">/// Run all tests regardless of failure</span>
     <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">long</span>, <span class="ident">overrides_with</span> <span class="op">=</span> <span class="string">&quot;fail-fast&quot;</span>)]</span>
     <span class="ident">no_fail_fast</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Number of tests to run simultaneously [default: logical CPU count]</span>
-    <span class="attribute">#[<span class="ident">clap</span>(
-        <span class="ident">long</span>,
-        <span class="ident">short</span> <span class="op">=</span> <span class="string">&#39;j&#39;</span>,
-        <span class="ident">visible_alias</span> <span class="op">=</span> <span class="string">&quot;jobs&quot;</span>,
-        <span class="ident">value_name</span> <span class="op">=</span> <span class="string">&quot;THREADS&quot;</span>,
-        <span class="ident">conflicts_with</span> <span class="op">=</span> <span class="string">&quot;no-capture&quot;</span>
-    )]</span>
-    <span class="ident">test_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TestRunnerOpts</span> {
@@ -497,7 +552,8 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Args</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestReporterOpts</span> {
+<span class="attribute">#[<span class="ident">clap</span>(<span class="ident">help_heading</span> <span class="op">=</span> <span class="string">&quot;REPORTER OPTIONS&quot;</span>)]</span>
+<span class="kw">struct</span> <span class="ident">TestReporterOpts</span> {
     <span class="doccomment">/// Output stdout and stderr on failure</span>
     <span class="attribute">#[<span class="ident">clap</span>(
         <span class="ident">long</span>,
@@ -539,9 +595,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CargoNextestApp</span> {
+<span class="kw">impl</span> <span class="ident">AppImpl</span> {
     <span class="doccomment">/// Execute the command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exec</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">exec</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">init</span>();
 
         <span class="kw">let</span> <span class="ident">graph</span> <span class="op">=</span> <span class="ident">build_graph</span>(<span class="self">self</span>.<span class="ident">manifest_path</span>.<span class="ident">as_deref</span>(), <span class="ident">output</span>)<span class="question-mark">?</span>;
