@@ -103,6 +103,10 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -120,13 +124,15 @@
 
     <span class="doccomment">/// A map of Rust test suites to the test binaries within them, keyed by a unique identifier</span>
     <span class="doccomment">/// for each test suite.</span>
-    <span class="kw">pub</span> <span class="ident">rust_testsuites</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RustTestsuite</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">rust_suites</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RustTestSuiteSummary</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// A suite of tests within a Rust test binary.</span>
+<span class="doccomment">/// A serializable suite of tests within a Rust test binary.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Part of a [`TestListSummary`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RustTestsuite</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RustTestSuiteSummary</span> {
     <span class="doccomment">/// The name of this package in the workspace.</span>
     <span class="kw">pub</span> <span class="ident">package_name</span>: <span class="ident">String</span>,
 
@@ -145,13 +151,15 @@
     <span class="kw">pub</span> <span class="ident">cwd</span>: <span class="ident">Utf8PathBuf</span>,
 
     <span class="doccomment">/// Test case names and other information about them.</span>
-    <span class="kw">pub</span> <span class="ident">testcases</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RustTestcase</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">testcases</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RustTestCaseSummary</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// An individual test case within a Rust test binary.</span>
+<span class="doccomment">/// Serializable information about an individual test case within a Rust test suite.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Part of a [`RustTestSuiteSummary`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RustTestcase</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RustTestCaseSummary</span> {
     <span class="doccomment">/// Returns true if this test is marked ignored.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Ignored tests, if run, are executed with the `--ignored` argument.</span>

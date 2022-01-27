@@ -39,15 +39,19 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
+
+<span class="doccomment">//! Support for handling signals in nextest.</span>
 
 <span class="kw">use</span> <span class="ident">crossbeam_channel::Receiver</span>;
 
 <span class="doccomment">/// A receiver that generates signals if ctrl-c is pressed.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A `SignalHandler` can be passed into</span>
-<span class="doccomment">/// [`TestRunnerOpts::build`](crate::runner::TestRunnerOpts::build).</span>
+<span class="doccomment">/// [`TestRunnerBuilder::build`](crate::runner::TestRunnerBuilder::build).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignalHandler</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">receiver</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">SignalEvent</span><span class="op">&gt;</span>,

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["NextestConfig","Configuration for nextest."],["NextestJunitConfig","JUnit configuration for nextest."],["NextestProfile","A nextest profile. Contains configuration for a specific nextest run."]]});
+initSidebarItems({"struct":[["NextestConfig","Overall configuration for nextest."],["NextestJunitConfig","JUnit configuration for nextest, returned by a [`NextestProfile`]."],["NextestProfile","A configuration profile for nextest. Contains most configuration used by the nextest runner."]]});

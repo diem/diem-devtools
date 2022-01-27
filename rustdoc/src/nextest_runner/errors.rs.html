@@ -406,8 +406,38 @@
 <span id="405">405</span>
 <span id="406">406</span>
 <span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
+
+<span class="doccomment">//! Errors produced by nextest.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">reporter</span>::{<span class="ident">StatusLevel</span>, <span class="ident">TestOutputDisplay</span>},
@@ -452,6 +482,7 @@
     }
 }
 
+<span class="doccomment">/// An error which indicates that a profile was requested but not known to nextest.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProfileNotFound</span> {
     <span class="ident">profile</span>: <span class="ident">String</span>,
@@ -630,7 +661,7 @@
 
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">PartitionerBuilderParseError</span> {}
 
-<span class="doccomment">/// An error that occurs in [`TestBinary::from_messages`](crate::test_list::TestBinary::from_messages).</span>
+<span class="doccomment">/// An error that occurs in [`RustTestArtifact::from_messages`](crate::test_list::RustTestArtifact::from_messages).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FromMessagesError</span> {
@@ -784,7 +815,8 @@
         <span class="doccomment">/// The output file.</span>
         <span class="ident">file</span>: <span class="ident">Utf8PathBuf</span>,
 
-        <span class="ident">error</span>: <span class="ident">quick_junit::Error</span>,
+        <span class="doccomment">/// The underlying error.</span>
+        <span class="ident">error</span>: <span class="ident">JunitError</span>,
     },
 }
 
@@ -811,6 +843,30 @@
             <span class="ident">WriteEventError::Fs</span> { <span class="ident">error</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">error</span>),
             <span class="ident">WriteEventError::Junit</span> { <span class="ident">error</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">error</span>),
         }
+    }
+}
+
+<span class="doccomment">/// An error that occurred while producing JUnit XML.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JunitError</span> {
+    <span class="ident">err</span>: <span class="ident">quick_junit::Error</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">JunitError</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">err</span>: <span class="ident">quick_junit::Error</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">err</span> }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">JunitError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">JunitError</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">err</span>)
     }
 }
 </code></pre></div>

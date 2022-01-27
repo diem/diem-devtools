@@ -869,15 +869,37 @@
 <span id="868">868</span>
 <span id="869">869</span>
 <span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
+
+<span class="doccomment">//! The test runner.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The main structure in this module is [`TestRunner`].</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">config::NextestProfile</span>,
     <span class="ident">reporter</span>::{<span class="ident">CancelReason</span>, <span class="ident">StatusLevel</span>, <span class="ident">TestEvent</span>},
+    <span class="ident">signal</span>::{<span class="ident">SignalEvent</span>, <span class="ident">SignalHandler</span>},
     <span class="ident">stopwatch</span>::{<span class="ident">StopwatchEnd</span>, <span class="ident">StopwatchStart</span>},
     <span class="ident">test_list</span>::{<span class="ident">TestInstance</span>, <span class="ident">TestList</span>},
-    <span class="ident">SignalEvent</span>, <span class="ident">SignalHandler</span>,
 };
 <span class="kw">use</span> <span class="ident">crossbeam_channel</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">Sender</span>};
 <span class="kw">use</span> <span class="ident">nextest_metadata</span>::{<span class="ident">FilterMatch</span>, <span class="ident">MismatchReason</span>};
@@ -966,6 +988,8 @@
 }
 
 <span class="doccomment">/// Context for running tests.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Created using [`TestRunnerBuilder::build`].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">no_capture</span>: <span class="ident">bool</span>,
     <span class="ident">tries</span>: <span class="ident">usize</span>,
@@ -995,7 +1019,7 @@
     <span class="doccomment">/// Executes the listed tests, each one in its own process.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Accepts a callback that is called with the results of each test. If the callback returns an</span>
-    <span class="doccomment">/// error, the callback is no longer called.</span>
+    <span class="doccomment">/// error, the test run terminates and the callback is no longer called.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_execute</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RunStats</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">TestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
@@ -1064,7 +1088,7 @@
                             .<span class="ident">run_test</span>(<span class="ident">test_instance</span>, <span class="ident">attempt</span>, <span class="kw-2">&amp;</span><span class="ident">this_run_sender</span>)
                             .<span class="ident">into_external</span>(<span class="ident">attempt</span>, <span class="self">self</span>.<span class="ident">tries</span>);
 
-                        <span class="kw">if</span> <span class="ident">run_status</span>.<span class="ident">status</span>.<span class="ident">is_success</span>() {
+                        <span class="kw">if</span> <span class="ident">run_status</span>.<span class="ident">result</span>.<span class="ident">is_success</span>() {
                             <span class="comment">// The test succeeded.</span>
                             <span class="ident">run_statuses</span>.<span class="ident">push</span>(<span class="ident">run_status</span>);
                             <span class="kw">break</span>;
@@ -1088,7 +1112,7 @@
                     <span class="comment">// In either case, the test is finished.</span>
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">this_run_sender</span>.<span class="ident">send</span>(<span class="ident">InternalTestEvent::Finished</span> {
                         <span class="ident">test_instance</span>,
-                        <span class="ident">run_statuses</span>: <span class="ident">RunStatuses::new</span>(<span class="ident">run_statuses</span>),
+                        <span class="ident">run_statuses</span>: <span class="ident">ExecutionStatuses::new</span>(<span class="ident">run_statuses</span>),
                     });
                 })
             });
@@ -1180,16 +1204,16 @@
         <span class="ident">test</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">attempt</span>: <span class="ident">usize</span>,
         <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InternalRunStatus</span> {
+    ) -&gt; <span class="ident">InternalExecuteStatus</span> {
         <span class="kw">let</span> <span class="ident">stopwatch</span> <span class="op">=</span> <span class="ident">StopwatchStart::now</span>();
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">run_test_inner</span>(<span class="ident">test</span>, <span class="ident">attempt</span>, <span class="kw-2">&amp;</span><span class="ident">stopwatch</span>, <span class="ident">run_sender</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">run_status</span>) =&gt; <span class="ident">run_status</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">InternalRunStatus</span> {
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">InternalExecuteStatus</span> {
                 <span class="comment">// TODO: can we return more information in stdout/stderr? investigate this</span>
                 <span class="ident">stdout</span>: <span class="macro">vec!</span>[],
                 <span class="ident">stderr</span>: <span class="macro">vec!</span>[],
-                <span class="ident">status</span>: <span class="ident">TestStatus::ExecFail</span>,
+                <span class="ident">result</span>: <span class="ident">ExecutionResult::ExecFail</span>,
                 <span class="ident">stopwatch_end</span>: <span class="ident">stopwatch</span>.<span class="ident">end</span>(),
             },
         }
@@ -1201,7 +1225,7 @@
         <span class="ident">attempt</span>: <span class="ident">usize</span>,
         <span class="ident">stopwatch</span>: <span class="kw-2">&amp;</span><span class="ident">StopwatchStart</span>,
         <span class="ident">run_sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InternalTestEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">InternalRunStatus</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">InternalExecuteStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">test</span>
             .<span class="ident">make_expression</span>()
             .<span class="ident">unchecked</span>()
@@ -1249,14 +1273,14 @@
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">into_output</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">output</span>.<span class="ident">status</span>.<span class="ident">success</span>() {
-            <span class="ident">TestStatus::Pass</span>
+            <span class="ident">ExecutionResult::Pass</span>
         } <span class="kw">else</span> {
-            <span class="ident">TestStatus::Fail</span>
+            <span class="ident">ExecutionResult::Fail</span>
         };
-        <span class="prelude-val">Ok</span>(<span class="ident">InternalRunStatus</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">InternalExecuteStatus</span> {
             <span class="ident">stdout</span>: <span class="ident">output</span>.<span class="ident">stdout</span>,
             <span class="ident">stderr</span>: <span class="ident">output</span>.<span class="ident">stderr</span>,
-            <span class="ident">status</span>,
+            <span class="ident">result</span>: <span class="ident">status</span>,
             <span class="ident">stopwatch_end</span>: <span class="ident">stopwatch</span>.<span class="ident">end</span>(),
         })
     }
@@ -1264,51 +1288,57 @@
 
 <span class="doccomment">/// Information about executions of a test, including retries.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RunStatuses</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecutionStatuses</span> {
     <span class="doccomment">/// This is guaranteed to be non-empty.</span>
-    <span class="ident">statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TestRunStatus</span><span class="op">&gt;</span>,
+    <span class="ident">statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExecuteStatus</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::len_without_is_empty</span>)]</span> <span class="comment">// RunStatuses is never empty</span>
-<span class="kw">impl</span> <span class="ident">RunStatuses</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TestRunStatus</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">ExecutionStatuses</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExecuteStatus</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">statuses</span> }
     }
 
-    <span class="doccomment">/// Returns the last run status.</span>
+    <span class="doccomment">/// Returns the last execution status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This status is typically used as the final result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">TestRunStatus</span> {
-        <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">last</span>().<span class="ident">expect</span>(<span class="string">&quot;run statuses is non-empty&quot;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ExecuteStatus</span> {
+        <span class="self">self</span>.<span class="ident">statuses</span>
+            .<span class="ident">last</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;execution statuses is non-empty&quot;</span>)
     }
 
     <span class="doccomment">/// Iterates over all the statuses.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">TestRunStatus</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DoubleEndedIterator</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">ExecuteStatus</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DoubleEndedIterator</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">iter</span>()
     }
 
-    <span class="doccomment">/// Returns the number of statuses.</span>
+    <span class="doccomment">/// Returns the number of times the test was executed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">len</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RunDescribe</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns a description of self.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ExecutionDescription</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">last_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_status</span>();
-        <span class="kw">if</span> <span class="ident">last_status</span>.<span class="ident">status</span>.<span class="ident">is_success</span>() {
+        <span class="kw">if</span> <span class="ident">last_status</span>.<span class="ident">result</span>.<span class="ident">is_success</span>() {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="ident">RunDescribe::Flaky</span> {
+                <span class="ident">ExecutionDescription::Flaky</span> {
                     <span class="ident">last_status</span>,
                     <span class="ident">prior_statuses</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">statuses</span>[..<span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>],
                 }
             } <span class="kw">else</span> {
-                <span class="ident">RunDescribe::Success</span> {
-                    <span class="ident">run_status</span>: <span class="ident">last_status</span>,
+                <span class="ident">ExecutionDescription::Success</span> {
+                    <span class="ident">single_status</span>: <span class="ident">last_status</span>,
                 }
             }
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">first_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">first</span>().<span class="ident">expect</span>(<span class="string">&quot;run-statuses is non-empty&quot;</span>);
+            <span class="kw">let</span> <span class="ident">first_status</span> <span class="op">=</span> <span class="self">self</span>
+                .<span class="ident">statuses</span>
+                .<span class="ident">first</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;execution statuses is non-empty&quot;</span>);
             <span class="kw">let</span> <span class="ident">retries</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">statuses</span>[<span class="number">1</span>..];
-            <span class="ident">RunDescribe::Failure</span> {
+            <span class="ident">ExecutionDescription::Failure</span> {
                 <span class="ident">first_status</span>,
                 <span class="ident">last_status</span>,
                 <span class="ident">retries</span>,
@@ -1317,64 +1347,69 @@
     }
 }
 
-<span class="doccomment">/// A description obtained from `RunStatuses`.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RunDescribe</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// A description of test executions obtained from `ExecuteStatuses`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This can be used to quickly determine whether a test passed, failed or was flaky.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExecutionDescription</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The test was run once and was successful.</span>
-    <span class="ident">Success</span> { <span class="ident">run_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestRunStatus</span> },
+    <span class="ident">Success</span> {
+        <span class="doccomment">/// The status of the test.</span>
+        <span class="ident">single_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ExecuteStatus</span>,
+    },
 
     <span class="doccomment">/// The test was run more than once. The final result was successful.</span>
     <span class="ident">Flaky</span> {
         <span class="doccomment">/// The last, successful status.</span>
-        <span class="ident">last_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestRunStatus</span>,
+        <span class="ident">last_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ExecuteStatus</span>,
 
         <span class="doccomment">/// Previous statuses, none of which are successes.</span>
-        <span class="ident">prior_statuses</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">TestRunStatus</span>],
+        <span class="ident">prior_statuses</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ExecuteStatus</span>],
     },
 
     <span class="doccomment">/// The test was run once, or possibly multiple times. All runs failed.</span>
     <span class="ident">Failure</span> {
         <span class="doccomment">/// The first, failing status.</span>
-        <span class="ident">first_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestRunStatus</span>,
+        <span class="ident">first_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ExecuteStatus</span>,
 
         <span class="doccomment">/// The last, failing status. Same as the first status if no retries were performed.</span>
-        <span class="ident">last_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestRunStatus</span>,
+        <span class="ident">last_status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ExecuteStatus</span>,
 
         <span class="doccomment">/// Any retries that were performed. All of these runs failed.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// May be empty.</span>
-        <span class="ident">retries</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">TestRunStatus</span>],
+        <span class="ident">retries</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ExecuteStatus</span>],
     },
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RunDescribe</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecutionDescription</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns the status level for this `RunDescribe`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StatusLevel</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RunDescribe::Success</span> { .. } =&gt; <span class="ident">StatusLevel::Pass</span>,
-            <span class="ident">RunDescribe::Flaky</span> { .. } =&gt; <span class="ident">StatusLevel::Retry</span>,
-            <span class="ident">RunDescribe::Failure</span> { .. } =&gt; <span class="ident">StatusLevel::Fail</span>,
+            <span class="ident">ExecutionDescription::Success</span> { .. } =&gt; <span class="ident">StatusLevel::Pass</span>,
+            <span class="ident">ExecutionDescription::Flaky</span> { .. } =&gt; <span class="ident">StatusLevel::Retry</span>,
+            <span class="ident">ExecutionDescription::Failure</span> { .. } =&gt; <span class="ident">StatusLevel::Fail</span>,
         }
     }
 }
 
 <span class="doccomment">/// Information about a single execution of a test.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRunStatus</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteStatus</span> {
     <span class="doccomment">/// The current attempt. In the range `[1, total_attempts]`.</span>
     <span class="kw">pub</span> <span class="ident">attempt</span>: <span class="ident">usize</span>,
     <span class="doccomment">/// The total number of times this test can be run. Equal to `1 + retries`.</span>
     <span class="kw">pub</span> <span class="ident">total_attempts</span>: <span class="ident">usize</span>,
     <span class="doccomment">/// Standard output and standard error for this test.</span>
     <span class="kw">pub</span> <span class="ident">stdout_stderr</span>: <span class="ident">Arc</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// The status of this test: pass, fail or execution error.</span>
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">TestStatus</span>,
+    <span class="doccomment">/// The result of execution this test: pass, fail or execution error.</span>
+    <span class="kw">pub</span> <span class="ident">result</span>: <span class="ident">ExecutionResult</span>,
     <span class="doccomment">/// The time at which the test started.</span>
     <span class="kw">pub</span> <span class="ident">start_time</span>: <span class="ident">SystemTime</span>,
     <span class="doccomment">/// The time it took for the test to run.</span>
     <span class="kw">pub</span> <span class="ident">time_taken</span>: <span class="ident">Duration</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TestRunStatus</span> {
+<span class="kw">impl</span> <span class="ident">ExecuteStatus</span> {
     <span class="doccomment">/// Returns the standard output.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stdout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stdout_stderr</span>.<span class="number">0</span>
@@ -1386,20 +1421,20 @@
     }
 }
 
-<span class="kw">struct</span> <span class="ident">InternalRunStatus</span> {
+<span class="kw">struct</span> <span class="ident">InternalExecuteStatus</span> {
     <span class="ident">stdout</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     <span class="ident">stderr</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">status</span>: <span class="ident">TestStatus</span>,
+    <span class="ident">result</span>: <span class="ident">ExecutionResult</span>,
     <span class="ident">stopwatch_end</span>: <span class="ident">StopwatchEnd</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">InternalRunStatus</span> {
-    <span class="kw">fn</span> <span class="ident">into_external</span>(<span class="self">self</span>, <span class="ident">attempt</span>: <span class="ident">usize</span>, <span class="ident">total_attempts</span>: <span class="ident">usize</span>) -&gt; <span class="ident">TestRunStatus</span> {
-        <span class="ident">TestRunStatus</span> {
+<span class="kw">impl</span> <span class="ident">InternalExecuteStatus</span> {
+    <span class="kw">fn</span> <span class="ident">into_external</span>(<span class="self">self</span>, <span class="ident">attempt</span>: <span class="ident">usize</span>, <span class="ident">total_attempts</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ExecuteStatus</span> {
+        <span class="ident">ExecuteStatus</span> {
             <span class="ident">attempt</span>,
             <span class="ident">total_attempts</span>,
             <span class="ident">stdout_stderr</span>: <span class="ident">Arc::new</span>((<span class="self">self</span>.<span class="ident">stdout</span>, <span class="self">self</span>.<span class="ident">stderr</span>)),
-            <span class="ident">status</span>: <span class="self">self</span>.<span class="ident">status</span>,
+            <span class="ident">result</span>: <span class="self">self</span>.<span class="ident">result</span>,
             <span class="ident">start_time</span>: <span class="self">self</span>.<span class="ident">stopwatch_end</span>.<span class="ident">start_time</span>,
             <span class="ident">time_taken</span>: <span class="self">self</span>.<span class="ident">stopwatch_end</span>.<span class="ident">duration</span>,
         }
@@ -1450,7 +1485,7 @@
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">on_test_finished</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">run_statuses</span>: <span class="kw-2">&amp;</span><span class="ident">RunStatuses</span>) {
+    <span class="kw">fn</span> <span class="ident">on_test_finished</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">run_statuses</span>: <span class="kw-2">&amp;</span><span class="ident">ExecutionStatuses</span>) {
         <span class="self">self</span>.<span class="ident">final_run_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="comment">// run_statuses is guaranteed to have at least one element.</span>
         <span class="comment">// * If the last element is success, treat it as success (and possibly flaky).</span>
@@ -1461,15 +1496,15 @@
         <span class="comment">// This is not likely to matter much in practice since failures are likely to be of the</span>
         <span class="comment">// same type.</span>
         <span class="kw">let</span> <span class="ident">last_status</span> <span class="op">=</span> <span class="ident">run_statuses</span>.<span class="ident">last_status</span>();
-        <span class="kw">match</span> <span class="ident">last_status</span>.<span class="ident">status</span> {
-            <span class="ident">TestStatus::Pass</span> =&gt; {
+        <span class="kw">match</span> <span class="ident">last_status</span>.<span class="ident">result</span> {
+            <span class="ident">ExecutionResult::Pass</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">passed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="kw">if</span> <span class="ident">run_statuses</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
                     <span class="self">self</span>.<span class="ident">flaky</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }
             }
-            <span class="ident">TestStatus::Fail</span> =&gt; <span class="self">self</span>.<span class="ident">failed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
-            <span class="ident">TestStatus::ExecFail</span> =&gt; <span class="self">self</span>.<span class="ident">exec_failed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+            <span class="ident">ExecutionResult::Fail</span> =&gt; <span class="self">self</span>.<span class="ident">failed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+            <span class="ident">ExecutionResult::ExecFail</span> =&gt; <span class="self">self</span>.<span class="ident">exec_failed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
         }
     }
 }
@@ -1538,7 +1573,7 @@
                 <span class="self">self</span>.<span class="ident">run_stats</span>.<span class="ident">on_test_finished</span>(<span class="kw-2">&amp;</span><span class="ident">run_statuses</span>);
 
                 <span class="comment">// should this run be canceled because of a failure?</span>
-                <span class="kw">let</span> <span class="ident">fail_cancel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fail_fast</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">run_statuses</span>.<span class="ident">last_status</span>().<span class="ident">status</span>.<span class="ident">is_success</span>();
+                <span class="kw">let</span> <span class="ident">fail_cancel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fail_fast</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">run_statuses</span>.<span class="ident">last_status</span>().<span class="ident">result</span>.<span class="ident">is_success</span>();
 
                 (<span class="self">self</span>.<span class="ident">callback</span>)(<span class="ident">TestEvent::TestFinished</span> {
                     <span class="ident">test_instance</span>,
@@ -1619,11 +1654,11 @@
     },
     <span class="ident">Retry</span> {
         <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="ident">run_status</span>: <span class="ident">TestRunStatus</span>,
+        <span class="ident">run_status</span>: <span class="ident">ExecuteStatus</span>,
     },
     <span class="ident">Finished</span> {
         <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="ident">run_statuses</span>: <span class="ident">RunStatuses</span>,
+        <span class="ident">run_statuses</span>: <span class="ident">ExecutionStatuses</span>,
     },
     <span class="ident">Skipped</span> {
         <span class="ident">test_instance</span>: <span class="ident">TestInstance</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
@@ -1638,8 +1673,9 @@
     <span class="ident">SignalCanceled</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
 }
 
+<span class="doccomment">/// Whether a test passed, failed or an error occurred while executing the test.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TestStatus</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExecutionResult</span> {
     <span class="doccomment">/// The test passed.</span>
     <span class="ident">Pass</span>,
     <span class="doccomment">/// The test failed.</span>
@@ -1648,12 +1684,12 @@
     <span class="ident">ExecFail</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TestStatus</span> {
+<span class="kw">impl</span> <span class="ident">ExecutionResult</span> {
     <span class="doccomment">/// Returns true if the test was successful.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestStatus::Pass</span> =&gt; <span class="bool-val">true</span>,
-            <span class="ident">TestStatus::Fail</span> <span class="op">|</span> <span class="ident">TestStatus::ExecFail</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident">ExecutionResult::Pass</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">ExecutionResult::Fail</span> <span class="op">|</span> <span class="ident">ExecutionResult::ExecFail</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }

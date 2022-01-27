@@ -241,8 +241,17 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
+
+<span class="doccomment">//! Filtering tests based on user-specified parameters.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The main structure in this module is [`TestFilter`], which is created by a [`TestFilterBuilder`].</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors::RunIgnoredParseError</span>,
@@ -268,6 +277,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RunIgnored</span> {
+    <span class="doccomment">/// String representations of all known variants.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
         <span class="kw-2">&amp;</span>[<span class="string">&quot;default&quot;</span>, <span class="string">&quot;ignored-only&quot;</span>, <span class="string">&quot;all&quot;</span>]
     }

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SignalHandler","A receiver that generates signals if ctrl-c is pressed."]]});
