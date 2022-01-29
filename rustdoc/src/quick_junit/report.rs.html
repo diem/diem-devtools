@@ -675,6 +675,19 @@
 <span id="674">674</span>
 <span id="675">675</span>
 <span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
@@ -699,17 +712,17 @@
     <span class="doccomment">/// This is serialized as the number of seconds.</span>
     <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The total number of tests from all testsuites.</span>
+    <span class="doccomment">/// The total number of tests from all TestSuites.</span>
     <span class="kw">pub</span> <span class="ident">tests</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// The total number of failures from all testsuites.</span>
+    <span class="doccomment">/// The total number of failures from all TestSuites.</span>
     <span class="kw">pub</span> <span class="ident">failures</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// The total number of errors from all testsuites.</span>
+    <span class="doccomment">/// The total number of errors from all TestSuites.</span>
     <span class="kw">pub</span> <span class="ident">errors</span>: <span class="ident">usize</span>,
 
     <span class="doccomment">/// The test suites contained in this report.</span>
-    <span class="kw">pub</span> <span class="ident">testsuites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Testsuite</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">test_suites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TestSuite</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Report</span> {
@@ -722,7 +735,7 @@
             <span class="ident">tests</span>: <span class="number">0</span>,
             <span class="ident">failures</span>: <span class="number">0</span>,
             <span class="ident">errors</span>: <span class="number">0</span>,
-            <span class="ident">testsuites</span>: <span class="macro">vec!</span>[],
+            <span class="ident">test_suites</span>: <span class="macro">vec!</span>[],
         }
     }
 
@@ -738,25 +751,28 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Adds a new testsuite and updates the `tests`, `failures` and `errors` counts.</span>
+    <span class="doccomment">/// Adds a new TestSuite and updates the `tests`, `failures` and `errors` counts.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
-    <span class="doccomment">/// `self.testsuites` directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testsuite</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">testsuite</span>: <span class="ident">Testsuite</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">tests</span> <span class="op">+</span><span class="op">=</span> <span class="ident">testsuite</span>.<span class="ident">tests</span>;
-        <span class="self">self</span>.<span class="ident">failures</span> <span class="op">+</span><span class="op">=</span> <span class="ident">testsuite</span>.<span class="ident">failures</span>;
-        <span class="self">self</span>.<span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="ident">testsuite</span>.<span class="ident">errors</span>;
-        <span class="self">self</span>.<span class="ident">testsuites</span>.<span class="ident">push</span>(<span class="ident">testsuite</span>);
+    <span class="doccomment">/// `self.TestSuites` directly.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_test_suite</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">test_suite</span>: <span class="ident">TestSuite</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">tests</span> <span class="op">+</span><span class="op">=</span> <span class="ident">test_suite</span>.<span class="ident">tests</span>;
+        <span class="self">self</span>.<span class="ident">failures</span> <span class="op">+</span><span class="op">=</span> <span class="ident">test_suite</span>.<span class="ident">failures</span>;
+        <span class="self">self</span>.<span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="ident">test_suite</span>.<span class="ident">errors</span>;
+        <span class="self">self</span>.<span class="ident">test_suites</span>.<span class="ident">push</span>(<span class="ident">test_suite</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Adds several testsuites and updates the `tests`, `failures` and `errors` counts.</span>
+    <span class="doccomment">/// Adds several [`TestSuite`]s and updates the `tests`, `failures` and `errors` counts.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
-    <span class="doccomment">/// `self.testsuites` directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testsuites</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">testsuites</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Testsuite</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">testsuite</span> <span class="kw">in</span> <span class="ident">testsuites</span> {
-            <span class="self">self</span>.<span class="ident">add_testsuite</span>(<span class="ident">testsuite</span>);
+    <span class="doccomment">/// `self.TestSuites` directly.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_test_suites</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">test_suites</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestSuite</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="kw">for</span> <span class="ident">test_suite</span> <span class="kw">in</span> <span class="ident">test_suites</span> {
+            <span class="self">self</span>.<span class="ident">add_test_suite</span>(<span class="ident">test_suite</span>);
         }
         <span class="self">self</span>
     }
@@ -774,19 +790,19 @@
     }
 }
 
-<span class="doccomment">/// Represents a single testsuite.</span>
+<span class="doccomment">/// Represents a single TestSuite.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// A `Testsuite` groups together several `Testcase` instances.</span>
+<span class="doccomment">/// A `TestSuite` groups together several `TestCase` instances.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Testsuite</span> {
-    <span class="doccomment">/// The name of this testsuite.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestSuite</span> {
+    <span class="doccomment">/// The name of this TestSuite.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
 
-    <span class="doccomment">/// The total number of tests in this testsuite.</span>
+    <span class="doccomment">/// The total number of tests in this TestSuite.</span>
     <span class="kw">pub</span> <span class="ident">tests</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// The total number of disabled tests in this testsuite.</span>
+    <span class="doccomment">/// The total number of disabled tests in this TestSuite.</span>
     <span class="kw">pub</span> <span class="ident">disabled</span>: <span class="ident">usize</span>,
 
     <span class="doccomment">/// The total number of tests in this suite that errored.</span>
@@ -799,30 +815,30 @@
     <span class="doccomment">/// A &quot;failure&quot; is usually some sort of *expected* issue in a test.</span>
     <span class="kw">pub</span> <span class="ident">failures</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// The time at which the testsuite began execution.</span>
+    <span class="doccomment">/// The time at which the TestSuite began execution.</span>
     <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The overall time taken by the testsuite.</span>
+    <span class="doccomment">/// The overall time taken by the TestSuite.</span>
     <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The testcases that form this testsuite.</span>
-    <span class="kw">pub</span> <span class="ident">testcases</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Testcase</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The test cases that form this TestSuite.</span>
+    <span class="kw">pub</span> <span class="ident">test_cases</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TestCase</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Custom properties set during test execution, e.g. environment variables.</span>
     <span class="kw">pub</span> <span class="ident">properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Property</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Data written to standard output while the testsuite was executed.</span>
+    <span class="doccomment">/// Data written to standard output while the TestSuite was executed.</span>
     <span class="kw">pub</span> <span class="ident">system_out</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Data written to standard error while the testsuite was executed.</span>
+    <span class="doccomment">/// Data written to standard error while the TestSuite was executed.</span>
     <span class="kw">pub</span> <span class="ident">system_err</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Other fields that may be set as attributes, such as &quot;hostname&quot; or &quot;package&quot;.</span>
     <span class="kw">pub</span> <span class="ident">extra</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Testsuite</span> {
-    <span class="doccomment">/// Creates a new `Testsuite`.</span>
+<span class="kw">impl</span> <span class="ident">TestSuite</span> {
+    <span class="doccomment">/// Creates a new `TestSuite`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
@@ -832,7 +848,7 @@
             <span class="ident">disabled</span>: <span class="number">0</span>,
             <span class="ident">errors</span>: <span class="number">0</span>,
             <span class="ident">failures</span>: <span class="number">0</span>,
-            <span class="ident">testcases</span>: <span class="macro">vec!</span>[],
+            <span class="ident">test_cases</span>: <span class="macro">vec!</span>[],
             <span class="ident">properties</span>: <span class="macro">vec!</span>[],
             <span class="ident">system_out</span>: <span class="prelude-val">None</span>,
             <span class="ident">system_err</span>: <span class="prelude-val">None</span>,
@@ -840,24 +856,25 @@
         }
     }
 
-    <span class="doccomment">/// Sets the start timestamp for the testsuite.</span>
+    <span class="doccomment">/// Sets the start timestamp for the TestSuite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the time taken for the testsuite.</span>
+    <span class="doccomment">/// Sets the time taken for the TestSuite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Adds a property to this testsuite.</span>
+    <span class="doccomment">/// Adds a property to this TestSuite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_property</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">property</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Property</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">properties</span>.<span class="ident">push</span>(<span class="ident">property</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Adds several properties to this TestSuite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_properties</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">properties</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Property</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -868,27 +885,31 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Adds a testcase to this testsuite and updates the counts.</span>
+    <span class="doccomment">/// Adds a [`TestCase`] to this TestSuite and updates counts.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
-    <span class="doccomment">/// `self.testcases` directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testcase</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">testcase</span>: <span class="ident">Testcase</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// `self.test_cases` directly.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_test_case</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">test_case</span>: <span class="ident">TestCase</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tests</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">testcase</span>.<span class="ident">status</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; {}
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">kind</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">kind</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">test_case</span>.<span class="ident">status</span> {
+            <span class="ident">TestCaseStatus::Success</span> { .. } =&gt; {}
+            <span class="ident">TestCaseStatus::NonSuccess</span> { <span class="ident">kind</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">kind</span> {
                 <span class="ident">NonSuccessKind::Failure</span> =&gt; <span class="self">self</span>.<span class="ident">failures</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
                 <span class="ident">NonSuccessKind::Error</span> =&gt; <span class="self">self</span>.<span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
             },
-            <span class="ident">TestcaseStatus::Skipped</span> { .. } =&gt; <span class="self">self</span>.<span class="ident">disabled</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+            <span class="ident">TestCaseStatus::Skipped</span> { .. } =&gt; <span class="self">self</span>.<span class="ident">disabled</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
         }
-        <span class="self">self</span>.<span class="ident">testcases</span>.<span class="ident">push</span>(<span class="ident">testcase</span>);
+        <span class="self">self</span>.<span class="ident">test_cases</span>.<span class="ident">push</span>(<span class="ident">test_case</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_testcases</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">testcases</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Testcase</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">testcase</span> <span class="kw">in</span> <span class="ident">testcases</span> {
-            <span class="self">self</span>.<span class="ident">add_testcase</span>(<span class="ident">testcase</span>);
+    <span class="doccomment">/// Adds several [`TestCase`]s to this TestSuite and updates counts.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When generating a new report, use of this method is recommended over adding to</span>
+    <span class="doccomment">/// `self.test_cases` directly.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_test_cases</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">test_cases</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestCase</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="kw">for</span> <span class="ident">test_case</span> <span class="kw">in</span> <span class="ident">test_cases</span> {
+            <span class="self">self</span>.<span class="ident">add_test_case</span>(<span class="ident">test_case</span>);
         }
         <span class="self">self</span>
     }
@@ -920,46 +941,46 @@
     }
 }
 
-<span class="doccomment">/// Represents a single testcase.</span>
+<span class="doccomment">/// Represents a single test case.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Testcase</span> {
-    <span class="doccomment">/// The name of the testcase.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestCase</span> {
+    <span class="doccomment">/// The name of the test case.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
 
-    <span class="doccomment">/// The &quot;classname&quot; of the testcase.</span>
+    <span class="doccomment">/// The &quot;classname&quot; of the test case.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Typically, this represents the fully qualified path to the test. In other words,</span>
     <span class="doccomment">/// `classname` + `name` together should uniquely identify and locate a test.</span>
     <span class="kw">pub</span> <span class="ident">classname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The number of assertions in the testcase.</span>
+    <span class="doccomment">/// The number of assertions in the test case.</span>
     <span class="kw">pub</span> <span class="ident">assertions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The time at which this testcase began execution.</span>
+    <span class="doccomment">/// The time at which this test case began execution.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is not part of the JUnit spec, but may be useful for some tools.</span>
     <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The time it took to execute this testcase.</span>
+    <span class="doccomment">/// The time it took to execute this test case.</span>
     <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The status of this test.</span>
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">TestcaseStatus</span>,
+    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">TestCaseStatus</span>,
 
-    <span class="doccomment">/// Data written to standard output while the testcase was executed.</span>
+    <span class="doccomment">/// Data written to standard output while the test case was executed.</span>
     <span class="kw">pub</span> <span class="ident">system_out</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Data written to standard error while the testcase was executed.</span>
+    <span class="doccomment">/// Data written to standard error while the test case was executed.</span>
     <span class="kw">pub</span> <span class="ident">system_err</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Other fields that may be set as attributes, such as &quot;classname&quot;.</span>
     <span class="kw">pub</span> <span class="ident">extra</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Testcase</span> {
-    <span class="doccomment">/// Creates a new testcase.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">TestcaseStatus</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">TestCase</span> {
+    <span class="doccomment">/// Creates a new test case.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">TestCaseStatus</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">classname</span>: <span class="prelude-val">None</span>,
@@ -979,19 +1000,19 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the number of assertions in the testcase.</span>
+    <span class="doccomment">/// Sets the number of assertions in the test case.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_assertions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">assertions</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">assertions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">assertions</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the start timestamp for the testcase.</span>
+    <span class="doccomment">/// Sets the start timestamp for the test case.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the time taken for the testcase.</span>
+    <span class="doccomment">/// Sets the time taken for the test case.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
         <span class="self">self</span>
@@ -1024,19 +1045,19 @@
     }
 }
 
-<span class="doccomment">/// Represents the success or failure of a testcase.</span>
+<span class="doccomment">/// Represents the success or failure of a test case.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TestcaseStatus</span> {
-    <span class="doccomment">/// This testcase passed.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TestCaseStatus</span> {
+    <span class="doccomment">/// This test case passed.</span>
     <span class="ident">Success</span> {
         <span class="doccomment">/// Prior runs of the test. These are represented as `flakyFailure` or `flakyError` in the</span>
         <span class="doccomment">/// JUnit XML.</span>
         <span class="ident">flaky_runs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TestRerun</span><span class="op">&gt;</span>,
     },
 
-    <span class="doccomment">/// This testcase did not pass.</span>
+    <span class="doccomment">/// This test case did not pass.</span>
     <span class="ident">NonSuccess</span> {
-        <span class="doccomment">/// Whether this testcase failed in an expected way (failure) or an unexpected way (error).</span>
+        <span class="doccomment">/// Whether this test case failed in an expected way (failure) or an unexpected way (error).</span>
         <span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>,
 
         <span class="doccomment">/// The failure message.</span>
@@ -1054,7 +1075,7 @@
         <span class="ident">reruns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TestRerun</span><span class="op">&gt;</span>,
     },
 
-    <span class="doccomment">/// This testcase was not run.</span>
+    <span class="doccomment">/// This test case was not run.</span>
     <span class="ident">Skipped</span> {
         <span class="doccomment">/// The skip message.</span>
         <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1069,15 +1090,15 @@
     },
 }
 
-<span class="kw">impl</span> <span class="ident">TestcaseStatus</span> {
-    <span class="doccomment">/// Creates a new `TestcaseStatus` that represents a successful test.</span>
+<span class="kw">impl</span> <span class="ident">TestCaseStatus</span> {
+    <span class="doccomment">/// Creates a new `TestCaseStatus` that represents a successful test.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">success</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TestcaseStatus::Success</span> { <span class="ident">flaky_runs</span>: <span class="macro">vec!</span>[] }
+        <span class="ident">TestCaseStatus::Success</span> { <span class="ident">flaky_runs</span>: <span class="macro">vec!</span>[] }
     }
 
-    <span class="doccomment">/// Creates a new `TestcaseStatus` that represents an unsuccessful test.</span>
+    <span class="doccomment">/// Creates a new `TestCaseStatus` that represents an unsuccessful test.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_success</span>(<span class="ident">kind</span>: <span class="ident">NonSuccessKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TestcaseStatus::NonSuccess</span> {
+        <span class="ident">TestCaseStatus::NonSuccess</span> {
             <span class="ident">kind</span>,
             <span class="ident">message</span>: <span class="prelude-val">None</span>,
             <span class="ident">ty</span>: <span class="prelude-val">None</span>,
@@ -1086,9 +1107,9 @@
         }
     }
 
-    <span class="doccomment">/// Creates a new `TestcaseStatus` that represents a skipped test.</span>
+    <span class="doccomment">/// Creates a new `TestCaseStatus` that represents a skipped test.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skipped</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TestcaseStatus::Skipped</span> {
+        <span class="ident">TestCaseStatus::Skipped</span> {
             <span class="ident">message</span>: <span class="prelude-val">None</span>,
             <span class="ident">ty</span>: <span class="prelude-val">None</span>,
             <span class="ident">description</span>: <span class="prelude-val">None</span>,
@@ -1098,9 +1119,9 @@
     <span class="doccomment">/// Sets the message. No-op if this is a success case.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">message_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">message</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">message</span>,
+            <span class="ident">TestCaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestCaseStatus::NonSuccess</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">message</span>,
+            <span class="ident">TestCaseStatus::Skipped</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">message</span>,
         };
         <span class="kw-2">*</span><span class="ident">message_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>.<span class="ident">into</span>());
         <span class="self">self</span>
@@ -1109,9 +1130,9 @@
     <span class="doccomment">/// Sets the type. No-op if this is a success case.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">ty_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">ty</span>, .. } =&gt; <span class="ident">ty</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">ty</span>, .. } =&gt; <span class="ident">ty</span>,
+            <span class="ident">TestCaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestCaseStatus::NonSuccess</span> { <span class="ident">ty</span>, .. } =&gt; <span class="ident">ty</span>,
+            <span class="ident">TestCaseStatus::Skipped</span> { <span class="ident">ty</span>, .. } =&gt; <span class="ident">ty</span>,
         };
         <span class="kw-2">*</span><span class="ident">ty_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ty</span>.<span class="ident">into</span>());
         <span class="self">self</span>
@@ -1120,9 +1141,9 @@
     <span class="doccomment">/// Sets the description (text node). No-op if this is a success case.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_description</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">description_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">description</span>, .. } =&gt; <span class="ident">description</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { <span class="ident">description</span>, .. } =&gt; <span class="ident">description</span>,
+            <span class="ident">TestCaseStatus::Success</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestCaseStatus::NonSuccess</span> { <span class="ident">description</span>, .. } =&gt; <span class="ident">description</span>,
+            <span class="ident">TestCaseStatus::Skipped</span> { <span class="ident">description</span>, .. } =&gt; <span class="ident">description</span>,
         };
         <span class="kw-2">*</span><span class="ident">description_mut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
         <span class="self">self</span>
@@ -1136,9 +1157,9 @@
     <span class="doccomment">/// Adds reruns or flaky runs. No-op if this test was skipped.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_reruns</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reruns</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TestRerun</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">reruns_mut</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TestcaseStatus::Success</span> { <span class="ident">flaky_runs</span> } =&gt; <span class="ident">flaky_runs</span>,
-            <span class="ident">TestcaseStatus::NonSuccess</span> { <span class="ident">reruns</span>, .. } =&gt; <span class="ident">reruns</span>,
-            <span class="ident">TestcaseStatus::Skipped</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
+            <span class="ident">TestCaseStatus::Success</span> { <span class="ident">flaky_runs</span> } =&gt; <span class="ident">flaky_runs</span>,
+            <span class="ident">TestCaseStatus::NonSuccess</span> { <span class="ident">reruns</span>, .. } =&gt; <span class="ident">reruns</span>,
+            <span class="ident">TestCaseStatus::Skipped</span> { .. } =&gt; <span class="kw">return</span> <span class="self">self</span>,
         };
         <span class="ident">reruns_mut</span>.<span class="ident">extend</span>(<span class="ident">reruns</span>);
         <span class="self">self</span>
@@ -1264,6 +1285,11 @@
     }
 }
 
+<span class="doccomment">/// Whether a test failure is &quot;expected&quot; or not.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// An expected test failure is generally one that is anticipated by the test or the harness, while</span>
+<span class="doccomment">/// an unexpected failure might be something like an external service being down or a failure to</span>
+<span class="doccomment">/// execute the binary.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NonSuccessKind</span> {
     <span class="doccomment">/// This is an expected failure. Serialized as `failure`, `flakyFailure` or `rerunFailure`</span>

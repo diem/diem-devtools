@@ -11,10 +11,93 @@
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
-<span class="doccomment">//! Generate and read JUnit reports in Rust.</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+
+<span class="doccomment">//! `quick-junit` is a JUnit/XUnit XML serializer for Rust. This crate is built to serve the needs</span>
+<span class="doccomment">//! of [cargo-nextest](docs.rs/cargo-nextest).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Overview</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The root element of a JUnit report is a [`Report`]. A [`Report`] consists of one or more</span>
+<span class="doccomment">//! [`TestSuite`] instances. A [`TestSuite`] instance consists of one or more [`TestCase`]s.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The status (success, failure, error, or skipped) of a [`TestCase`] is represented by [`TestCaseStatus`].</span>
+<span class="doccomment">//! If a test was rerun, [`TestCaseStatus`] can manage [`TestRerun`] instances as well.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use quick_junit::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut report = Report::new(&quot;my-test-run&quot;);</span>
+<span class="doccomment">//! let mut test_suite = TestSuite::new(&quot;my-test-suite&quot;);</span>
+<span class="doccomment">//! let success_case = TestCase::new(&quot;success-case&quot;, TestCaseStatus::success());</span>
+<span class="doccomment">//! let failure_case = TestCase::new(&quot;failure-case&quot;, TestCaseStatus::non_success(NonSuccessKind::Failure));</span>
+<span class="doccomment">//! test_suite.add_test_cases([success_case, failure_case]);</span>
+<span class="doccomment">//! report.add_test_suite(test_suite);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! const EXPECTED_XML: &amp;str = r#&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="doccomment">//! &lt;testsuites name=&quot;my-test-run&quot; tests=&quot;2&quot; failures=&quot;1&quot; errors=&quot;0&quot;&gt;</span>
+<span class="doccomment">//!     &lt;testsuite name=&quot;my-test-suite&quot; tests=&quot;2&quot; disabled=&quot;0&quot; errors=&quot;0&quot; failures=&quot;1&quot;&gt;</span>
+<span class="doccomment">//!         &lt;testcase name=&quot;success-case&quot;&gt;</span>
+<span class="doccomment">//!         &lt;/testcase&gt;</span>
+<span class="doccomment">//!         &lt;testcase name=&quot;failure-case&quot;&gt;</span>
+<span class="doccomment">//!             &lt;failure/&gt;</span>
+<span class="doccomment">//!         &lt;/testcase&gt;</span>
+<span class="doccomment">//!     &lt;/testsuite&gt;</span>
+<span class="doccomment">//! &lt;/testsuites&gt;</span>
+<span class="doccomment">//! &quot;#;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(report.to_string().unwrap(), EXPECTED_XML);</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For a more comprehensive example, see</span>
+<span class="doccomment">//! [`fixture_tests.rs`](https://github.com/diem/diem-devtools/blob/main/quick-junit/tests/fixture_tests.rs).</span>
 
 <span class="kw">mod</span> <span class="ident">report</span>;
 <span class="kw">mod</span> <span class="ident">serialize</span>;
@@ -22,6 +105,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">report</span>::<span class="kw-2">*</span>;
 
 <span class="comment">// Re-export `quick_xml::Error` and `Result` so it can be used by downstream consumers.</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">quick_xml</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quick_junit" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
