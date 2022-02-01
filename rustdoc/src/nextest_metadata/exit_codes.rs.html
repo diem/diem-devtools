@@ -18,13 +18,23 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
 <span class="doccomment">/// Documented exit codes for `cargo nextest` failures.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NextestExitCodes</span> {}
+<span class="doccomment">///</span>
+<span class="doccomment">/// `cargo nextest` runs may fail for a variety of reasons. This structure documents the exit codes</span>
+<span class="doccomment">/// that may occur in case of expected failures.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Unknown/unexpected failures will always result in exit code 1.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NextestExitCode</span> {}
 
-<span class="kw">impl</span> <span class="ident">NextestExitCodes</span> {
+<span class="kw">impl</span> <span class="ident">NextestExitCode</span> {
     <span class="doccomment">/// Running `cargo metadata` produced an error.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CARGO_METADATA_FAILED</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">102</span>;
 

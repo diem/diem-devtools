@@ -138,7 +138,7 @@
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) The diem-devtools Contributors</span>
 <span class="comment">// SPDX-License-Identifier: MIT OR Apache-2.0</span>
 
-<span class="kw">use</span> <span class="ident">nextest_metadata::NextestExitCodes</span>;
+<span class="kw">use</span> <span class="ident">nextest_metadata::NextestExitCode</span>;
 <span class="kw">use</span> <span class="ident">nextest_runner::errors</span>::{<span class="ident">ConfigParseError</span>, <span class="ident">ProfileNotFound</span>};
 <span class="kw">use</span> <span class="ident">owo_colors</span>::{<span class="ident">OwoColorize</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -197,12 +197,12 @@
     <span class="doccomment">/// Returns the exit code for the process.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_exit_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::CargoMetadataFailed</span> =&gt; <span class="ident">NextestExitCodes::CARGO_METADATA_FAILED</span>,
+            <span class="ident"><span class="self">Self</span>::CargoMetadataFailed</span> =&gt; <span class="ident">NextestExitCode::CARGO_METADATA_FAILED</span>,
             <span class="ident"><span class="self">Self</span>::ProfileNotFound</span> { .. } <span class="op">|</span> <span class="ident"><span class="self">Self</span>::ConfigParseError</span> { .. } =&gt; {
-                <span class="ident">NextestExitCodes::SETUP_ERROR</span>
+                <span class="ident">NextestExitCode::SETUP_ERROR</span>
             }
-            <span class="ident"><span class="self">Self</span>::BuildFailed</span> { .. } =&gt; <span class="ident">NextestExitCodes::BUILD_FAILED</span>,
-            <span class="ident"><span class="self">Self</span>::TestRunFailed</span> =&gt; <span class="ident">NextestExitCodes::TEST_RUN_FAILED</span>,
+            <span class="ident"><span class="self">Self</span>::BuildFailed</span> { .. } =&gt; <span class="ident">NextestExitCode::BUILD_FAILED</span>,
+            <span class="ident"><span class="self">Self</span>::TestRunFailed</span> =&gt; <span class="ident">NextestExitCode::TEST_RUN_FAILED</span>,
         }
     }
 
